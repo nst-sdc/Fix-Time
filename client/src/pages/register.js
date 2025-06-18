@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import "./register.css";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
 
 function Register() {
@@ -8,75 +9,71 @@ function Register() {
     const [showPass, setShowPass] = useState(false);
     const [showConfirmPass, setShowConfirmPass] = useState(false);
 
-    const inputStyle = {
-        width: "300px",
-        padding: "10px",
-        paddingRight: "40px", // space for the icon
-        boxSizing: "border-box"
-    };
-
     return (
-        <div style={{ display: "grid", placeItems: "center" }}>
-            <h2>Register Here!</h2>
-            <form style={{ position: "relative" }}>
-                <div style={{ marginBottom: "10px" }}>
-                    <input
-                        type="email"
-                        placeholder="Enter your Email"
-                        onChange={(e) => setEmail(e.target.value)}
-                        required
-                        style={inputStyle}
-                    />
-                </div>
-
-                <div style={{ marginBottom: "10px", position: "relative" }}>
-                    <input
-                        type={showPass ? "text" : "password"}
-                        placeholder="Enter your Password"
-                        onChange={(e) => setPasswd(e.target.value)}
-                        required
-                        style={inputStyle}
-                    />
-                    <span
-                        onClick={() => setShowPass(!showPass)}
-                        style={{
-                            position: "absolute",
-                            right: "10px",
-                            top: "50%",
-                            transform: "translateY(-50%)",
-                            cursor: "pointer"
-                        }}
-                    >
-                        {showPass ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-                    </span>
-                </div>
-
-                <div style={{ marginBottom: "10px", position: "relative" }}>
-                    <input
-                        type={showConfirmPass ? "text" : "password"}
-                        placeholder="Confirm your Password"
-                        onChange={(e) => setConfirmPasswd(e.target.value)}
-                        required
-                        style={inputStyle}
-                    />
-                    <span
-                        onClick={() => setShowConfirmPass(!showConfirmPass)}
-                        style={{
-                            position: "absolute",
-                            right: "10px",
-                            top: "50%",
-                            transform: "translateY(-50%)",
-                            cursor: "pointer"
-                        }}
-                    >
-                        {showConfirmPass ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
-                    </span>
-                </div>
-
-                <button type="submit" style={{ padding: "8px 16px" }}>
-                    Register
-                </button>
-            </form>
+        <div className="register-container">
+            <div className="register-card">
+                <h2 className="register-title">Register Here!</h2>
+                <form className="register-form">
+                    <div className="form-group">
+                        <input
+                            type="email"
+                            placeholder="Enter your Email"
+                            className="form-input"
+                            onChange={(e) => setEmail(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div className="form-group" style={{ position: "relative" }}>
+                        <input
+                            type={showPass ? "text" : "password"}
+                            placeholder="Enter your Password"
+                            className="form-input"
+                            onChange={(e) => setPasswd(e.target.value)}
+                            required
+                        />
+                        <span
+                            onClick={() => setShowPass(!showPass)}
+                            style={{
+                                position: "absolute",
+                                right: "15px",
+                                top: "50%",
+                                transform: "translateY(-50%)",
+                                cursor: "pointer",
+                                fontSize: "20px",
+                                color: "#667eea"
+                            }}
+                        >
+                            {showPass ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                        </span>
+                    </div>
+                    <div className="form-group" style={{ position: "relative" }}>
+                        <input
+                            type={showConfirmPass ? "text" : "password"}
+                            placeholder="Confirm your Password"
+                            className="form-input"
+                            onChange={(e) => setConfirmPasswd(e.target.value)}
+                            required
+                        />
+                        <span
+                            onClick={() => setShowConfirmPass(!showConfirmPass)}
+                            style={{
+                                position: "absolute",
+                                right: "15px",
+                                top: "50%",
+                                transform: "translateY(-50%)",
+                                cursor: "pointer",
+                                fontSize: "20px",
+                                color: "#667eea"
+                            }}
+                        >
+                            {showConfirmPass ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
+                        </span>
+                    </div>
+                    <button type="submit" className="register-button">
+                        Register
+                    </button>
+                </form>
+            </div>
         </div>
     );
 }
