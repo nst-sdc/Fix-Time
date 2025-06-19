@@ -1,0 +1,122 @@
+
+
+
+.page-container {
+    /* Remove min-height to ensure it only takes the space of its content */
+    min-height: unset;
+    height: auto;
+    /* No background here, as it will be on the navbar */
+    color: #333; /* Default text color */
+    margin: 0;
+    padding: 0;
+    font-family: "Inter", sans-serif; /* Using Inter font as per instructions */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* The background gradient is moved to the navbar itself to control the visible area */
+    background: #fff;
+}
+
+/* Navbar styles */
+.navbar {
+    padding: 0.3rem; /* Equivalent to p-4 */
+    /* Applying the background gradient directly to the navbar */
+    background: linear-gradient(to bottom right, #E0F2FE, #E8E8FF); /* Background now on the navbar */
+    backdrop-filter: blur(8px); /* Equivalent to backdrop-blur-md */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Equivalent to shadow-md */
+    border-bottom-left-radius: 0.75rem; /* Equivalent to rounded-b-xl */
+    border-bottom-right-radius: 0.75rem; /* Equivalent to rounded-b-xl */
+}
+
+.navbar-container {
+    max-width: 1280px; /* Equivalent to container mx-auto */
+    margin-left: auto;
+    margin-right: auto;
+    display: flex;
+    flex-direction: column; /* Default to column for small screens (md:flex-row) */
+    align-items: center; /* Equivalent to items-center */
+    justify-content: space-between; /* Equivalent to justify-between */
+}
+
+/* Media query for medium screens and up (md: equivalent) */
+@media (min-width: 768px) {
+    .navbar-container {
+    flex-direction: row; /* Change to row for larger screens */
+    }
+}
+
+/* Company Title */
+.navbar-title {
+    font-size: 2.25rem; /* Equivalent to text-3xl */
+    font-weight: 800; /* Equivalent to font-extrabold */
+    color: #1e40af; /* Equivalent to text-blue-800 */
+    margin-bottom: 1rem; /* Equivalent to mb-4 */
+}
+
+@media (min-width: 768px) {
+    .navbar-title {
+    margin-bottom: 0; /* Equivalent to md:mb-0 */
+    }
+}
+
+/* Navigation Links */
+.nav-links {
+    display: flex;
+    flex-direction: column; /* Default to column for small screens (md:flex-row) */
+    gap: 1rem; /* Equivalent to space-y-4 */
+    font-size: 1.125rem; /* Equivalent to text-lg */
+    font-weight: 500; /* Equivalent to font-medium */
+    color: #4b5563; /* Equivalent to text-gray-700 */
+}
+
+@media (min-width: 768px) {
+    .nav-links {
+    flex-direction: row; /* Change to row for larger screens */
+    gap: 2rem; /* Equivalent to md:space-x-8 */
+    }
+}
+
+.nav-item {
+    color: inherit; /* Inherit color from parent .nav-links */
+    text-decoration: none;
+    transition: color 300ms ease-in-out; /* Equivalent to transition duration-300 ease-in-out */
+}
+
+.nav-item:hover {
+    color: #2563eb; /* Equivalent to hover:text-blue-600 */
+}
+
+/* Register Button */
+.register-button-wrapper {
+    margin-top: 1rem; /* Equivalent to mt-4 */
+    margin-bottom: 1rem;
+    margin-right: 0.5rem;
+}
+
+@media (min-width: 768px) {
+    .register-button-wrapper {
+    margin-top: 0; /* Equivalent to md:mt-0 */
+    margin-bottom: 0.5rem;
+    }
+}
+
+.register-button {
+    padding: 1rem 1rem; /* Equivalent to px-6 py-2 */
+    background-color: #2563eb; /* Equivalent to bg-blue-600 */
+    color: #fff; /* Equivalent to text-white */
+    font-weight: 400; /* Equivalent to font-semibold */
+    border-radius: 9999px; /* Equivalent to rounded-full */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08); /* Equivalent to shadow-lg */
+    border: none;
+    cursor: pointer;
+    transition: background-color 300ms ease-in-out, transform 300ms ease-in-out; /* Equivalent to transition duration-300 ease-in-out */
+}
+
+.register-button:hover {
+    background-color: #1d4ed8; /* Equivalent to hover:bg-blue-700 */
+    transform: scale(1.05); /* Equivalent to transform hover:scale-105 */
+}
+
+.register-button:focus {
+    outline: none; /* Equivalent to focus:outline-none */
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5), 0 0 0 4px rgba(59, 130, 246, 0.5); /* Equivalent to focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 */
+}
