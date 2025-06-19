@@ -82,6 +82,7 @@ Set up the frontend
 ```bash
 cd ../client
 npm install
+npm install react-icons
 npm start
 ```
 Frontend runs at: http://localhost:3000
