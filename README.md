@@ -54,7 +54,7 @@ Everyone wins.
 
 #### 1. Clone the repo
 ```bash
-git clone https://github.com/Rudrxxx/Fix-Time.git
+git clone https://github.com/nst-sdc/Fix-Time
 cd Fix-Time
 ```
 
