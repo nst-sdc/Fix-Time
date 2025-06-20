@@ -8,12 +8,21 @@ function Register() {
     const [confirmPasswd, setConfirmPasswd] = useState("");
     const [showPass, setShowPass] = useState(false);
     const [showConfirmPass, setShowConfirmPass] = useState(false);
+    const [error, setError] = useState("");
 
     return (
         <div className="register-container">
             <div className="register-card">
                 <h2 className="register-title">Register Here!</h2>
-                <form className="register-form">
+                <form className="register-form" onSubmit={e => {
+                    e.preventDefault();
+                    if (!email || !passwd || !confirmPasswd) {
+                        setError("All fields are required.");
+                        return;
+                    }
+                    setError("");
+                    // Proceed with registration logic here
+                }}>
                     <div className="form-group">
                         <input
                             type="email"
@@ -73,6 +82,7 @@ function Register() {
                         Register
                     </button>
                 </form>
+                {error && <div className="register-error" style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
             </div>
         </div>
     );
