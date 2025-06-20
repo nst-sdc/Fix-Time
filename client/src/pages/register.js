@@ -1,24 +1,38 @@
-import React, { useState } from "react";
+ import React,{ useState } from "react";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-
+import axios from "axios"
 function Register() {
     const [email, setEmail] = useState("");
     const [passwd, setPasswd] = useState("");
     const [confirmPasswd, setConfirmPasswd] = useState("");
     const [showPass, setShowPass] = useState(false);
     const [showConfirmPass, setShowConfirmPass] = useState(false);
-
+    const [message,setMessage]=useState("");
+    
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        if (passwd !== confirmPasswd) {
+            setMessage("❌ Passwords do not match");
+            return;}
+        try {
+            const response = await axios.post("http://localhost:5001/auth/register", {email,password: passwd,});
+            setMessage("✅ Registered successfully!");
+            console.log("Server Response:", response.data);}
+            catch (error) {
+                setMessage("❌ Registration failed.");
+                console.error("Error:", error.response?.data || error.message);}
+            };
     const inputStyle = {
         width: "300px",
         padding: "10px",
-        paddingRight: "40px", // space for the icon
+        paddingRight: "40px", 
         boxSizing: "border-box"
     };
 
     return (
         <div style={{ display: "grid", placeItems: "center" }}>
             <h2>Register Here!</h2>
-            <form style={{ position: "relative" }}>
+            <form style={{ position: "relative" }} onSubmit={handleSubmit}>
                 <div style={{ marginBottom: "10px" }}>
                     <input
                         type="email"
@@ -72,6 +86,7 @@ function Register() {
                         {showConfirmPass ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
                     </span>
                 </div>
+                {message && (<p style={{ color: message.includes("❌") ? "red" : "green", marginBottom: "10px" }}>{message}</p>)}
 
                 <button type="submit" style={{ padding: "8px 16px" }}>
                     Register
@@ -82,3 +97,5 @@ function Register() {
 }
 
 export default Register;
+
+
