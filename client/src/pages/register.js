@@ -20,6 +20,14 @@ function Register() {
                         setError("All fields are required.");
                         return;
                     }
+                    if (!email.includes("@gmail.com")) {
+                        setError("Email must contain @gmail.com");
+                        return;
+                    }
+                    if (passwd !== confirmPasswd) {
+                        setError("Passwords do not match.");
+                        return;
+                    }
                     setError("");
                     // Proceed with registration logic here
                 }}>
