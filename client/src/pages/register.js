@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import "./register.css";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import axios from "axios";
 
 function Register() {
     const [email, setEmail] = useState("");
@@ -9,12 +8,29 @@ function Register() {
     const [confirmPasswd, setConfirmPasswd] = useState("");
     const [showPass, setShowPass] = useState(false);
     const [showConfirmPass, setShowConfirmPass] = useState(false);
+    const [error, setError] = useState("");
 
     return (
         <div className="register-container">
             <div className="register-card">
                 <h2 className="register-title">Register Here!</h2>
-                <form className="register-form">
+                <form className="register-form" onSubmit={e => {
+                    e.preventDefault();
+                    if (!email || !passwd || !confirmPasswd) {
+                        setError("All fields are required.");
+                        return;
+                    }
+                    if (!email.includes("@gmail.com")) {
+                        setError("Email must contain @gmail.com");
+                        return;
+                    }
+                    if (passwd !== confirmPasswd) {
+                        setError("Passwords do not match.");
+                        return;
+                    }
+                    setError("");
+                    // Proceed with registration logic here
+                }}>
                     <div className="form-group">
                         <input
                             type="email"
@@ -70,8 +86,6 @@ function Register() {
                             {showConfirmPass ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
                         </span>
                     </div>
-                    {message && (<p style={{ color: message.includes("❌") ? "red" : "green", marginBottom: "10px" }}>{message}</p>)}
-
                     <button type="submit" className="register-button">
                         Register
                     </button>

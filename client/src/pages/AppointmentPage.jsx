@@ -1,5 +1,5 @@
 import React from 'react';
-import AppointmentBooking from '../components/AppointmentBooking';
+import AppointmentBooking from '../components/AppointmentBooking.jsx';
 
 const AppointmentPage = () => {
   return (
