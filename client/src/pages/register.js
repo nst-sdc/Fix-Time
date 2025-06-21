@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import "./register.css";
 import { AiOutlineEye, AiOutlineEyeInvisible } from "react-icons/ai";
-import axios from "axios";
 
 function Register() {
     const [email, setEmail] = useState("");
@@ -9,27 +8,29 @@ function Register() {
     const [confirmPasswd, setConfirmPasswd] = useState("");
     const [showPass, setShowPass] = useState(false);
     const [showConfirmPass, setShowConfirmPass] = useState(false);
-    const [message,setMessage]=useState("");
-    
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        if (passwd !== confirmPasswd) {
-            setMessage("❌ Passwords do not match");
-            return;}
-        try {
-            const response = await axios.post("http://localhost:5001/auth/register", {email,password: passwd,});
-            setMessage("✅ Registered successfully!");
-            console.log("Server Response:", response.data);}
-            catch (error) {
-                setMessage("❌ Registration failed.");
-                console.error("Error:", error.response?.data || error.message);}
-            };
+    const [error, setError] = useState("");
 
     return (
         <div className="register-container">
             <div className="register-card">
                 <h2 className="register-title">Register Here!</h2>
-                <form className="register-form" onSubmit={handleSubmit}>
+                <form className="register-form" onSubmit={e => {
+                    e.preventDefault();
+                    if (!email || !passwd || !confirmPasswd) {
+                        setError("All fields are required.");
+                        return;
+                    }
+                    if (!email.includes("@gmail.com")) {
+                        setError("Email must contain @gmail.com");
+                        return;
+                    }
+                    if (passwd !== confirmPasswd) {
+                        setError("Passwords do not match.");
+                        return;
+                    }
+                    setError("");
+                    // Proceed with registration logic here
+                }}>
                     <div className="form-group">
                         <input
                             type="email"
@@ -85,12 +86,11 @@ function Register() {
                             {showConfirmPass ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
                         </span>
                     </div>
-                    {message && (<p style={{ color: message.includes("❌") ? "red" : "green", marginBottom: "10px" }}>{message}</p>)}
-
                     <button type="submit" className="register-button">
                         Register
                     </button>
                 </form>
+                {error && <div className="register-error" style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
             </div>
         </div>
     );
