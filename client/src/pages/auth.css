@@ -1,0 +1,100 @@
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 20px; /* Add this for mobile spacing */
+  box-sizing: border-box;
+}
+
+  
+.auth-card {
+  background: white;
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  
+  max-width: 400px;
+}
+
+  .auth-title {
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+    font-size: 28px;
+    font-weight: bold;
+  }
+  
+  .auth-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .form-input {
+    width: 100%;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #ccc;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  .form-group {
+    width: 100%;
+  }
+  .auth-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  
+  .eye-toggle {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 20px;
+    color: #667eea;
+  }
+  
+  .auth-error {
+    color: red;
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  .auth-success {
+    color: green;
+    text-align: center;
+    margin-top: 10px;
+  }
+  
+  .toggle-text {
+    text-align: center;
+    margin-top: 15px;
+  }
+  
+  .toggle-button {
+    background: none;
+    border: none;
+    color: #667eea;
+    font-weight: bold;
+    cursor: pointer;
+  }
+  .auth-container.login-mode {
+    background: linear-gradient(135deg, #FF9A9E 0%, #FAD0C4 100%);
+  }
+  
+  .auth-container.register-mode {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  }
+  
