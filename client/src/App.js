@@ -1,14 +1,14 @@
 import React from 'react';
 import './App.css';
-
-import Register from './pages/register';
+import AuthPage from './pages/AuthPage';
 import AppointmentPage from './pages/AppointmentPage';
 
 function App() {
   return (
     <div className="App">
-      <Register />
-      <AppointmentPage />
+      <AuthPage />
+      {/* Uncomment this below once auth is done */}
+      {/* <AppointmentPage /> */}
     </div>
   );
 }
