@@ -9,6 +9,7 @@ function Register() {
     const [showPass, setShowPass] = useState(false);
     const [showConfirmPass, setShowConfirmPass] = useState(false);
     const [error, setError] = useState("");
+    const [success, setSuccess] = useState("");
 
     return (
         <div className="register-container">
@@ -16,6 +17,8 @@ function Register() {
                 <h2 className="register-title">Register Here!</h2>
                 <form className="register-form" onSubmit={e => {
                     e.preventDefault();
+                    setError("");
+                    setSuccess("");
                     if (!email || !passwd || !confirmPasswd) {
                         setError("All fields are required.");
                         return;
@@ -28,8 +31,8 @@ function Register() {
                         setError("Passwords do not match.");
                         return;
                     }
-                    setError("");
                     // Proceed with registration logic here
+                    setSuccess("Registration successful!");
                 }}>
                     <div className="form-group">
                         <input
@@ -91,6 +94,7 @@ function Register() {
                     </button>
                 </form>
                 {error && <div className="register-error" style={{ color: 'red', marginBottom: '10px' }}>{error}</div>}
+                {success && <div className="register-success" style={{ color: 'green', marginBottom: '10px' }}>{success}</div>}
             </div>
         </div>
     );
