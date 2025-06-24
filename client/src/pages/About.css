@@ -1,0 +1,50 @@
+/* src/pages/About.css */
+.about-container {
+  max-width: 1000px;
+  margin: 3rem auto;
+  padding: 2rem;
+  background:  linear-gradient(135deg, #FF9A9E 0%, #FAD0C4 100%);
+  border-radius: 12px;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #333;
+  line-height: 1.8;
+}
+
+.about-title {
+  font-size: 2.4rem;
+  margin-bottom: 1.2rem;
+  text-align: center;
+  color: #1a1a1a;
+}
+
+.about-subtitle {
+  font-size: 1.8rem;
+  margin-top: 2.5rem;
+  color: #1a1a1a;
+}
+
+.about-problem,
+.about-context,
+.about-solution,
+.about-impact {
+  margin-bottom: 1.4rem;
+  font-size: 1rem;
+}
+
+.about-features {
+  list-style: none;
+  padding-left: 0;
+  margin: 1rem 0;
+}
+
+.about-features li {
+  padding-left: 1.2rem;
+  margin-bottom: 0.6rem;
+  position: relative;
+}
+
+.about-features li::before {
+  content: none;
+  
+}
