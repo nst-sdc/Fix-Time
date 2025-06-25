@@ -8,7 +8,6 @@ import Dashboard from './pages/Dashboard';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
-
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
@@ -100,6 +99,12 @@ function App() {
         </main>
         <Footer />
       </div>
+    </Router>
+  );
+}
+
+export default App;
+
     </Router>
   );
 }

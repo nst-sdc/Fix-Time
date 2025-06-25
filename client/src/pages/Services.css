@@ -1,0 +1,78 @@
+.services-page {
+  min-height: 100vh; /* Cover full screen height */
+  display: flex;
+  justify-content: center;
+  align-items: center; /* Vertical centering */
+  background: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding: 40px 20px;
+  box-sizing: border-box;
+}
+
+.services-container {
+  max-width: 1100px;
+  width: 100%;
+  background: #ffffff;
+  padding: 50px;
+  border-radius: 20px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.services-heading {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 30px;
+  background: linear-gradient(90deg, #FF758C, #FF7EB3);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.service-filters {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2.5rem;
+}
+
+.service-filters input,
+.service-filters select {
+  padding: 12px 18px;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 2px solid #ddd;
+  min-width: 250px;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
+}
+
+.service-filters input:focus,
+.service-filters select:focus {
+  border-color: #FF8FA3;
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(255, 143, 163, 0.2);
+}
+
+.service-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 2rem;
+  padding-top: 10px;
+}
+
+.service-card {
+  padding: 1.5rem;
+  border-radius: 18px;
+  background: linear-gradient(135deg, #FF9A9E 0%, #FAD0C4 100%);
+  color: #2c2c2c;
+  font-weight: 500;
+  box-shadow: 0 10px 24px rgba(255, 154, 158, 0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.service-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 30px rgba(255, 154, 158, 0.3);
+  background: linear-gradient(135deg, #FFDEE9 0%, #B5FFFC 100%);
+}
