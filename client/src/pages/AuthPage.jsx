@@ -1,10 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './auth.css';
 import axios from 'axios';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 
-const AuthPage = () => {
-  const [isLogin, setIsLogin] = useState(true);
+const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
+  const [isLogin, setIsLogin] = useState(initialIsLogin);
   const [email, setEmail] = useState('');
   const [passwd, setPasswd] = useState('');
   const [confirmPasswd, setConfirmPasswd] = useState('');
@@ -13,14 +14,24 @@ const AuthPage = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
-  const toggleForm = () => {
-    setIsLogin(!isLogin);
+  // Update local state when prop changes and reset form fields
+  useEffect(() => {
+    setIsLogin(initialIsLogin);
+    // Reset form fields when switching between login/register
     setEmail('');
     setPasswd('');
     setConfirmPasswd('');
     setError('');
     setSuccess('');
+    setShowPass(false);
+    setShowConfirmPass(false);
+  }, [initialIsLogin]);
+
+  const toggleForm = () => {
+    // Navigate to the respective route instead of just toggling the form
+    navigate(isLogin ? '/register' : '/login');
   };
 
   const handleSubmit = async (e) => {
@@ -32,8 +43,8 @@ const AuthPage = () => {
       return setError('All fields are required.');
     }
 
-    if (!email.includes('@gmail.com')) {
-      return setError('Email must be a valid @gmail.com address');
+    if (!email.includes('@')) {
+      return setError('Please enter a valid email address');
     }
 
     if (!isLogin && passwd !== confirmPasswd) {
@@ -42,18 +53,43 @@ const AuthPage = () => {
 
     try {
       setLoading(true);
-      const url = isLogin
-        ? 'http://localhost:5001/auth/login'
-        : 'http://localhost:5001/auth/register';
+      
+      if (isLogin) {
+        // Handle login
+        const res = await axios.post('http://localhost:5001/auth/login', { 
+          email, 
+          password: passwd 
+        });
 
-      const payload = { email, password: passwd };
-      const res = await axios.post(url, payload);
-
-      if (res.data.token) {
-        setSuccess(res.data.message || 'Success');
-        localStorage.setItem('token', res.data.token);
+        if (res.data.token) {
+          setSuccess(res.data.message || 'Login successful');
+          localStorage.setItem('token', res.data.token);
+          
+          // Set logged in state with user data and redirect
+          if (setIsLoggedIn) {
+            setIsLoggedIn(res.data.user);
+          }
+          
+          // Short delay before redirect to show success message
+          setTimeout(() => {
+            navigate('/');
+          }, 1500);
+        } else {
+          setError('Invalid credentials or missing token');
+        }
       } else {
-        setError('Invalid credentials or missing token');
+        // Handle registration
+        const res = await axios.post('http://localhost:5001/auth/register', {
+          email,
+          password: passwd
+        });
+        
+        setSuccess('Registration successful! Please log in with your credentials.');
+        
+        // Redirect to login page after successful registration
+        setTimeout(() => {
+          navigate('/login');
+        }, 2000);
       }
     } catch (err) {
       setError(err.response?.data?.error || 'Something went wrong');
