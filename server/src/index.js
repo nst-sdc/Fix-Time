@@ -14,8 +14,8 @@ app.use('/auth', authRoutes);
 app.get('/', (req, res) => {
   res.send('Backend is running!');
 });
-
-mongoose.connect(process.env.MONGODB_URI)
+console.log("DEBUG | MONGO_URL =", process.env.MONGO_URL);
+mongoose.connect(process.env.MONGO_URL)
   .then(() => {
     console.log('MongoDB connected');
     app.listen(process.env.PORT || 5001, () => {
