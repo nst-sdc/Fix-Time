@@ -105,8 +105,3 @@ function App() {
 
 export default App;
 
-    </Router>
-  );
-}
-
-export default App;
