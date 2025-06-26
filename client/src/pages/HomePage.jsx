@@ -20,7 +20,7 @@ const HomePage = () => {
             <Link to="/register" className="btn btn-primary">
               Get Started
             </Link>
-            <Link to="/appointments" className="btn btn-secondary">
+            <Link to="/services" className="btn btn-secondary">
               Explore Services
             </Link>
           </div>
