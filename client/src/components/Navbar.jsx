@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import { IoMenuOutline, IoCloseOutline } from 'react-icons/io5';
-import { FaUser, FaSignOutAlt, FaUserCircle, FaChevronDown } from 'react-icons/fa';
+import { FaUser, FaSignOutAlt, FaChevronDown } from 'react-icons/fa';
+import { BsSun, BsMoon } from 'react-icons/bs';
 
-const Navbar = ({ isLoggedIn, userProfile, onLogout }) => {
+const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const navigate = useNavigate();
@@ -61,6 +62,17 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout }) => {
               </Link>
             </li>
           )}
+
+          {/* Theme Toggle Button */}
+          <li className="nav-item">
+            <button 
+              className="theme-toggle-btn" 
+              onClick={onThemeToggle}
+              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+            >
+              {theme === 'light' ? <BsMoon /> : <BsSun />}
+            </button>
+          </li>
           
           {!isLoggedIn ? (
             <>
