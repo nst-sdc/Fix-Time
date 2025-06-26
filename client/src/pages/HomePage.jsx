@@ -14,6 +14,16 @@ const HomePage = () => {
     });
   }, []);
 
+  const scrollToServices = () => {
+    const servicesSection = document.getElementById('explore-services-section');
+    if (servicesSection) {
+      servicesSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      // Fallback to the services page if section not found
+      window.location.href = '/services';
+    }
+  };
+
   return (
     <div className="home-page">
       {/* Hero Section */}
@@ -33,9 +43,9 @@ const HomePage = () => {
                 Get Started
                 <FaArrowRight className="btn-icon" />
               </Link>
-              <Link to="/services" className="btn btn-secondary">
+              <button onClick={scrollToServices} className="btn btn-secondary explore-btn">
                 Explore Services
-              </Link>
+              </button>
             </div>
             <div className="hero-stats">
               <div className="stat-item">
@@ -129,6 +139,56 @@ const HomePage = () => {
                 <FaArrowRight />
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Explore Services Section */}
+      <section id="explore-services-section" className="services-section">
+        <div className="container">
+          <div className="section-header" data-aos="fade-up">
+            <h2 className="section-title">Explore Our <span className="text-accent">Services</span></h2>
+            <p className="section-subtitle">Book appointments for a wide range of services and skip the queues!</p>
+          </div>
+          
+          <div className="services-grid">
+            <Link to="/categories/healthcare" className="service-category-link">
+              <div className="service-category-card" data-aos="fade-up" data-aos-delay="100">
+                <div className="category-icon">🏥</div>
+                <h3>Healthcare & Wellness</h3>
+                <p>Medical consultations, checkups and more</p>
+              </div>
+            </Link>
+            
+            <Link to="/categories/beauty" className="service-category-link">
+              <div className="service-category-card" data-aos="fade-up" data-aos-delay="200">
+                <div className="category-icon">💇</div>
+                <h3>Beauty & Personal Care</h3>
+                <p>Haircuts, spa, and grooming services</p>
+              </div>
+            </Link>
+            
+            <Link to="/categories/home-repair" className="service-category-link">
+              <div className="service-category-card" data-aos="fade-up" data-aos-delay="300">
+                <div className="category-icon">🧰</div>
+                <h3>Home & Repair Services</h3>
+                <p>Electricians, plumbers, and maintenance</p>
+              </div>
+            </Link>
+            
+            <Link to="/categories/private-events" className="service-category-link">
+              <div className="service-category-card" data-aos="fade-up" data-aos-delay="400">
+                <div className="category-icon">🎉</div>
+                <h3>Private Events</h3>
+                <p>Webinars, parties, and celebrations</p>
+              </div>
+            </Link>
+          </div>
+          
+          <div className="view-all-container" data-aos="fade-up">
+            <Link to="/services" className="btn btn-secondary">
+              View All Services
+            </Link>
           </div>
         </div>
       </section>

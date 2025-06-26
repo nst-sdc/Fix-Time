@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import "./AppointmentBooking.css";
 
 const timeSlots = [
@@ -8,22 +9,51 @@ const timeSlots = [
   "4:30 PM", "5:30 PM"
 ];
 
-const dateOptions = [
-  "Wed, Jun 25", "Thu, Jun 26", "Fri, Jun 27", "Sat, Jun 28",
-  "Sun, Jun 29", "Mon, Jun 30", "Tue, Jul 1"
-];
-
 const AppointmentBooking = () => {
-  const [selectedDate, setSelectedDate] = useState(dateOptions[0]);
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const preSelectedService = searchParams.get('service');
+
+  // Generate 10 upcoming dates starting from today
+  const [dateOptions, setDateOptions] = useState([]);
+  const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
-  const [bookedSlots, setBookedSlots] = useState([
-  ]);
+  const [bookedSlots, setBookedSlots] = useState([]);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
-    reason: ""
+    reason: preSelectedService || ""
   });
+
+  useEffect(() => {
+    const generateDates = () => {
+      const dates = [];
+      const today = new Date();
+      
+      for (let i = 0; i < 10; i++) {
+        const date = new Date(today);
+        date.setDate(today.getDate() + i);
+        
+        const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+        
+        const formattedDate = `${dayNames[date.getDay()]}, ${monthNames[date.getMonth()]} ${date.getDate()}`;
+        dates.push(formattedDate);
+      }
+      
+      setDateOptions(dates);
+      setSelectedDate(dates[0]);
+    };
+    
+    generateDates();
+  }, []);
+
+  useEffect(() => {
+    if (preSelectedService) {
+      setFormData(prev => ({...prev, reason: preSelectedService}));
+    }
+  }, [preSelectedService]);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -31,37 +61,48 @@ const AppointmentBooking = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    if (!selectedDate || !selectedTime) {
+      alert("Please select both a date and time for your appointment");
+      return;
+    }
+    
     setBookedSlots([...bookedSlots, { date: selectedDate, time: selectedTime }]);
     alert(
       `✅ Appointment booked on ${selectedDate} at ${selectedTime}\n👤 Name: ${formData.name}`
     );
     
     setSelectedTime("");
-    setFormData({ name: "", email: "", phone: "", reason: "" });
+    setFormData({ name: "", email: "", phone: "", reason: preSelectedService || "" });
   };
 
   const isSlotDisabled = (date, time) => {
-  const now = new Date();
+    const now = new Date();
 
-  // Convert readable date like "Thu, Jun 26" to real date
-  const [dayName, monthStr, dayNum] = date.replace(',', '').split(' ');
-  const year = new Date().getFullYear(); 
-  const fullDateStr = `${monthStr} ${dayNum}, ${year} ${time}`;
-  const slotDateTime = new Date(fullDateStr);
+    // Convert readable date like "Thu, Jun 26" to real date
+    const [dayName, monthStr, dayNum] = date.replace(',', '').split(' ');
+    const year = new Date().getFullYear(); 
+    const fullDateStr = `${monthStr} ${dayNum}, ${year} ${time}`;
+    const slotDateTime = new Date(fullDateStr);
 
-  const isPast = slotDateTime < now;
+    const isPast = slotDateTime < now;
 
-  const isBooked = bookedSlots.some(
-    (b) => b.date === date && b.time === time
-  );
+    const isBooked = bookedSlots.some(
+      (b) => b.date === date && b.time === time
+    );
 
-  return isPast || isBooked;
-};
-
+    return isPast || isBooked;
+  };
 
   return (
     <div className="booking-container">
       <h2>Book Your Appointment!</h2>
+      {preSelectedService && (
+        <div className="selected-service">
+          <span>Service: </span>
+          <strong>{preSelectedService}</strong>
+        </div>
+      )}
 
       <h4 className="section-heading">📅 Select a Date</h4>
       <div className="date-selector">
@@ -79,25 +120,22 @@ const AppointmentBooking = () => {
       <h4 className="section-heading">⏰ Select a Time Slot</h4>
       <div className="time-selector">
         {timeSlots.map((slot) => {
-  const disabled = isSlotDisabled(selectedDate, slot);
-  return (
-    <button
-      key={slot}
-      className={`time-button ${
-        selectedTime === slot ? "selected" : ""
-      }`}
-      onClick={() => !disabled && setSelectedTime(slot)}
-      disabled={disabled}
-      style={{
-        opacity: disabled ? 0.5 : 1,
-        cursor: disabled ? "not-allowed" : "pointer"
-      }}
-    >
-      {slot}
-    </button>
-  );
-})}
-
+          const disabled = isSlotDisabled(selectedDate, slot);
+          return (
+            <button
+              key={slot}
+              className={`time-button ${selectedTime === slot ? "selected" : ""}`}
+              onClick={() => !disabled && setSelectedTime(slot)}
+              disabled={disabled}
+              style={{
+                opacity: disabled ? 0.5 : 1,
+                cursor: disabled ? "not-allowed" : "pointer"
+              }}
+            >
+              {slot}
+            </button>
+          );
+        })}
       </div>
 
       <form className="form-fields" onSubmit={handleSubmit}>

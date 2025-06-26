@@ -1,22 +1,21 @@
 import React from 'react';
 import './CategoryPage.css';
-import { FaBolt, FaWrench, FaSnowflake, FaWater, FaHammer, FaBug, FaCogs } from 'react-icons/fa';
+import { FaUtensils, FaBed, FaConciergeBell, FaGlassWhiskey, FaUsers, FaHotel } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 
 const services = [
-  { name: "Electrician Booking", icon: <FaBolt /> },
-  { name: "Plumber Booking", icon: <FaWrench /> },
-  { name: "AC Repair & Servicing", icon: <FaSnowflake /> },
-  { name: "Water Purifier Maintenance", icon: <FaWater /> },
-  { name: "Carpenter Appointments", icon: <FaHammer /> },
-  { name: "Pest Control Scheduling", icon: <FaBug /> },
-  { name: "Appliance Repairs (washing machine, fridge, etc.)", icon: <FaCogs /> }
+  { name: "Table Reservation", icon: <FaUtensils /> },
+  { name: "Room Booking", icon: <FaBed /> },
+  { name: "Buffet Slot Reservation", icon: <FaConciergeBell /> },
+  { name: "Private Dining Booking", icon: <FaGlassWhiskey /> },
+  { name: "Conference Room Reservation", icon: <FaUsers /> },
+  { name: "Special Event Catering", icon: <FaHotel /> }
 ];
 
-const HomeRepairServices = () => {
+const HotelRestaurant = () => {
   return (
     <div className="category-page">
-      <h1 className="category-title">🧰 Home & Repair Services</h1>
+      <h1 className="category-title">🏨 Hotel & Restaurant</h1>
       <div className="services-list">
         {services.map((service, idx) => (
           <Link to={`/book?service=${encodeURIComponent(service.name)}`} className="service-link" key={idx}>
@@ -34,4 +33,4 @@ const HomeRepairServices = () => {
   );
 };
 
-export default HomeRepairServices; 
+export default HotelRestaurant; 

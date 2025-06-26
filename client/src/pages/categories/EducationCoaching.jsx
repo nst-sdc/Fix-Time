@@ -1,6 +1,7 @@
 import React from 'react';
 import './CategoryPage.css';
 import { FaCalculator, FaMusic, FaPalette, FaLanguage, FaDumbbell, FaChild } from 'react-icons/fa';
+import { Link } from 'react-router-dom';
 
 const services = [
   { name: "Tuition Sessions (Math, Science, etc.)", icon: <FaCalculator /> },
@@ -17,13 +18,15 @@ const EducationCoaching = () => {
       <h1 className="category-title">🧑‍🏫 Education & Coaching</h1>
       <div className="services-list">
         {services.map((service, idx) => (
-          <div className="service-card" key={idx}>
-            <div className="service-icon">{service.icon}</div>
-            <div className="service-details">
-              <p className="service-name">{service.name}</p>
-              <button className="book-now-btn">Book Now</button>
+          <Link to={`/book?service=${encodeURIComponent(service.name)}`} className="service-link" key={idx}>
+            <div className="service-card">
+              <div className="service-icon">{service.icon}</div>
+              <div className="service-details">
+                <p className="service-name">{service.name}</p>
+                <button className="book-now-btn">Book Now</button>
+              </div>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>

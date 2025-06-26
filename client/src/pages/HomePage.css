@@ -865,4 +865,147 @@ body.dark .cta-content {
   .section-title {
     font-size: 1.8rem;
   }
+}
+
+.explore-btn {
+  background: linear-gradient(90deg, #FF758C, #FF7EB3) !important;
+  color: white !important;
+  font-weight: 600 !important;
+  box-shadow: 0 6px 18px rgba(255, 117, 140, 0.25) !important;
+  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+  border: none !important;
+}
+
+.explore-btn:hover {
+  transform: translateY(-3px) !important;
+  box-shadow: 0 8px 25px rgba(255, 117, 140, 0.35) !important;
+}
+
+/* Add ID for Services section to target with scroll */
+#explore-services-section {
+  padding-top: 2rem;
+  scroll-margin-top: 80px; /* Adjust based on navbar height */
+}
+
+/* Services Section */
+.services-section {
+  padding: 6rem 0;
+  background-color: #f8f9fa;
+  position: relative;
+  transition: var(--transition);
+}
+
+body.dark .services-section {
+  background-color: #121212;
+}
+
+.service-category-link {
+  text-decoration: none;
+  color: inherit;
+  display: contents;
+}
+
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.service-category-card {
+  background: white;
+  border-radius: 1rem;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease, background-color 0.3s ease, border-color 0.3s ease;
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+body.dark .service-category-card {
+  background: #1a1a1a;
+  border-color: #333;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.service-category-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 15px 35px rgba(255, 117, 140, 0.15);
+  border-color: rgba(255, 123, 179, 0.2);
+}
+
+body.dark .service-category-card:hover {
+  box-shadow: 0 15px 35px rgba(255, 117, 140, 0.2);
+  border-color: rgba(255, 123, 179, 0.3);
+}
+
+.category-icon {
+  font-size: 3.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.service-category-card h3 {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-bottom: 0.8rem;
+  color: #333;
+  transition: color 0.3s ease;
+}
+
+body.dark .service-category-card h3 {
+  color: #e0e0e0;
+}
+
+.service-category-card p {
+  color: #666;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+body.dark .service-category-card p {
+  color: #aaa;
+}
+
+.view-all-container {
+  margin-top: 3rem;
+  text-align: center;
+}
+
+body.dark .section-title {
+  -webkit-text-fill-color: initial !important;
+  color: #fff !important;
+}
+
+body.dark .text-accent {
+  -webkit-text-fill-color: transparent !important;
+}
+
+body.dark .explore-btn {
+  background: linear-gradient(90deg, #FF758C, #FF7EB3) !important;
+  color: white !important;
+}
+
+/* Ensure "Explore Our Services" heading is visible in dark mode */
+body.dark #explore-services-section .section-title {
+  color: #ffffff !important;
+}
+
+@media (max-width: 768px) {
+  .services-grid {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .service-category-card {
+    padding: 1.5rem;
+  }
+  
+  .category-icon {
+    font-size: 3rem;
+  }
 } 

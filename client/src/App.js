@@ -18,6 +18,8 @@ import EducationCoaching from './pages/categories/EducationCoaching';
 import GovernmentLegalServices from './pages/categories/GovernmentLegalServices';
 import AutomobileService from './pages/categories/AutomobileService';
 import RetailLocalBusinesses from './pages/categories/RetailLocalBusinesses';
+import PrivateEvents from './pages/categories/PrivateEvents';
+import HotelRestaurant from './pages/categories/HotelRestaurant';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -133,7 +135,10 @@ function App() {
             <Route path="/categories/government-legal" element={<GovernmentLegalServices />} />
             <Route path="/categories/automobile" element={<AutomobileService />} />
             <Route path="/categories/retail" element={<RetailLocalBusinesses />} />
+            <Route path="/categories/private-events" element={<PrivateEvents />} />
+            <Route path="/categories/hotel-restaurant" element={<HotelRestaurant />} />
             <Route path="/appointments" element={isLoggedIn ? <AppointmentPage /> : <Navigate to="/login" />} />
+            <Route path="/book" element={isLoggedIn ? <AppointmentPage /> : <Navigate to="/login" />} />
             <Route path="/dashboard" element={isLoggedIn ? 
               <Dashboard userProfile={userProfile} setUserProfile={setUserProfile} /> 
               : <Navigate to="/login" />} 

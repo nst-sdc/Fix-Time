@@ -6,6 +6,7 @@
   flex-direction: column;
   align-items: center;
   font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+  transition: all 0.3s ease;
 }
 
 .category-title {
@@ -31,6 +32,18 @@
   grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
   gap: 2.2rem;
   margin-bottom: 2rem;
+  transition: all 0.3s ease;
+}
+
+body.dark .services-list {
+  background: rgba(30, 30, 30, 0.6);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.15);
+}
+
+.service-link {
+  text-decoration: none;
+  color: inherit;
+  display: contents;
 }
 
 .service-card {
@@ -40,15 +53,27 @@
   padding: 1.8rem 1.2rem 1.5rem 1.2rem;
   display: flex;
   align-items: center;
-  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.25s;
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.25s, background-color 0.3s ease, border-color 0.3s ease;
   opacity: 0;
   animation: pop-up 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
   border: 1.5px solid #f3f3f7;
+  cursor: pointer;
+}
+
+body.dark .service-card {
+  background: #1a1a1a;
+  border-color: #333;
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
 }
 
 .service-card:hover {
   transform: translateY(-8px) scale(1.025);
   box-shadow: 0 16px 48px rgba(255, 117, 140, 0.13), 0 2px 16px rgba(80, 80, 120, 0.10);
+  border-color: #FF7EB3;
+}
+
+body.dark .service-card:hover {
+  box-shadow: 0 16px 48px rgba(255, 117, 140, 0.2), 0 2px 16px rgba(0, 0, 0, 0.2);
   border-color: #FF7EB3;
 }
 
@@ -67,6 +92,12 @@
   margin-right: 1.3rem;
   box-shadow: 0 2px 8px rgba(255, 117, 140, 0.10);
   border: 1.5px solid #FF7EB3;
+  transition: all 0.3s ease;
+}
+
+body.dark .service-icon {
+  background: linear-gradient(135deg, rgba(255, 222, 233, 0.8) 0%, rgba(181, 255, 252, 0.8) 100%);
+  box-shadow: 0 2px 8px rgba(255, 117, 140, 0.2);
 }
 
 .service-details {
@@ -83,6 +114,11 @@
   color: #2c2c2c;
   margin-bottom: 0.2rem;
   letter-spacing: 0.1px;
+  transition: color 0.3s ease;
+}
+
+body.dark .service-name {
+  color: #e0e0e0;
 }
 
 .book-now-btn {
@@ -105,6 +141,10 @@
   transform: scale(1.07);
   background: linear-gradient(90deg, #FF7EB3, #FF758C);
   box-shadow: 0 7px 24px rgba(255, 117, 140, 0.22);
+}
+
+body.dark .book-now-btn:hover {
+  box-shadow: 0 7px 24px rgba(255, 117, 140, 0.3);
 }
 
 /* Animations */

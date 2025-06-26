@@ -1,7 +1,7 @@
 // src/pages/Services.jsx
 import React, { useState } from "react";
 import "./Services.css";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const SERVICES = [
   {
@@ -90,10 +90,35 @@ const SERVICES = [
       "Custom Gift Makers or Artists",
       "Local Laundry / Dry Cleaning Pickup-Slots"
     ]
+  },
+  {
+    id: 8,
+    category: "🎉 Private Events",
+    services: [
+      "Webinar Booking",
+      "Seminar Registration",
+      "Birthday Party Reservation",
+      "Wedding Venue Booking",
+      "Corporate Event Planning",
+      "Anniversary Celebration Booking"
+    ]
+  },
+  {
+    id: 9,
+    category: "🏨 Hotel & Restaurant",
+    services: [
+      "Table Reservation",
+      "Room Booking",
+      "Buffet Slot Reservation",
+      "Private Dining Booking",
+      "Conference Room Reservation",
+      "Special Event Catering"
+    ]
   }
 ];
 
 const Services = () => {
+  const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState("");
   const [categoryFilter, setCategoryFilter] = useState("All");
 
@@ -122,6 +147,10 @@ const Services = () => {
     acc[service.category].push(service.name);
     return acc;
   }, {});
+
+  const handleCategoryClick = (route) => {
+    navigate(route);
+  };
 
   return (
     <div className="services-page">
@@ -162,11 +191,18 @@ const Services = () => {
               else if (category.includes("Government")) { route = "/categories/government-legal"; emoji = "📋"; }
               else if (category.includes("Automobile")) { route = "/categories/automobile"; emoji = "🚗"; }
               else if (category.includes("Retail")) { route = "/categories/retail"; emoji = "🛍️"; }
+              else if (category.includes("Private Events")) { route = "/categories/private-events"; emoji = "🎉"; }
+              else if (category.includes("Hotel & Restaurant")) { route = "/categories/hotel-restaurant"; emoji = "🏨"; }
+              
               return (
-                <div className="service-category-card" key={category}>
+                <div 
+                  className="service-category-card" 
+                  key={category}
+                  onClick={() => handleCategoryClick(route)}
+                >
                   <div className="category-emoji">{emoji}</div>
                   <h3 className="category-title">{category}</h3>
-                  <Link to={route} className="btn btn-secondary" style={{marginTop: '1rem'}}>Show Category</Link>
+                  <button className="btn btn-secondary show-category-btn">Show Category</button>
                 </div>
               );
             })
