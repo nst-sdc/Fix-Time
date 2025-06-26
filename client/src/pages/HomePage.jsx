@@ -22,7 +22,7 @@ const HomePage = () => {
           <div className="hero-content" data-aos="fade-right">
             <div className="hero-badge">Appointment Scheduling Made Simple</div>
             <h1 className="hero-title">
-              Book Appointments <span className="hero-highlight">Without The Queue</span>
+              Skip the Queue<span className="hero-highlight">Book what's due</span>
             </h1>
             <p className="hero-description">
               Say goodbye to waiting in lines. FixTime lets you book appointments online 
