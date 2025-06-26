@@ -326,3 +326,155 @@
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   }
   
+/* Dark Mode Overrides for Auth Pages */
+body.dark .auth-container {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+}
+
+body.dark .auth-container.login-mode {
+  background: linear-gradient(135deg, #2d1b3d 0%, #1a1a1a 100%);
+}
+
+body.dark .auth-container.register-mode {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+}
+
+body.dark .auth-card {
+  background: #2d2d2d;
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.1);
+}
+
+body.dark .auth-title {
+  color: #fff;
+}
+
+body.dark .form-input {
+  background: #1a1a1a;
+  border: 2px solid #444;
+  color: #fff;
+}
+
+body.dark .form-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+body.dark .form-input::placeholder {
+  color: #888;
+}
+
+body.dark .eye-toggle {
+  color: #667eea;
+}
+
+body.dark .auth-error {
+  color: #ff6b6b;
+}
+
+body.dark .auth-success {
+  color: #51cf66;
+}
+
+body.dark .toggle-text {
+  color: #ccc;
+}
+
+body.dark .toggle-button {
+  color: #667eea;
+}
+
+body.dark .toggle-button:hover {
+  color: #8b9eff;
+}
+
+/* Preserve gradient elements */
+body.dark .auth-button {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+}
+
+body.dark .auth-button:hover {
+  box-shadow: 0 6px 15px rgba(102, 126, 234, 0.3);
+}
+
+/* Additional dark mode styles for other auth elements */
+body.dark .auth-logo {
+  color: #fff;
+}
+
+body.dark .auth-logo-accent {
+  background: linear-gradient(90deg, #ff6b8b 0%, #a56bff 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+body.dark .auth-header h2 {
+  color: #fff;
+}
+
+body.dark .auth-header p {
+  color: #ccc;
+}
+
+body.dark .form-field label {
+  color: #ccc;
+}
+
+body.dark .form-field input {
+  background: #1a1a1a;
+  border: 1px solid #444;
+  color: #fff;
+}
+
+body.dark .form-field input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+}
+
+body.dark .password-toggle {
+  color: #667eea;
+}
+
+body.dark .password-toggle:hover {
+  color: #8b9eff;
+}
+
+body.dark .error-message {
+  color: #ff6b6b;
+}
+
+body.dark .server-error {
+  background-color: rgba(255, 107, 107, 0.1);
+  color: #ff6b6b;
+}
+
+body.dark .server-success {
+  background-color: rgba(81, 207, 102, 0.1);
+  color: #51cf66;
+}
+
+body.dark .form-terms {
+  color: #ccc;
+}
+
+body.dark .terms-link {
+  color: #667eea;
+}
+
+body.dark .terms-link:hover {
+  color: #8b9eff;
+}
+
+body.dark .auth-footer {
+  color: #ccc;
+}
+
+body.dark .auth-link {
+  color: #667eea;
+}
+
+body.dark .auth-link:hover {
+  color: #8b9eff;
+}
+  
