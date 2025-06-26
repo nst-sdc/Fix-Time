@@ -1,28 +1,107 @@
-.appointment-form {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-width: 400px;
-    margin: auto;
+.booking-container {
+  max-width: 400px;
+  margin: 2rem auto;
+  background: white;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.1);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+h2 {
+  text-align: left;
+  color: #1a9d3f;
+  margin-bottom: 1rem;
+}
+
+.date-selector,
+.time-selector {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.date-button,
+.time-button {
+  border: 1px solid #ccc;
+  background: #f9f9f9;
+  padding: 10px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.date-button.selected,
+.time-button.selected {
+  background-color: #e6f0ff;
+  border-color: #007bff;
+  color: #007bff;
+  font-weight: 600;
+}
+
+.form-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+input,
+textarea {
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+  font-size: 14px;
+  width: 100%;
+}
+
+.confirm-button {
+  background: linear-gradient(to right, #00c853, #2196f3);
+  color: white;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: 0.2s ease;
+}
+
+.confirm-button:hover {
+  opacity: 0.9;
+}
+@media (max-width: 500px) {
+  .booking-container {
     padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    background-color: #f9f9f9;
-  }
-  
-  .appointment-form input,
-  .appointment-form select,
-  .appointment-form button {
-    padding: 10px;
-    border-radius: 4px;
-    border: 1px solid #aaa;
-  }
-  
-  .appointment-form button {
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
+    margin: 1rem;
+    max-width: 100%;
+    border-radius: 12px;
   }
 
-  
+  h2 {
+    font-size: 20px;
+    text-align: center;
+  }
+
+  .date-button,
+  .time-button {
+    flex: 1 1 48%;
+    font-size: 13px;
+    padding: 8px;
+  }
+
+  .form-fields {
+    gap: 12px;
+  }
+
+  input,
+  textarea {
+    font-size: 15px;
+    padding: 10px;
+  }
+
+  .confirm-button {
+    font-size: 15px;
+    padding: 10px;
+  }
+}

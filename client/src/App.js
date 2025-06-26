@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 import './App.css';
 import AuthPage from './pages/AuthPage';
 import AppointmentPage from './pages/AppointmentPage';
@@ -21,6 +23,17 @@ function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [theme, setTheme] = useState('light');
+
+  // Initialize AOS animation library
+  useEffect(() => {
+    AOS.init({
+      duration: 800,
+      easing: 'ease-out',
+      once: true,
+      offset: 100
+    });
+  }, []);
 
   // Set up axios defaults for authentication
   useEffect(() => {
@@ -30,13 +43,18 @@ function App() {
     }
   }, []);
 
+  // Load theme from localStorage on app start
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+    document.body.className = savedTheme;
+  }, []);
+
   useEffect(() => {
     // Check if user is logged in based on JWT token
     const token = localStorage.getItem('token');
-    
     if (token) {
       setIsLoggedIn(true);
-      
       // Fetch user profile data
       const fetchUserProfile = async () => {
         try {
@@ -45,7 +63,6 @@ function App() {
               Authorization: `Bearer ${token}`
             }
           });
-          
           setUserProfile(res.data);
         } catch (err) {
           console.error('Error fetching profile:', err);
@@ -57,7 +74,6 @@ function App() {
           setLoading(false);
         }
       };
-      
       fetchUserProfile();
     } else {
       setLoading(false);
@@ -67,7 +83,6 @@ function App() {
   const handleLogin = (userData) => {
     setIsLoggedIn(true);
     setUserProfile(userData);
-    
     // Set Authorization header for future requests
     const token = localStorage.getItem('token');
     if (token) {
@@ -79,9 +94,15 @@ function App() {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
     setUserProfile(null);
-    
     // Remove Authorization header
     delete axios.defaults.headers.common['Authorization'];
+  };
+
+  const handleThemeToggle = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.body.className = newTheme;
   };
 
   if (loading) {
@@ -91,8 +112,14 @@ function App() {
 
   return (
     <Router>
-      <div className="App">
-        <Navbar isLoggedIn={isLoggedIn} userProfile={userProfile} onLogout={handleLogout} />
+      <div className={`App ${theme}`}>
+        <Navbar 
+          isLoggedIn={isLoggedIn} 
+          userProfile={userProfile} 
+          onLogout={handleLogout}
+          theme={theme}
+          onThemeToggle={handleThemeToggle}
+        />
         <main className="app-content">
           <Routes>
             <Route path="/" element={<HomePage />} />
