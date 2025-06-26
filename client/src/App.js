@@ -8,10 +8,12 @@ import Dashboard from './pages/Dashboard';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
+
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [theme, setTheme] = useState('light');
 
   // Set up axios defaults for authentication
   useEffect(() => {
@@ -19,6 +21,13 @@ function App() {
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
     }
+  }, []);
+
+  // Load theme from localStorage on app start
+  useEffect(() => {
+    const savedTheme = localStorage.getItem('theme') || 'light';
+    setTheme(savedTheme);
+    document.body.className = savedTheme;
   }, []);
 
   useEffect(() => {
@@ -75,6 +84,13 @@ function App() {
     delete axios.defaults.headers.common['Authorization'];
   };
 
+  const handleThemeToggle = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light';
+    setTheme(newTheme);
+    localStorage.setItem('theme', newTheme);
+    document.body.className = newTheme;
+  };
+
   if (loading) {
     // You can add a loading spinner here
     return <div className="loading-container">Loading...</div>;
@@ -82,8 +98,14 @@ function App() {
 
   return (
     <Router>
-      <div className="App">
-        <Navbar isLoggedIn={isLoggedIn} userProfile={userProfile} onLogout={handleLogout} />
+      <div className={`App ${theme}`}>
+        <Navbar 
+          isLoggedIn={isLoggedIn} 
+          userProfile={userProfile} 
+          onLogout={handleLogout}
+          theme={theme}
+          onThemeToggle={handleThemeToggle}
+        />
         <main className="app-content">
           <Routes>
             <Route path="/" element={<HomePage />} />

@@ -339,4 +339,141 @@
     margin: 0 auto;
     justify-content: center;
   }
+}
+
+/* Theme Toggle Button */
+.theme-toggle-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  margin-left: 10px;
+}
+
+.theme-toggle-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  transform: scale(1.1);
+}
+
+/* Dark Mode Overrides - Only text and backgrounds */
+body.dark .navbar {
+  background: #000;
+  box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1);
+}
+
+body.dark .navbar-logo {
+  color: #fff;
+}
+
+body.dark .menu-icon {
+  color: #fff;
+}
+
+body.dark .nav-link {
+  color: #fff;
+}
+
+body.dark .nav-link:hover {
+  color: #fff;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+body.dark .login-btn {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #fff;
+}
+
+body.dark .login-btn:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark .profile-button {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+body.dark .profile-button:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+body.dark .profile-name {
+  color: #fff;
+}
+
+body.dark .dropdown-arrow {
+  color: #fff;
+}
+
+body.dark .theme-toggle-btn {
+  color: #fff;
+}
+
+body.dark .theme-toggle-btn:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* Light Mode Overrides - Only text and backgrounds */
+body.light .navbar {
+  background: linear-gradient(90deg, #ffffff 0%, #f8f9fa 100%);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+body.light .navbar-logo {
+  color: #333;
+}
+
+body.light .menu-icon {
+  color: #333;
+}
+
+body.light .nav-link {
+  color: #333;
+}
+
+body.light .nav-link:hover {
+  color: #333;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+body.light .login-btn {
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  color: #333;
+}
+
+body.light .login-btn:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light .profile-button {
+  background-color: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+body.light .profile-button:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+
+body.light .profile-name {
+  color: #333;
+}
+
+body.light .dropdown-arrow {
+  color: #333;
+}
+
+body.light .theme-toggle-btn {
+  color: #333;
+}
+
+body.light .theme-toggle-btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 } 
