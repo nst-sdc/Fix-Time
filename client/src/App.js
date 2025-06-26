@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import axios from 'axios';
+import AOS from 'aos';
+import 'aos/dist/aos.css';
 import './App.css';
 import AuthPage from './pages/AuthPage';
 import AppointmentPage from './pages/AppointmentPage';
@@ -14,6 +16,16 @@ function App() {
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState('light');
+
+  // Initialize AOS animation library
+  useEffect(() => {
+    AOS.init({
+      duration: 800,
+      easing: 'ease-out',
+      once: true,
+      offset: 100
+    });
+  }, []);
 
   // Set up axios defaults for authentication
   useEffect(() => {
