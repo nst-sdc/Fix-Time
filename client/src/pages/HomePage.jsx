@@ -33,7 +33,7 @@ const HomePage = () => {
                 Get Started
                 <FaArrowRight className="btn-icon" />
               </Link>
-              <Link to="/appointments" className="btn btn-secondary">
+              <Link to="/services" className="btn btn-secondary">
                 Explore Services
               </Link>
             </div>

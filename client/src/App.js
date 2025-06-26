@@ -10,6 +10,14 @@ import Dashboard from './pages/Dashboard';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
+import Services from './pages/Services';
+import HealthcareCate from './pages/categories/HealthcareCate';
+import BeautyCate from './pages/categories/BeautyCate';
+import HomeRepairServices from './pages/categories/HomeRepairServices';
+import EducationCoaching from './pages/categories/EducationCoaching';
+import GovernmentLegalServices from './pages/categories/GovernmentLegalServices';
+import AutomobileService from './pages/categories/AutomobileService';
+import RetailLocalBusinesses from './pages/categories/RetailLocalBusinesses';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -45,10 +53,8 @@ function App() {
   useEffect(() => {
     // Check if user is logged in based on JWT token
     const token = localStorage.getItem('token');
-    
     if (token) {
       setIsLoggedIn(true);
-      
       // Fetch user profile data
       const fetchUserProfile = async () => {
         try {
@@ -57,7 +63,6 @@ function App() {
               Authorization: `Bearer ${token}`
             }
           });
-          
           setUserProfile(res.data);
         } catch (err) {
           console.error('Error fetching profile:', err);
@@ -69,7 +74,6 @@ function App() {
           setLoading(false);
         }
       };
-      
       fetchUserProfile();
     } else {
       setLoading(false);
@@ -79,7 +83,6 @@ function App() {
   const handleLogin = (userData) => {
     setIsLoggedIn(true);
     setUserProfile(userData);
-    
     // Set Authorization header for future requests
     const token = localStorage.getItem('token');
     if (token) {
@@ -91,7 +94,6 @@ function App() {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
     setUserProfile(null);
-    
     // Remove Authorization header
     delete axios.defaults.headers.common['Authorization'];
   };
@@ -123,6 +125,14 @@ function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/login" element={!isLoggedIn ? <AuthPage isLogin={true} setIsLoggedIn={handleLogin} /> : <Navigate to="/dashboard" />} />
             <Route path="/register" element={!isLoggedIn ? <AuthPage isLogin={false} setIsLoggedIn={handleLogin} /> : <Navigate to="/dashboard" />} />
+            <Route path="/services" element={<Services />} />
+            <Route path="/categories/healthcare" element={<HealthcareCate />} />
+            <Route path="/categories/beauty" element={<BeautyCate />} />
+            <Route path="/categories/home-repair" element={<HomeRepairServices />} />
+            <Route path="/categories/education" element={<EducationCoaching />} />
+            <Route path="/categories/government-legal" element={<GovernmentLegalServices />} />
+            <Route path="/categories/automobile" element={<AutomobileService />} />
+            <Route path="/categories/retail" element={<RetailLocalBusinesses />} />
             <Route path="/appointments" element={isLoggedIn ? <AppointmentPage /> : <Navigate to="/login" />} />
             <Route path="/dashboard" element={isLoggedIn ? 
               <Dashboard userProfile={userProfile} setUserProfile={setUserProfile} /> 
