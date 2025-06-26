@@ -1,3 +1,7 @@
+const dotenv = require('dotenv');
+dotenv.config();
+
+
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -23,3 +27,6 @@ mongoose.connect(process.env.MONGODB_URI)
     });
   })
   .catch(err => console.error('MongoDB connection error:', err));
+
+
+  console.log("DEBUG MONGO_URI:", process.env.MONGO_URI);

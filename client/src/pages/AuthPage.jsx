@@ -1,3 +1,5 @@
+import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './auth.css';
@@ -16,10 +18,22 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Update local state when prop changes and reset form fields
+  const handleGoogleLogin = (credentialResponse) => {
+    const userData = jwtDecode(credentialResponse.credential);
+    console.log("✅ Google User Info:", userData);
+
+    // Optional: Call your backend API to handle Google login
+    // axios.post('http://localhost:5001/auth/google', userData)
+    //   .then(res => {
+    //     localStorage.setItem('token', res.data.token);
+    //     setIsLoggedIn && setIsLoggedIn(res.data.user);
+    //     navigate('/');
+    //   })
+    //   .catch(err => setError('Google login failed'));
+  };
+
   useEffect(() => {
     setIsLogin(initialIsLogin);
-    // Reset form fields when switching between login/register
     setEmail('');
     setPasswd('');
     setConfirmPasswd('');
@@ -30,7 +44,6 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
   }, [initialIsLogin]);
 
   const toggleForm = () => {
-    // Navigate to the respective route instead of just toggling the form
     navigate(isLogin ? '/register' : '/login');
   };
 
@@ -53,24 +66,17 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
 
     try {
       setLoading(true);
-      
+
       if (isLogin) {
-        // Handle login
-        const res = await axios.post('http://localhost:5001/auth/login', { 
-          email, 
-          password: passwd 
+        const res = await axios.post('http://localhost:5001/auth/login', {
+          email,
+          password: passwd
         });
 
         if (res.data.token) {
           setSuccess(res.data.message || 'Login successful');
           localStorage.setItem('token', res.data.token);
-          
-          // Set logged in state with user data and redirect
-          if (setIsLoggedIn) {
-            setIsLoggedIn(res.data.user);
-          }
-          
-          // Short delay before redirect to show success message
+          if (setIsLoggedIn) setIsLoggedIn(res.data.user);
           setTimeout(() => {
             navigate('/');
           }, 1500);
@@ -78,15 +84,12 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
           setError('Invalid credentials or missing token');
         }
       } else {
-        // Handle registration
         const res = await axios.post('http://localhost:5001/auth/register', {
           email,
           password: passwd
         });
-        
+
         setSuccess('Registration successful! Please log in with your credentials.');
-        
-        // Redirect to login page after successful registration
         setTimeout(() => {
           navigate('/login');
         }, 2000);
@@ -102,6 +105,7 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
     <div className={`auth-container ${isLogin ? 'login-mode' : 'register-mode'}`}>
       <div className="auth-card">
         <h2 className="auth-title">{isLogin ? 'Login' : 'Register'} Here!</h2>
+        
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <input
@@ -154,6 +158,16 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
             {loading ? 'Please wait...' : isLogin ? 'Login' : 'Register'}
           </button>
         </form>
+
+        {/* ✅ Google Sign-In Button */}
+        <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+          <GoogleLogin
+            onSuccess={handleGoogleLogin}
+            onError={() => {
+              console.log('❌ Google Login Failed');
+            }}
+          />
+        </div>
 
         {error && <div className="auth-error">{error}</div>}
         {success && <div className="auth-success">{success}</div>}
