@@ -1,3 +1,5 @@
+import { GoogleLogin } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './auth.css';
@@ -16,10 +18,45 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  // Update local state when prop changes and reset form fields
+  const handleGoogleLogin = async (credentialResponse) => {
+    setError('');
+    setSuccess('');
+    try {
+      if (!credentialResponse || !credentialResponse.credential) {
+        setError('Google login failed: No credential received.');
+        return;
+      }
+      let userData;
+      try {
+        userData = jwtDecode(credentialResponse.credential);
+      } catch (decodeErr) {
+        setError('Google login failed: Unable to decode credential.');
+        return;
+      }
+      const res = await axios.post('http://localhost:5001/auth/google', {
+        email: userData.email,
+        name: userData.name,
+        sub: userData.sub
+      });
+      if (res.data.token) {
+        localStorage.setItem('token', res.data.token);
+        setIsLoggedIn && setIsLoggedIn(res.data.user);
+        navigate('/');
+      } else {
+        setError(res.data.error || 'Google login failed');
+      }
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.error) {
+        setError('Google login failed: ' + err.response.data.error);
+      } else {
+        setError('Google login failed: Unexpected error.');
+      }
+      console.error('Google login error:', err);
+    }
+  };
+
   useEffect(() => {
     setIsLogin(initialIsLogin);
-    // Reset form fields when switching between login/register
     setEmail('');
     setPasswd('');
     setConfirmPasswd('');
@@ -30,7 +67,6 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
   }, [initialIsLogin]);
 
   const toggleForm = () => {
-    // Navigate to the respective route instead of just toggling the form
     navigate(isLogin ? '/register' : '/login');
   };
 
@@ -53,24 +89,17 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
 
     try {
       setLoading(true);
-      
+
       if (isLogin) {
-        // Handle login
-        const res = await axios.post('http://localhost:5001/auth/login', { 
-          email, 
-          password: passwd 
+        const res = await axios.post('http://localhost:5001/auth/login', {
+          email,
+          password: passwd
         });
 
         if (res.data.token) {
           setSuccess(res.data.message || 'Login successful');
           localStorage.setItem('token', res.data.token);
-          
-          // Set logged in state with user data and redirect
-          if (setIsLoggedIn) {
-            setIsLoggedIn(res.data.user);
-          }
-          
-          // Short delay before redirect to show success message
+          setIsLoggedIn && setIsLoggedIn(res.data.user);
           setTimeout(() => {
             navigate('/');
           }, 1500);
@@ -78,15 +107,12 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
           setError('Invalid credentials or missing token');
         }
       } else {
-        // Handle registration
         const res = await axios.post('http://localhost:5001/auth/register', {
           email,
           password: passwd
         });
-        
-        setSuccess('Registration successful! Please log in with your credentials.');
-        
-        // Redirect to login page after successful registration
+
+        setSuccess('Registration successful. Please log in.');
         setTimeout(() => {
           navigate('/login');
         }, 2000);
@@ -102,6 +128,7 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
     <div className={`auth-container ${isLogin ? 'login-mode' : 'register-mode'}`}>
       <div className="auth-card">
         <h2 className="auth-title">{isLogin ? 'Login' : 'Register'} Here!</h2>
+
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <input
@@ -123,10 +150,7 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
               onChange={(e) => setPasswd(e.target.value)}
               required
             />
-            <span
-              onClick={() => setShowPass(!showPass)}
-              className="eye-toggle"
-            >
+            <span onClick={() => setShowPass(!showPass)} className="eye-toggle">
               {showPass ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
             </span>
           </div>
@@ -141,10 +165,7 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
                 onChange={(e) => setConfirmPasswd(e.target.value)}
                 required
               />
-              <span
-                onClick={() => setShowConfirmPass(!showConfirmPass)}
-                className="eye-toggle"
-              >
+              <span onClick={() => setShowConfirmPass(!showConfirmPass)} className="eye-toggle">
                 {showConfirmPass ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
               </span>
             </div>
@@ -154,6 +175,16 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
             {loading ? 'Please wait...' : isLogin ? 'Login' : 'Register'}
           </button>
         </form>
+
+        <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
+          <GoogleLogin
+            onSuccess={handleGoogleLogin}
+            onError={() => {
+              setError('Google Login Failed: Unable to authenticate with Google.');
+              console.log('Google Login Failed');
+            }}
+          />
+        </div>
 
         {error && <div className="auth-error">{error}</div>}
         {success && <div className="auth-success">{success}</div>}
