@@ -7,7 +7,15 @@ const generateToken = (userId) => {
 
 // Register a new user
 exports.register = async (req, res) => {
-  const { email, password } = req.body;
+  const { 
+    email, 
+    password, 
+    fullName, 
+    phoneNumber, 
+    address, 
+    dateOfBirth, 
+    gender 
+  } = req.body;
   
   try {
     // Check if user already exists
@@ -16,8 +24,27 @@ exports.register = async (req, res) => {
       return res.status(400).json({ error: 'User already exists' });
     }
 
-    // Create new user
-    const user = new User({ email, password });
+    // Validate required fields
+    if (!email || !password || !fullName || !phoneNumber || !address || !gender) {
+      return res.status(400).json({ error: 'All required fields must be provided' });
+    }
+
+    // Create new user with all profile data
+    const userData = {
+      email,
+      password,
+      fullName,
+      phoneNumber,
+      address,
+      gender
+    };
+
+    // Add dateOfBirth if provided
+    if (dateOfBirth) {
+      userData.dateOfBirth = new Date(dateOfBirth);
+    }
+
+    const user = new User(userData);
     await user.save();
 
     // Don't generate JWT for registration
@@ -56,7 +83,14 @@ exports.login = async (req, res) => {
       token,
       user: {
         id: user._id,
-        email: user.email
+        email: user.email,
+        fullName: user.fullName,
+        phoneNumber: user.phoneNumber,
+        address: user.address,
+        dateOfBirth: user.dateOfBirth,
+        gender: user.gender,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
       }
     });
   } catch (err) {
@@ -76,5 +110,60 @@ exports.getProfile = async (req, res) => {
   } catch (err) {
     console.error('Profile fetch error:', err);
     res.status(500).json({ error: 'Server error fetching profile' });
+  }
+};
+
+// Update user profile
+exports.updateProfile = async (req, res) => {
+  try {
+    const { 
+      fullName, 
+      email,
+      phoneNumber, 
+      address, 
+      dateOfBirth, 
+      gender 
+    } = req.body;
+
+    const user = await User.findById(req.user.userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if email is being changed and if it's already taken by another user
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ error: 'Email is already taken by another user' });
+      }
+    }
+
+    // Update fields if provided
+    if (fullName) user.fullName = fullName;
+    if (email) user.email = email;
+    if (phoneNumber) user.phoneNumber = phoneNumber;
+    if (address) user.address = address;
+    if (dateOfBirth) user.dateOfBirth = new Date(dateOfBirth);
+    if (gender) user.gender = gender;
+
+    await user.save();
+
+    res.json({ 
+      message: 'Profile updated successfully',
+      user: {
+        id: user._id,
+        email: user.email,
+        fullName: user.fullName,
+        phoneNumber: user.phoneNumber,
+        address: user.address,
+        dateOfBirth: user.dateOfBirth,
+        gender: user.gender,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
+    });
+  } catch (err) {
+    console.error('Profile update error:', err);
+    res.status(500).json({ error: 'Server error updating profile' });
   }
 };

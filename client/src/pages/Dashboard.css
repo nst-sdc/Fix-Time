@@ -91,12 +91,13 @@
 
 .profile-info-container {
   width: 100%;
-  max-width: 400px;
+  max-width: 500px;
 }
 
 .profile-info-item {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   padding: 1rem 0;
   border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
@@ -106,12 +107,25 @@
 }
 
 .info-label {
+  display: flex;
+  align-items: center;
   font-weight: 600;
   color: #555;
+  min-width: 120px;
+}
+
+.info-icon {
+  color: #ff6b8b;
+  margin-right: 0.5rem;
+  font-size: 0.9rem;
 }
 
 .info-value {
   color: #333;
+  text-align: right;
+  flex: 1;
+  margin-left: 1rem;
+  word-break: break-word;
 }
 
 /* Empty States */
@@ -154,6 +168,57 @@
   color: #666;
 }
 
+/* Dark Mode Styles */
+body.dark .dashboard-container {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+
+body.dark .dashboard-panel {
+  background-color: #1e293b;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+body.dark .dashboard-header h1 {
+  color: #e2e8f0;
+}
+
+body.dark .dashboard-header p {
+  color: #94a3b8;
+}
+
+body.dark .user-name {
+  color: #ff6b8b;
+}
+
+body.dark .panel-header {
+  background: linear-gradient(90deg, rgba(90, 61, 255, 0.1) 0%, rgba(255, 107, 139, 0.1) 100%);
+  border-bottom-color: #334155;
+}
+
+body.dark .panel-header h2 {
+  color: #e2e8f0;
+}
+
+body.dark .info-label {
+  color: #94a3b8;
+}
+
+body.dark .info-value {
+  color: #e2e8f0 !important;
+}
+
+body.dark .empty-state {
+  color: #94a3b8;
+}
+
+body.dark .loading-container {
+  color: #94a3b8;
+}
+
+body.dark .profile-info-item {
+  border-bottom-color: #334155;
+}
+
 /* Responsive */
 @media (min-width: 768px) {
   .dashboard-content {
@@ -176,6 +241,31 @@
   }
   
   .profile-details {
-    min-height: 350px;
+    min-height: 400px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-container {
+    padding: 1rem;
+  }
+  
+  .dashboard-header h1 {
+    font-size: 2rem;
+  }
+  
+  .profile-info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  
+  .info-label {
+    min-width: auto;
+  }
+  
+  .info-value {
+    text-align: left;
+    margin-left: 0;
   }
 } 

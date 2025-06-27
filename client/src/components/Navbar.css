@@ -320,6 +320,12 @@
     padding: 1rem;
     width: 70%;
     margin: 0 auto;
+    color: #fff !important;
+  }
+
+  .nav-link:hover {
+    color: #fff !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
   }
 
   .menu-icon {
@@ -475,5 +481,33 @@ body.light .theme-toggle-btn {
 }
 
 body.light .theme-toggle-btn:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
+
+/* Mobile-specific light mode overrides */
+@media screen and (max-width: 960px) {
+  body.light .nav-link {
+    color: #fff !important;
+  }
+
+  body.light .nav-link:hover {
+    color: #fff !important;
+    background-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  body.light .profile-name {
+    color: #fff !important;
+  }
+
+  body.light .dropdown-arrow {
+    color: #fff !important;
+  }
+
+  body.light .theme-toggle-btn {
+    color: #fff !important;
+  }
+
+  body.light .theme-toggle-btn:hover {
+    background-color: rgba(255, 255, 255, 0.1) !important;
+  }
 } 

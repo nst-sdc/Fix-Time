@@ -9,6 +9,11 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
   const [email, setEmail] = useState('');
   const [passwd, setPasswd] = useState('');
   const [confirmPasswd, setConfirmPasswd] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [phoneNumber, setPhoneNumber] = useState('');
+  const [address, setAddress] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
+  const [gender, setGender] = useState('');
   const [showPass, setShowPass] = useState(false);
   const [showConfirmPass, setShowConfirmPass] = useState(false);
   const [error, setError] = useState('');
@@ -23,6 +28,11 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
     setEmail('');
     setPasswd('');
     setConfirmPasswd('');
+    setFullName('');
+    setPhoneNumber('');
+    setAddress('');
+    setDateOfBirth('');
+    setGender('');
     setError('');
     setSuccess('');
     setShowPass(false);
@@ -34,21 +44,47 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
     navigate(isLogin ? '/register' : '/login');
   };
 
+  const validateForm = () => {
+    if (!email || !passwd || (!isLogin && !confirmPasswd)) {
+      return 'All fields are required.';
+    }
+
+    if (!email.includes('@')) {
+      return 'Please enter a valid email address';
+    }
+
+    if (!isLogin) {
+      if (!fullName.trim()) {
+        return 'Full name is required.';
+      }
+      if (!phoneNumber.trim()) {
+        return 'Phone number is required.';
+      }
+      if (!address.trim()) {
+        return 'Address is required.';
+      }
+      if (!gender) {
+        return 'Please select your gender.';
+      }
+      if (passwd !== confirmPasswd) {
+        return 'Passwords do not match.';
+      }
+      if (passwd.length < 6) {
+        return 'Password must be at least 6 characters long.';
+      }
+    }
+
+    return null;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
     setSuccess('');
 
-    if (!email || !passwd || (!isLogin && !confirmPasswd)) {
-      return setError('All fields are required.');
-    }
-
-    if (!email.includes('@')) {
-      return setError('Please enter a valid email address');
-    }
-
-    if (!isLogin && passwd !== confirmPasswd) {
-      return setError('Passwords do not match.');
+    const validationError = validateForm();
+    if (validationError) {
+      return setError(validationError);
     }
 
     try {
@@ -79,10 +115,21 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
         }
       } else {
         // Handle registration
-        const res = await axios.post('http://localhost:5001/auth/register', {
+        const registrationData = {
           email,
-          password: passwd
-        });
+          password: passwd,
+          fullName: fullName.trim(),
+          phoneNumber: phoneNumber.trim(),
+          address: address.trim(),
+          gender
+        };
+
+        // Add dateOfBirth if provided
+        if (dateOfBirth) {
+          registrationData.dateOfBirth = dateOfBirth;
+        }
+
+        await axios.post('http://localhost:5001/auth/register', registrationData);
         
         setSuccess('Registration successful! Please log in with your credentials.');
         
@@ -113,6 +160,74 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
               required
             />
           </div>
+
+          {!isLogin && (
+            <div className="form-group">
+              <input
+                type="text"
+                placeholder="Enter your Full Name"
+                className="form-input"
+                value={fullName}
+                onChange={(e) => setFullName(e.target.value)}
+                required
+              />
+            </div>
+          )}
+
+          {!isLogin && (
+            <div className="form-group">
+              <input
+                type="tel"
+                placeholder="Enter your Phone Number"
+                className="form-input"
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                required
+              />
+            </div>
+          )}
+
+          {!isLogin && (
+            <div className="form-group">
+              <textarea
+                placeholder="Enter your Address"
+                className="form-input"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                rows="3"
+                required
+              />
+            </div>
+          )}
+
+          {!isLogin && (
+            <div className="form-group">
+              <select
+                className="form-input"
+                value={gender}
+                onChange={(e) => setGender(e.target.value)}
+                required
+              >
+                <option value="">Select Gender</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+                <option value="prefer-not-to-say">Prefer not to say</option>
+              </select>
+            </div>
+          )}
+
+          {!isLogin && (
+            <div className="form-group">
+              <input
+                type="date"
+                placeholder="Date of Birth (Optional)"
+                className="form-input"
+                value={dateOfBirth}
+                onChange={(e) => setDateOfBirth(e.target.value)}
+              />
+            </div>
+          )}
 
           <div className="form-group" style={{ position: 'relative' }}>
             <input
