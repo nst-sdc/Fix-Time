@@ -1,0 +1,167 @@
+.service-reviews {
+  margin: 2rem 0;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.reviews-title {
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+  color: #333;
+  font-weight: 600;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 0.75rem;
+  text-align: center;
+}
+
+body.dark .reviews-title {
+  color: #fff;
+  border-bottom-color: #333;
+}
+
+.review-loading,
+.review-error,
+.no-reviews {
+  text-align: center;
+  padding: 2rem;
+  font-size: 1.1rem;
+  border-radius: 8px;
+  background-color: #f5f5f5;
+  margin: 1rem 0;
+}
+
+.review-loading {
+  color: #666;
+}
+
+.no-reviews {
+  color: #666;
+}
+
+.review-error {
+  color: #fff;
+  background-color: rgba(231, 76, 60, 0.9);
+}
+
+body.dark .review-loading,
+body.dark .no-reviews {
+  color: #aaa;
+  background-color: #222;
+}
+
+body.dark .review-error {
+  background-color: rgba(231, 76, 60, 0.7);
+}
+
+.reviews-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.review-item {
+  background-color: #fff;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+body.dark .review-item {
+  background-color: #1a1a1a;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border: 1px solid #333;
+}
+
+.review-item:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+  transform: translateY(-3px);
+}
+
+body.dark .review-item:hover {
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+}
+
+.review-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.review-user {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.user-icon {
+  color: #777;
+  font-size: 1.1rem;
+}
+
+body.dark .user-icon {
+  color: #aaa;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #333;
+}
+
+body.dark .user-name {
+  color: #eee;
+}
+
+.review-date {
+  font-size: 0.85rem;
+  color: #777;
+}
+
+body.dark .review-date {
+  color: #888;
+}
+
+.review-rating {
+  display: flex;
+  gap: 0.3rem;
+  margin-bottom: 0.7rem;
+}
+
+.review-rating .star-filled {
+  color: #ffb700;
+  font-size: 1rem;
+}
+
+.review-rating .star-empty {
+  color: #d1d1d1;
+  font-size: 1rem;
+}
+
+body.dark .review-rating .star-empty {
+  color: #555;
+}
+
+.review-comment {
+  color: #555;
+  line-height: 1.6;
+  font-size: 1rem;
+}
+
+body.dark .review-comment {
+  color: #ccc;
+}
+
+@media (max-width: 768px) {
+  .service-reviews {
+    padding: 0 1rem;
+  }
+  
+  .review-item {
+    padding: 1.2rem;
+  }
+  
+  .reviews-title {
+    font-size: 1.3rem;
+  }
+} 

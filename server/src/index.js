@@ -9,7 +9,10 @@ app.use(cors());
 app.use(express.json());
 
 const authRoutes = require('./routes/auth');
+const reviewRoutes = require('./routes/reviews');
+
 app.use('/auth', authRoutes);
+app.use('/reviews', reviewRoutes);
 
 app.get('/', (req, res) => {
   res.send('Backend is running!');

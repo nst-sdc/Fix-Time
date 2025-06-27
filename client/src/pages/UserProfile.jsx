@@ -4,7 +4,7 @@ import axios from 'axios';
 import { FiEdit2, FiSave, FiX, FiUser, FiPhone, FiMapPin, FiCalendar, FiMail } from 'react-icons/fi';
 import './UserProfile.css';
 
-const UserProfile = ({ isLoggedIn, setIsLoggedIn }) => {
+const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -98,6 +98,10 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn }) => {
       // Update the logged-in user data
       if (setIsLoggedIn) {
         setIsLoggedIn(response.data.user);
+      }
+      // Update the global user profile for Dashboard
+      if (setUserProfile) {
+        setUserProfile(response.data.user);
       }
 
       setTimeout(() => setSuccess(''), 3000);

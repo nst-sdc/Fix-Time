@@ -1,0 +1,103 @@
+.service-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.service-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  border: 1px solid transparent;
+}
+
+body.dark .service-card {
+  background-color: #1a1a1a;
+  border-color: #333;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+  border-color: #f0f0f0;
+}
+
+body.dark .service-card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  border-color: #444;
+}
+
+.service-icon {
+  background: linear-gradient(135deg, #FF9A8B 0%, #FF6B8B 100%);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.service-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.service-name {
+  font-weight: 600;
+  font-size: 1.1rem;
+  color: #333;
+  margin: 0;
+}
+
+body.dark .service-name {
+  color: #fff;
+}
+
+.book-now-btn {
+  background: linear-gradient(90deg, #FF758C, #FF7EB3);
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+  align-self: flex-start;
+}
+
+.book-now-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 117, 140, 0.3);
+}
+
+@media (max-width: 768px) {
+  .service-card {
+    padding: 1.2rem;
+  }
+  
+  .service-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 1.2rem;
+  }
+  
+  .service-name {
+    font-size: 1rem;
+  }
+  
+  .book-now-btn {
+    padding: 0.4rem 0.8rem;
+    font-size: 0.9rem;
+  }
+} 

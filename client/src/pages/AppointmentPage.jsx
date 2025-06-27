@@ -1,185 +1,73 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { FaCalendarAlt, FaClock, FaUser, FaPhone, FaMapPin, FaArrowLeft, FaInfoCircle } from 'react-icons/fa';
+import React, { useState, useEffect } from 'react';
+import AppointmentBooking from '../components/AppointmentBooking.jsx';
+import ServiceReviews from '../components/ServiceReviews.jsx';
+import { useLocation } from 'react-router-dom';
 import './AppointmentPage.css';
+import { fetchServiceRating } from '../utils/serviceUtils';
+import { FaStar } from 'react-icons/fa';
 
 const AppointmentPage = () => {
-  const navigate = useNavigate();
-  const [selectedService, setSelectedService] = useState('');
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedTime, setSelectedTime] = useState('');
-  const [notes, setNotes] = useState('');
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const service = searchParams.get('service');
+  const [serviceId, setServiceId] = useState('mock-service-id'); // In a real app, this would come from API
+  const [showReviews, setShowReviews] = useState(false);
+  const [serviceRating, setServiceRating] = useState({ avgRating: 4.1, totalReviews: 3 });
 
-  const services = [
-    { id: 'general', name: 'General Consultation', duration: '30 min', price: '$50' },
-    { id: 'emergency', name: 'Emergency Service', duration: '45 min', price: '$75' },
-    { id: 'followup', name: 'Follow-up Visit', duration: '20 min', price: '$35' },
-    { id: 'specialist', name: 'Specialist Consultation', duration: '60 min', price: '$100' }
-  ];
-
-  const timeSlots = [
-    '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
-    '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'
-  ];
-
-  const handleBackToDashboard = () => {
-    navigate('/dashboard');
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Placeholder for future booking functionality
-    alert('Booking functionality coming soon! This is a placeholder.');
-  };
-
-  const getMinDate = () => {
-    const today = new Date();
-    return today.toISOString().split('T')[0];
-  };
+  useEffect(() => {
+    // In a real app, we would fetch the service details including its ID
+    // For demo purposes, we're using a mock ID
+    if (service) {
+      // Mock service ID based on service name
+      const mockId = `service-${service.replace(/\s+/g, '-').toLowerCase()}`;
+      setServiceId(mockId);
+      
+      // Fetch service rating
+      const getRating = async () => {
+        try {
+          const rating = await fetchServiceRating(mockId);
+          setServiceRating(rating);
+        } catch (error) {
+          console.error('Error fetching service rating:', error);
+          // Use default rating if fetch fails
+          setServiceRating({ avgRating: 4.1, totalReviews: 3 });
+        }
+      };
+      
+      getRating();
+    }
+  }, [service]);
 
   return (
     <div className="appointment-page">
-      <div className="appointment-container">
-        {/* Header */}
-        <div className="appointment-header">
-          <button className="back-button" onClick={handleBackToDashboard}>
-            <FaArrowLeft /> Back to Dashboard
-          </button>
-          <h1 className="appointment-title">Book Your Appointment</h1>
-          <p className="appointment-subtitle">Schedule your visit with our professional team</p>
-        </div>
-
-        {/* Coming Soon Notice */}
-        <div className="coming-soon-notice">
-          <FaInfoCircle className="notice-icon" />
-          <div className="notice-content">
-            <h3>Booking System Coming Soon!</h3>
-            <p>We're currently developing our advanced booking system. For now, you can explore the interface and see what features will be available.</p>
-          </div>
-        </div>
-
-        <div className="appointment-content">
-          {/* Service Selection */}
-          <div className="appointment-section">
-            <h2 className="section-title">
-              <FaCalendarAlt className="section-icon" />
-              Select Service
-            </h2>
-            <div className="services-grid">
-              {services.map((service) => (
-                <div
-                  key={service.id}
-                  className={`service-card ${selectedService === service.id ? 'selected' : ''}`}
-                  onClick={() => setSelectedService(service.id)}
-                >
-                  <h3>{service.name}</h3>
-                  <div className="service-details">
-                    <span className="duration">{service.duration}</span>
-                    <span className="price">{service.price}</span>
-                  </div>
-                </div>
-              ))}
+      <div className="appointment-header">
+        <h1>Book an Appointment</h1>
+        {service && (
+          <div className="service-info">
+            <p className="service-subtitle">For: {service}</p>
+            <div className="service-rating-summary">
+              <div className="rating-display">
+                <FaStar className="star-icon" />
+                <span className="rating-value">{serviceRating.avgRating}</span>
+              </div>
+              <button 
+                className="view-reviews-btn"
+                onClick={() => setShowReviews(!showReviews)}
+              >
+                {showReviews ? 'Hide Reviews' : 'View Reviews'}
+              </button>
             </div>
           </div>
-
-          {/* Date and Time Selection */}
-          <div className="appointment-section">
-            <h2 className="section-title">
-              <FaClock className="section-icon" />
-              Select Date & Time
-            </h2>
-            <div className="datetime-selection">
-              <div className="date-selection">
-                <label>Preferred Date:</label>
-                <input
-                  type="date"
-                  value={selectedDate}
-                  onChange={(e) => setSelectedDate(e.target.value)}
-                  min={getMinDate()}
-                  className="date-input"
-                />
-              </div>
-              
-              <div className="time-selection">
-                <label>Preferred Time:</label>
-                <div className="time-slots">
-                  {timeSlots.map((time) => (
-                    <button
-                      key={time}
-                      type="button"
-                      className={`time-slot ${selectedTime === time ? 'selected' : ''}`}
-                      onClick={() => setSelectedTime(time)}
-                    >
-                      {time}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Additional Notes */}
-          <div className="appointment-section">
-            <h2 className="section-title">
-              <FaUser className="section-icon" />
-              Additional Information
-            </h2>
-            <div className="notes-section">
-              <label>Special Notes or Requirements:</label>
-              <textarea
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Please mention any specific concerns, symptoms, or special requirements..."
-                className="notes-textarea"
-                rows="4"
-              />
-            </div>
-          </div>
-
-          {/* Contact Information */}
-          <div className="appointment-section">
-            <h2 className="section-title">
-              <FaPhone className="section-icon" />
-              Contact Information
-            </h2>
-            <div className="contact-info">
-              <div className="contact-item">
-                <FaPhone className="contact-icon" />
-                <div>
-                  <strong>Phone:</strong> +1 (555) 123-4567
-                </div>
-              </div>
-              <div className="contact-item">
-                <FaMapPin className="contact-icon" />
-                <div>
-                  <strong>Address:</strong> 123 Medical Center Dr, Suite 100
-                </div>
-              </div>
-              <div className="contact-item">
-                <FaClock className="contact-icon" />
-                <div>
-                  <strong>Hours:</strong> Mon-Fri 9:00 AM - 6:00 PM
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Submit Button */}
-          <div className="submit-section">
-            <button
-              type="button"
-              className="book-appointment-btn"
-              onClick={handleSubmit}
-              disabled={!selectedService || !selectedDate || !selectedTime}
-            >
-              Book Appointment
-            </button>
-            <p className="submit-note">
-              * This is a demo interface. Actual booking functionality will be available soon.
-            </p>
-          </div>
-        </div>
+        )}
       </div>
+      
+      {showReviews && service && (
+        <div className="service-reviews-section">
+          <ServiceReviews serviceId={serviceId} />
+        </div>
+      )}
+      
+      <AppointmentBooking />
     </div>
   );
 };
