@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import { IoMenuOutline, IoCloseOutline } from 'react-icons/io5';
-import { FaUser, FaSignOutAlt, FaChevronDown } from 'react-icons/fa';
+import { FaUser, FaSignOutAlt, FaChevronDown, FaUserEdit } from 'react-icons/fa';
 import { BsSun, BsMoon } from 'react-icons/bs';
 
 const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => {
@@ -116,6 +116,11 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => 
                   <Link to="/dashboard" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
                     <FaUser className="dropdown-icon" />
                     <span>Dashboard</span>
+                  </Link>
+                  
+                  <Link to="/profile" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
+                    <FaUserEdit className="dropdown-icon" />
+                    <span>Profile</span>
                   </Link>
                   
                   <div className="dropdown-item logout-item" onClick={handleLogout}>

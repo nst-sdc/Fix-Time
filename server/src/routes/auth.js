@@ -12,4 +12,7 @@ router.post('/login', authController.login);
 // Get user profile - protected route
 router.get('/profile', auth, authController.getProfile);
 
+// Update user profile - protected route
+router.put('/profile', auth, authController.updateProfile);
+
 module.exports = router;

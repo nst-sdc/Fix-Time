@@ -7,6 +7,7 @@ import './App.css';
 import AuthPage from './pages/AuthPage';
 import AppointmentPage from './pages/AppointmentPage';
 import Dashboard from './pages/Dashboard';
+import UserProfile from './pages/UserProfile';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
@@ -143,7 +144,10 @@ function App() {
               <Dashboard userProfile={userProfile} setUserProfile={setUserProfile} /> 
               : <Navigate to="/login" />} 
             />
-            <Route path="/profile" element={isLoggedIn ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
+            <Route path="/profile" element={isLoggedIn ? 
+              <UserProfile isLoggedIn={isLoggedIn} setIsLoggedIn={handleLogin} setUserProfile={setUserProfile} /> 
+              : <Navigate to="/login" />} 
+            />
           </Routes>
         </main>
         <Footer />

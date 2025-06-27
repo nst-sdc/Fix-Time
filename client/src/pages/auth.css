@@ -72,26 +72,47 @@
   color: #444;
 }
 
-.form-field input {
+.form-field input,
+.form-field textarea,
+.form-field select {
   height: 48px;
   padding: 0 1rem;
   border: 1px solid #ddd;
   border-radius: 8px;
   font-size: 1rem;
   transition: all 0.2s ease;
+  font-family: inherit;
 }
 
-.form-field input:focus {
+.form-field textarea {
+  height: auto;
+  min-height: 80px;
+  resize: vertical;
+  padding: 0.75rem 1rem;
+}
+
+.form-field select {
+  cursor: pointer;
+  background-color: white;
+}
+
+.form-field input:focus,
+.form-field textarea:focus,
+.form-field select:focus {
   border-color: #5a3dff;
   box-shadow: 0 0 0 3px rgba(90, 61, 255, 0.1);
   outline: none;
 }
 
-.form-field input.input-error {
+.form-field input.input-error,
+.form-field textarea.input-error,
+.form-field select.input-error {
   border-color: #e74c3c;
 }
 
-.form-field input.input-error:focus {
+.form-field input.input-error:focus,
+.form-field textarea.input-error:focus,
+.form-field select.input-error:focus {
   box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
 }
 
@@ -421,15 +442,29 @@ body.dark .form-field label {
   color: #ccc;
 }
 
-body.dark .form-field input {
-  background: #1a1a1a;
-  border: 1px solid #444;
-  color: #fff;
+body.dark .form-field input,
+body.dark .form-field textarea,
+body.dark .form-field select {
+  background-color: #2d3748;
+  border-color: #4a5568;
+  color: #e2e8f0;
 }
 
-body.dark .form-field input:focus {
-  border-color: #667eea;
-  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.2);
+body.dark .form-field input:focus,
+body.dark .form-field textarea:focus,
+body.dark .form-field select:focus {
+  border-color: #5a3dff;
+  box-shadow: 0 0 0 3px rgba(90, 61, 255, 0.2);
+}
+
+body.dark .form-field input::placeholder,
+body.dark .form-field textarea::placeholder {
+  color: #a0aec0;
+}
+
+body.dark .form-field select option {
+  background-color: #2d3748;
+  color: #e2e8f0;
 }
 
 body.dark .password-toggle {
