@@ -20,8 +20,6 @@ exports.register = async (req, res) => {
     const user = new User({ email, password });
     await user.save();
 
-    // Don't generate JWT for registration
-    // Just return success message
     res.status(201).json({ 
       message: 'User registered successfully. Please log in.',
       success: true
@@ -78,3 +76,43 @@ exports.getProfile = async (req, res) => {
     res.status(500).json({ error: 'Server error fetching profile' });
   }
 };
+
+// Google Sign-In
+exports.googleLogin = async (req, res) => {
+  console.log('Google login request body:', req.body);
+  const { email, name, sub } = req.body;
+  try {
+    if (!email || !sub || !name) {
+      return res.status(400).json({ error: 'Invalid Google data received: missing email, name, or sub.' });
+    }
+    let user = await User.findOne({ email });
+    if (!user) {
+      user = new User({
+        email,
+        name,
+        password: sub, // sub is a unique ID from Google
+      });
+      await user.save();
+    }
+    if (!process.env.JWT_SECRET) {
+      console.error('JWT_SECRET is not set in environment variables!');
+      return res.status(500).json({ error: 'Server misconfiguration: JWT secret missing.' });
+    }
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '1d',
+    });
+    res.json({
+      message: 'Google login successful',
+      token,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.name,
+      },
+    });
+  } catch (err) {
+    console.error('Google login error:', err);
+    res.status(500).json({ error: 'Server error during Google login' });
+  }
+};
+

@@ -18,18 +18,41 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleGoogleLogin = (credentialResponse) => {
-    const userData = jwtDecode(credentialResponse.credential);
-    console.log("✅ Google User Info:", userData);
-
-    // Optional: Call your backend API to handle Google login
-    // axios.post('http://localhost:5001/auth/google', userData)
-    //   .then(res => {
-    //     localStorage.setItem('token', res.data.token);
-    //     setIsLoggedIn && setIsLoggedIn(res.data.user);
-    //     navigate('/');
-    //   })
-    //   .catch(err => setError('Google login failed'));
+  const handleGoogleLogin = async (credentialResponse) => {
+    setError('');
+    setSuccess('');
+    try {
+      if (!credentialResponse || !credentialResponse.credential) {
+        setError('Google login failed: No credential received.');
+        return;
+      }
+      let userData;
+      try {
+        userData = jwtDecode(credentialResponse.credential);
+      } catch (decodeErr) {
+        setError('Google login failed: Unable to decode credential.');
+        return;
+      }
+      const res = await axios.post('http://localhost:5001/auth/google', {
+        email: userData.email,
+        name: userData.name,
+        sub: userData.sub
+      });
+      if (res.data.token) {
+        localStorage.setItem('token', res.data.token);
+        setIsLoggedIn && setIsLoggedIn(res.data.user);
+        navigate('/');
+      } else {
+        setError(res.data.error || 'Google login failed');
+      }
+    } catch (err) {
+      if (err.response && err.response.data && err.response.data.error) {
+        setError('Google login failed: ' + err.response.data.error);
+      } else {
+        setError('Google login failed: Unexpected error.');
+      }
+      console.error('Google login error:', err);
+    }
   };
 
   useEffect(() => {
@@ -76,7 +99,7 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
         if (res.data.token) {
           setSuccess(res.data.message || 'Login successful');
           localStorage.setItem('token', res.data.token);
-          if (setIsLoggedIn) setIsLoggedIn(res.data.user);
+          setIsLoggedIn && setIsLoggedIn(res.data.user);
           setTimeout(() => {
             navigate('/');
           }, 1500);
@@ -89,7 +112,7 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
           password: passwd
         });
 
-        setSuccess('Registration successful! Please log in with your credentials.');
+        setSuccess('Registration successful. Please log in.');
         setTimeout(() => {
           navigate('/login');
         }, 2000);
@@ -105,7 +128,7 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
     <div className={`auth-container ${isLogin ? 'login-mode' : 'register-mode'}`}>
       <div className="auth-card">
         <h2 className="auth-title">{isLogin ? 'Login' : 'Register'} Here!</h2>
-        
+
         <form className="auth-form" onSubmit={handleSubmit}>
           <div className="form-group">
             <input
@@ -127,10 +150,7 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
               onChange={(e) => setPasswd(e.target.value)}
               required
             />
-            <span
-              onClick={() => setShowPass(!showPass)}
-              className="eye-toggle"
-            >
+            <span onClick={() => setShowPass(!showPass)} className="eye-toggle">
               {showPass ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
             </span>
           </div>
@@ -145,10 +165,7 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
                 onChange={(e) => setConfirmPasswd(e.target.value)}
                 required
               />
-              <span
-                onClick={() => setShowConfirmPass(!showConfirmPass)}
-                className="eye-toggle"
-              >
+              <span onClick={() => setShowConfirmPass(!showConfirmPass)} className="eye-toggle">
                 {showConfirmPass ? <AiOutlineEyeInvisible /> : <AiOutlineEye />}
               </span>
             </div>
@@ -159,12 +176,12 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
           </button>
         </form>
 
-        {/* ✅ Google Sign-In Button */}
         <div style={{ marginTop: '20px', display: 'flex', justifyContent: 'center' }}>
           <GoogleLogin
             onSuccess={handleGoogleLogin}
             onError={() => {
-              console.log('❌ Google Login Failed');
+              setError('Google Login Failed: Unable to authenticate with Google.');
+              console.log('Google Login Failed');
             }}
           />
         </div>
