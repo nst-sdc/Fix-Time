@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import './CategoryPage.css';
 import { FaUserMd, FaTooth, FaEye, FaWalking, FaVial, FaSyringe, FaCommentMedical, FaAppleAlt } from 'react-icons/fa';
-import { Link } from 'react-router-dom';
+import ServiceCard from '../../components/ServiceCard';
+import { addRatingsToServices } from '../../utils/serviceUtils';
 
-const services = [
+const serviceData = [
   { name: "General Physician Appointments", icon: <FaUserMd /> },
   { name: "Dentist Checkups", icon: <FaTooth /> },
   { name: "Eye Specialist Consultations", icon: <FaEye /> },
@@ -15,22 +16,30 @@ const services = [
 ];
 
 const HealthcareCate = () => {
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    // In a real app, this would be an API call to fetch services with ratings
+    // For demo purposes, we're adding mock ratings to our static data
+    setLoading(true);
+    const servicesWithRatings = addRatingsToServices(serviceData);
+    setServices(servicesWithRatings);
+    setLoading(false);
+  }, []);
+
   return (
     <div className="category-page">
       <h1 className="category-title">🏥 Healthcare & Wellness</h1>
-      <div className="services-list">
-        {services.map((service, idx) => (
-          <Link to={`/book?service=${encodeURIComponent(service.name)}`} className="service-link" key={idx}>
-            <div className="service-card">
-              <div className="service-icon">{service.icon}</div>
-              <div className="service-details">
-                <p className="service-name">{service.name}</p>
-                <button className="book-now-btn">Book Now</button>
-              </div>
-            </div>
-          </Link>
-        ))}
-      </div>
+      {loading ? (
+        <div className="loading-state">Loading services...</div>
+      ) : (
+        <div className="services-list">
+          {services.map((service, idx) => (
+            <ServiceCard key={idx} service={service} />
+          ))}
+        </div>
+      )}
     </div>
   );
 };

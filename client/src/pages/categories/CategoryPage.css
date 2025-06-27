@@ -40,6 +40,35 @@ body.dark .services-list {
   box-shadow: 0 2px 16px rgba(0, 0, 0, 0.15);
 }
 
+/* Loading state */
+.loading-state {
+  width: 100%;
+  background: rgba(245, 247, 250, 0.85);
+  border-radius: 22px;
+  box-shadow: 0 2px 16px rgba(80, 80, 120, 0.06);
+  padding: 4rem 2rem;
+  text-align: center;
+  color: #888;
+  font-size: 1.1rem;
+  animation: fade-in 0.5s ease;
+  transition: all 0.3s ease;
+}
+
+body.dark .loading-state {
+  background: rgba(30, 30, 30, 0.6);
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.15);
+  color: #aaa;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .service-link {
   text-decoration: none;
   color: inherit;
