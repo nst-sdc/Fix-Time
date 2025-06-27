@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { FaStar } from 'react-icons/fa';
 import './ReviewForm.css';
 
+// ReviewForm component for handling user reviews in both demo and production modes
 const ReviewForm = ({ appointmentId, onReviewSubmitted }) => {
   const [rating, setRating] = useState(0);
   const [hover, setHover] = useState(0);
