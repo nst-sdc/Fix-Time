@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
+import axios from 'axios';
 import "./AppointmentBooking.css";
+import ReviewForm from './ReviewForm';
 
 const timeSlots = [
   "8:00 AM", "9:00 AM", "10:00 AM",
@@ -25,6 +27,8 @@ const AppointmentBooking = () => {
     phone: "",
     reason: preSelectedService || ""
   });
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [bookedAppointmentId, setBookedAppointmentId] = useState(null);
 
   useEffect(() => {
     const generateDates = () => {
@@ -59,7 +63,7 @@ const AppointmentBooking = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (!selectedDate || !selectedTime) {
@@ -67,11 +71,60 @@ const AppointmentBooking = () => {
       return;
     }
     
+    const appointmentData = {
+      ...formData,
+      date: selectedDate,
+      time: selectedTime,
+      // In a real app, these would come from the database:
+      serviceId: "mock-service-id", 
+      userId: "mock-user-id"
+    };
+    
+    // In a real app, you would send this to the backend API
+    // try {
+    //   const token = localStorage.getItem('token');
+    //   const response = await axios.post(
+    //     'http://localhost:5001/appointments/book',
+    //     appointmentData,
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`
+    //       }
+    //     }
+    //   );
+    //   
+    //   setBookedAppointmentId(response.data.appointment._id);
+    //   setBookedSlots([...bookedSlots, { date: selectedDate, time: selectedTime }]);
+    //   
+    //   // For demo purposes, let's immediately mark the appointment as completed
+    //   // In a real app, this would happen when the actual appointment is completed
+    //   const mockCompleteResponse = await axios.patch(
+    //     `http://localhost:5001/appointments/${response.data.appointment._id}/complete`,
+    //     {},
+    //     {
+    //       headers: {
+    //         Authorization: `Bearer ${token}`
+    //       }
+    //     }
+    //   );
+    //   
+    //   setShowReviewForm(true);
+    //   
+    // } catch (err) {
+    //   console.error('Error booking appointment:', err);
+    //   alert('Failed to book appointment. Please try again.');
+    // }
+
+    // For demo purposes, let's just simulate a successful booking
     setBookedSlots([...bookedSlots, { date: selectedDate, time: selectedTime }]);
+    setBookedAppointmentId("mock-appointment-id-" + Date.now());
+    setShowReviewForm(true);
+    
     alert(
       `✅ Appointment booked on ${selectedDate} at ${selectedTime}\n👤 Name: ${formData.name}`
     );
     
+    // Reset form
     setSelectedTime("");
     setFormData({ name: "", email: "", phone: "", reason: preSelectedService || "" });
   };
@@ -94,6 +147,36 @@ const AppointmentBooking = () => {
     return isPast || isBooked;
   };
 
+  const handleReviewSubmitted = (review) => {
+    // Show success message or update UI as needed
+    console.log('Review submitted successfully:', review);
+    
+    // For demo purposes, just hide the review form after a delay
+    setTimeout(() => {
+      alert('Thank you for your review! Your feedback is valuable to us.');
+      setShowReviewForm(false);
+    }, 2000);
+  };
+
+  // If showing review form, render it instead of booking form
+  if (showReviewForm) {
+    return (
+      <div className="booking-container">
+        <h2>Thank You for Booking!</h2>
+        <p className="booking-success-message">
+          Your appointment has been confirmed. We look forward to serving you!
+        </p>
+        <div className="review-form-wrapper">
+          <ReviewForm 
+            appointmentId={bookedAppointmentId} 
+            onReviewSubmitted={handleReviewSubmitted}
+          />
+        </div>
+      </div>
+    );
+  }
+
+  // Original booking form
   return (
     <div className="booking-container">
       <h2>Book Your Appointment!</h2>
