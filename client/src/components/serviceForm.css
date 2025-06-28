@@ -1,0 +1,143 @@
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+/* Modal container */
+.service-form-modal {
+  background-color: white;
+  color: #333;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 550px;
+  padding: 2rem;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  animation: fadeIn 0.3s ease-in-out;
+  position: relative;
+}
+
+body.dark .service-form-modal {
+  background-color: #1a1a1a;
+  color: #fff;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+}
+
+.service-form-modal h2 {
+  margin-bottom: 1.5rem;
+  text-align: center;
+  font-size: 1.5rem;
+  color: inherit;
+}
+
+.service-form-modal form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Inputs */
+.service-form-modal input,
+.service-form-modal select,
+.service-form-modal textarea {
+  padding: 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 1rem;
+  background-color: #fafafa;
+  color: #333;
+  transition: border 0.3s;
+}
+
+body.dark .service-form-modal input,
+body.dark .service-form-modal select,
+body.dark .service-form-modal textarea {
+  background-color: #2a2a2a;
+  color: #fff;
+  border-color: #444;
+}
+
+.service-form-modal input:focus,
+.service-form-modal select:focus,
+.service-form-modal textarea:focus {
+  outline: none;
+  border-color: #ff7eb3;
+}
+
+/* Buttons */
+.button-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.button-row button {
+  flex: 1;
+  padding: 0.65rem 1rem;
+  font-weight: 600;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+/* Gradient submit button */
+.submit-btn {
+  background: linear-gradient(90deg, #FF758C, #FF7EB3);
+  color: white;
+}
+
+.submit-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 117, 140, 0.3);
+}
+
+/* Cancel button */
+.cancel-btn {
+  background-color: #e0e0e0;
+  color: #333;
+}
+
+.cancel-btn:hover {
+  background-color: #ccc;
+}
+
+body.dark .cancel-btn {
+  background-color: #333;
+  color: #fff;
+}
+
+body.dark .cancel-btn:hover {
+  background-color: #444;
+}
+
+/* Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-15px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .service-form-modal {
+    padding: 1.5rem;
+  }
+
+  .button-row {
+    flex-direction: column;
+  }
+}

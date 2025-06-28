@@ -10,9 +10,11 @@ app.use(express.json());
 
 const authRoutes = require('./routes/auth');
 const reviewRoutes = require('./routes/reviews');
+const serviceRoutes = require ('./routes/serviceRoutes')
 
 app.use('/auth', authRoutes);
 app.use('/reviews', reviewRoutes);
+app.use('/services', serviceRoutes);
 
 app.get('/', (req, res) => {
   res.send('Backend is running!');
