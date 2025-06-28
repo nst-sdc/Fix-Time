@@ -39,7 +39,33 @@ const serviceSchema = new mongoose.Schema({
   totalReviews: { 
     type: Number, 
     default: 0 
+  },
+
+  // ✅ New fields for dynamic listing
+  brand: {
+    type: String,
+    trim: true
+  },
+  address: {
+    type: String,
+    trim: true
+  },
+  city: {
+    type: String,
+    trim: true
+  },
+  timeSlots: {
+    type: [String],
+    default: []
+  },
+  contact: {
+    type: String,
+    trim: true
+  },
+  imageUrl: {
+    type: String,
+    trim: true
   }
 }, { timestamps: true });
 
-module.exports = mongoose.model('Service', serviceSchema); 
+module.exports = mongoose.model('Service', serviceSchema);
