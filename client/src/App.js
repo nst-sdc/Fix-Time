@@ -23,9 +23,6 @@ import PrivateEvents from './pages/categories/PrivateEvents';
 import HotelRestaurant from './pages/categories/HotelRestaurant';
 import AppointmentCalendar from './pages/AppointmentCalendar';
 
-// Set API base URL with fallback
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
-
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
@@ -65,7 +62,7 @@ function App() {
       // Fetch user profile data
       const fetchUserProfile = async () => {
         try {
-          const res = await axios.get(`${API_BASE_URL}/auth/profile`, {
+          const res = await axios.get('http://localhost:5001/auth/profile', {
             headers: {
               Authorization: `Bearer ${token}`
             }

@@ -8,9 +8,6 @@ import { FaFilter, FaCalendarDay, FaTimes, FaEdit, FaTrash, FaMapMarkerAlt, FaBu
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 
-// Set API base URL with fallback
-const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
-
 const AppointmentCalendar = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,7 +52,7 @@ const AppointmentCalendar = () => {
       console.log("Fetching appointments...");
       
       // Fetch appointments from API with timeout
-      const response = await axios.get(`${API_BASE_URL}/appointments`, {
+      const response = await axios.get('http://localhost:5001/appointments', {
         headers: {
           Authorization: `Bearer ${token}`
         },
@@ -67,14 +64,6 @@ const AppointmentCalendar = () => {
       if (response.data && response.data.success) {
         if (response.data.appointments && response.data.appointments.length > 0) {
           console.log("Loaded", response.data.appointments.length, "appointments");
-          
-          // Check if appointments have valid _id values
-          const validAppointments = response.data.appointments.filter(app => app._id);
-          if (validAppointments.length !== response.data.appointments.length) {
-            console.warn("Some appointments are missing _id fields:", 
-              response.data.appointments.filter(app => !app._id));
-          }
-          
           setAppointments(response.data.appointments);
         } else {
           console.log("No appointments found");
@@ -183,7 +172,7 @@ const AppointmentCalendar = () => {
         
         // Call API to update appointment status
         const response = await axios.patch(
-          `${API_BASE_URL}/appointments/${id}/status`,
+          `http://localhost:5001/appointments/${id}/status`,
           { status: 'cancelled' },
           {
             headers: {
