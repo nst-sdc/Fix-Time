@@ -87,30 +87,9 @@ npm start
 ```
 Frontend runs at: http://localhost:3000
 
-### ✅ Setup Checklist After Cloning
 
-Follow these steps after cloning the repository to ensure everything works correctly:
 
-#### 1. Install Dependencies
-```bash
-# Install server dependencies
-cd server
-npm install
-
-# Install client dependencies
-cd ../client
-npm install
-```
-
-#### 2. Create Environment Variables
-Create a `.env` file in the `server/` directory with the following content:
-```
-PORT=5001
-MONGODB_URI=mongodb://localhost:27017/fixtime
-JWT_SECRET=thisissecretkey
-```
-
-#### 3. Ensure MongoDB is Running
+#### Ensure MongoDB is Running
 Make sure MongoDB is installed and running on your local machine. On most systems, you can check with:
 ```bash
 # Check if MongoDB is running
@@ -129,7 +108,7 @@ brew services start mongodb-community
 
 For other operating systems, follow the [official MongoDB installation guide](https://www.mongodb.com/docs/manual/installation/).
 
-#### 4. Start the Applications
+#### Start the Applications
 ```bash
 # Start the server (from server directory)
 cd server
