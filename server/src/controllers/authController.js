@@ -102,14 +102,34 @@ exports.login = async (req, res) => {
 // Get user profile
 exports.getProfile = async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId).select('-password');
+    console.log('Getting profile for user ID:', req.user.id);
+    const user = await User.findById(req.user.id).select('-password');
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      console.log('User not found with ID:', req.user.id);
+      return res.status(404).json({ 
+        success: false,
+        error: 'User not found' 
+      });
     }
-    res.json(user);
+    
+    console.log('User found:', user.email);
+    res.json({
+      success: true,
+      user: {
+        id: user._id,
+        email: user.email,
+        name: user.fullName,
+        phoneNumber: user.phoneNumber,
+        address: user.address,
+        dateOfBirth: user.dateOfBirth,
+        gender: user.gender,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt
+      }
+    });
   } catch (err) {
     console.error('Profile fetch error:', err);
-    res.status(500).json({ error: 'Server error fetching profile' });
+    res.status(500).json({ success: false, error: 'Server error fetching profile' });
   }
 };
 
@@ -125,16 +145,22 @@ exports.updateProfile = async (req, res) => {
       gender 
     } = req.body;
 
-    const user = await User.findById(req.user.userId);
+    const user = await User.findById(req.user.id);
     if (!user) {
-      return res.status(404).json({ error: 'User not found' });
+      return res.status(404).json({ 
+        success: false,
+        error: 'User not found' 
+      });
     }
 
     // Check if email is being changed and if it's already taken by another user
     if (email && email !== user.email) {
       const existingUser = await User.findOne({ email });
       if (existingUser) {
-        return res.status(400).json({ error: 'Email is already taken by another user' });
+        return res.status(400).json({ 
+          success: false,
+          error: 'Email is already taken by another user' 
+        });
       }
     }
 
@@ -149,6 +175,7 @@ exports.updateProfile = async (req, res) => {
     await user.save();
 
     res.json({ 
+      success: true,
       message: 'Profile updated successfully',
       user: {
         id: user._id,
@@ -164,6 +191,9 @@ exports.updateProfile = async (req, res) => {
     });
   } catch (err) {
     console.error('Profile update error:', err);
-    res.status(500).json({ error: 'Server error updating profile' });
+    res.status(500).json({ 
+      success: false,
+      error: 'Server error updating profile' 
+    });
   }
 };

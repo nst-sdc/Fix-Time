@@ -116,6 +116,9 @@ const Dashboard = ({ userProfile, setUserProfile }) => {
           <div className="panel-header">
             <FaCalendarAlt className="panel-icon" />
             <h2>Upcoming Appointments</h2>
+            <Link to="/calendar" className="view-calendar-link">
+              View Calendar
+            </Link>
           </div>
           
           {loading ? (
@@ -130,19 +133,19 @@ const Dashboard = ({ userProfile, setUserProfile }) => {
               ))}
             </div>
           ) : (
-            <div className="empty-state">
-              <FaClock className="empty-icon" />
-              <p>You don't have any upcoming appointments.</p>
+          <div className="empty-state">
+            <FaClock className="empty-icon" />
+            <p>You don't have any upcoming appointments.</p>
               <Link to="/services" className="book-btn">Book Now</Link>
-            </div>
+          </div>
           )}
         </div>
         
         <div className="dashboard-panel appointment-history">
           <div className="panel-header" onClick={() => setExpandHistory(!expandHistory)}>
             <div className="header-content">
-              <FaHistory className="panel-icon" />
-              <h2>Appointment History</h2>
+            <FaHistory className="panel-icon" />
+            <h2>Appointment History</h2>
             </div>
             <div className="expand-icon">
               {expandHistory ? <FaAngleUp /> : <FaAngleDown />}
@@ -163,9 +166,9 @@ const Dashboard = ({ userProfile, setUserProfile }) => {
                   ))}
                 </div>
               ) : (
-                <div className="empty-state">
-                  <p>You don't have any past appointments.</p>
-                </div>
+          <div className="empty-state">
+            <p>You don't have any past appointments.</p>
+          </div>
               )}
             </>
           )}

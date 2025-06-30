@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import "./AppointmentBooking.css";
 import ReviewForm from './ReviewForm';
@@ -11,10 +11,12 @@ const timeSlots = [
   "4:30 PM", "5:30 PM"
 ];
 
-const AppointmentBooking = () => {
+const AppointmentBooking = ({ serviceId = null }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const searchParams = new URLSearchParams(location.search);
   const preSelectedService = searchParams.get('service');
+  const preSelectedServiceId = searchParams.get('serviceId');
 
   // Generate 10 upcoming dates starting from today
   const [dateOptions, setDateOptions] = useState([]);
@@ -29,6 +31,7 @@ const AppointmentBooking = () => {
   });
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [bookedAppointmentId, setBookedAppointmentId] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     const generateDates = () => {
@@ -63,6 +66,13 @@ const AppointmentBooking = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  // Add phone validation function at the top of the component
+  const validatePhone = (phone) => {
+    // Basic validation: At least 10 digits
+    return /^\d{10,15}$/.test(phone.replace(/\D/g, ''));
+  };
+
+  // Update handleSubmit function to validate phone before submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     
@@ -70,63 +80,127 @@ const AppointmentBooking = () => {
       alert("Please select both a date and time for your appointment");
       return;
     }
-    
-    const appointmentData = {
-      ...formData,
-      date: selectedDate,
-      time: selectedTime,
-      // In a real app, these would come from the database:
-      serviceId: "mock-service-id", 
-      userId: "mock-user-id"
-    };
-    
-    // In a real app, you would send this to the backend API
-    // try {
-    //   const token = localStorage.getItem('token');
-    //   const response = await axios.post(
-    //     'http://localhost:5001/appointments/book',
-    //     appointmentData,
-    //     {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`
-    //       }
-    //     }
-    //   );
-    //   
-    //   setBookedAppointmentId(response.data.appointment._id);
-    //   setBookedSlots([...bookedSlots, { date: selectedDate, time: selectedTime }]);
-    //   
-    //   // For demo purposes, let's immediately mark the appointment as completed
-    //   // In a real app, this would happen when the actual appointment is completed
-    //   const mockCompleteResponse = await axios.patch(
-    //     `http://localhost:5001/appointments/${response.data.appointment._id}/complete`,
-    //     {},
-    //     {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`
-    //       }
-    //     }
-    //   );
-    //   
-    //   setShowReviewForm(true);
-    //   
-    // } catch (err) {
-    //   console.error('Error booking appointment:', err);
-    //   alert('Failed to book appointment. Please try again.');
-    // }
 
-    // For demo purposes, let's just simulate a successful booking
-    setBookedSlots([...bookedSlots, { date: selectedDate, time: selectedTime }]);
-    setBookedAppointmentId("mock-appointment-id-" + Date.now());
-    setShowReviewForm(true);
+    // Validate phone number
+    const phoneToUse = formData.phone.trim();
+    if (!validatePhone(phoneToUse)) {
+      alert("Please enter a valid phone number (at least 10 digits)");
+      return;
+    }
     
-    alert(
-      `✅ Appointment booked on ${selectedDate} at ${selectedTime}\n👤 Name: ${formData.name}`
-    );
+    // Parse selected date into a proper Date object
+    const [dayName, monthStr, dayNum] = selectedDate.replace(',', '').split(' ');
+    const year = new Date().getFullYear();
+    const months = {"Jan":0,"Feb":1,"Mar":2,"Apr":3,"May":4,"Jun":5,"Jul":6,"Aug":7,"Sep":8,"Oct":9,"Nov":10,"Dec":11};
     
-    // Reset form
-    setSelectedTime("");
-    setFormData({ name: "", email: "", phone: "", reason: preSelectedService || "" });
+    const appointmentDate = new Date(year, months[monthStr], parseInt(dayNum));
+    
+    setLoading(true);
+    
+    try {
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        alert("You must be logged in to book an appointment");
+        navigate('/login');
+        return;
+      }
+      
+      // Get user profile to use for customer details
+      const userResponse = await axios.get('http://localhost:5001/auth/profile', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      console.log("User profile response:", userResponse.data);
+      
+      if (!userResponse.data || !userResponse.data.success || !userResponse.data.user) {
+        console.error("Invalid user profile response:", userResponse.data);
+        throw new Error("Could not fetch user profile");
+      }
+      
+      const user = userResponse.data.user;
+      const effectiveServiceId = preSelectedServiceId || serviceId;
+      
+      console.log("Booking appointment with serviceId:", effectiveServiceId);
+      
+      // If no serviceId is provided, let's fetch the first available service of the requested name
+      let finalServiceId = effectiveServiceId;
+      
+      if (!finalServiceId && preSelectedService) {
+        // Try to find a service with the matching name
+        try {
+          const servicesResponse = await axios.get('http://localhost:5001/services', {
+            params: { name: preSelectedService }
+          });
+          
+          if (servicesResponse.data && servicesResponse.data.services && servicesResponse.data.services.length > 0) {
+            finalServiceId = servicesResponse.data.services[0]._id;
+            console.log("Found service by name:", finalServiceId);
+          }
+        } catch (err) {
+          console.error("Error finding service by name:", err);
+        }
+      }
+      
+      if (!finalServiceId) {
+        // If we still don't have a serviceId, get the first service from any category
+        try {
+          const servicesResponse = await axios.get('http://localhost:5001/services');
+          
+          if (servicesResponse.data && servicesResponse.data.services && servicesResponse.data.services.length > 0) {
+            finalServiceId = servicesResponse.data.services[0]._id;
+            console.log("Using first available service:", finalServiceId);
+          }
+        } catch (err) {
+          console.error("Error getting any services:", err);
+        }
+      }
+      
+      if (!finalServiceId) {
+        throw new Error("No service ID available for booking");
+      }
+      
+      // Use the correct user fields from the profile response
+      const appointmentData = {
+        serviceId: finalServiceId,
+        date: appointmentDate.toISOString(),
+        time: selectedTime,
+        notes: formData.reason,
+        customerName: formData.name || user.name,
+        customerEmail: formData.email || user.email,
+        customerPhone: phoneToUse
+      };
+      
+      console.log("Appointment data being sent:", appointmentData);
+      
+      // Create the appointment
+      const response = await axios.post(
+        'http://localhost:5001/appointments',
+        appointmentData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      
+      if (response.data && response.data.success) {
+        setBookedAppointmentId(response.data.appointment._id);
+        setBookedSlots([...bookedSlots, { date: selectedDate, time: selectedTime }]);
+        
+        alert(`✅ Appointment booked successfully on ${selectedDate} at ${selectedTime}`);
+        
+        // Navigate to calendar view to see the appointment
+        navigate('/calendar');
+      } else {
+        throw new Error(response.data?.message || "Failed to book appointment");
+      }
+    } catch (err) {
+      console.error('Error booking appointment:', err);
+      alert(`Failed to book appointment: ${err.message || 'Please try again.'}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const isSlotDisabled = (date, time) => {
@@ -274,8 +348,8 @@ const AppointmentBooking = () => {
           />
         </div>
 
-        <button className="confirm-button" type="submit">
-          Confirm Appointment
+        <button className="confirm-button" type="submit" disabled={loading}>
+          {loading ? "Booking..." : "Confirm Appointment"}
         </button>
       </form>
     </div>
