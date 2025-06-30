@@ -4,8 +4,9 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import './AppointmentCalendar.css';
-import { FaFilter, FaCalendarDay, FaTimes, FaEdit, FaTrash, FaMapMarkerAlt, FaBuilding, FaClock, FaCalendarAlt, FaStickyNote, FaChevronDown } from 'react-icons/fa';
+import { FaFilter, FaCalendarDay, FaTimes, FaEdit, FaTrash, FaMapMarkerAlt, FaBuilding, FaClock, FaCalendarAlt, FaStickyNote, FaChevronDown, FaSync } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import axios from 'axios';
 
 const AppointmentCalendar = () => {
   const [appointments, setAppointments] = useState([]);
@@ -32,86 +33,78 @@ const AppointmentCalendar = () => {
     'default': '#6c757d'      // gray
   };
 
-  // Mock appointments data - in a real app, would come from API
-  useEffect(() => {
-    // Simulate API call
+  // Fetch real appointments from the API
+  const fetchAppointments = async () => {
     setLoading(true);
+    setError(null);
     
-    setTimeout(() => {
-      // Mock data with more service categories
-      const mockAppointments = [
-        {
-          _id: 'appt-001',
-          serviceName: 'Haircut & Styling',
-          serviceCategory: 'Beauty',
-          date: new Date(Date.now() + 86400000 * 3), // 3 days from now
-          time: '10:00 AM',
-          status: 'scheduled',
-          provider: 'Style Studio',
-          location: '123 Fashion Ave',
-          notes: 'Please arrive 10 minutes early'
-        },
-        {
-          _id: 'appt-002',
-          serviceName: 'Beard Grooming',
-          serviceCategory: 'Beauty',
-          date: new Date(Date.now() + 86400000 * 7), // 7 days from now
-          time: '2:30 PM',
-          status: 'scheduled',
-          provider: 'Men\'s Grooming Center',
-          location: '456 Style Blvd',
-          notes: 'Bring reference photos if you have them'
-        },
-        {
-          _id: 'appt-003',
-          serviceName: 'Dental Checkup',
-          serviceCategory: 'Healthcare',
-          date: new Date(Date.now() + 86400000 * 5), // 5 days from now
-          time: '9:00 AM',
-          status: 'scheduled',
-          provider: 'Smile Dentistry',
-          location: '789 Health St',
-          notes: 'Annual checkup and cleaning'
-        },
-        {
-          _id: 'appt-004',
-          serviceName: 'Car Oil Change',
-          serviceCategory: 'Automobile',
-          date: new Date(Date.now() + 86400000 * 2), // 2 days from now
-          time: '11:00 AM',
-          status: 'scheduled',
-          provider: 'Quick Auto Service',
-          location: '321 Motor Dr',
-          notes: 'Full synthetic oil requested'
-        },
-        {
-          _id: 'appt-005',
-          serviceName: 'Spa & Massage',
-          serviceCategory: 'Beauty',
-          date: new Date(Date.now() - 86400000 * 5), // 5 days ago
-          time: '3:30 PM',
-          status: 'completed',
-          hasReviewed: true,
-          provider: 'Relaxation Spa',
-          location: '567 Calm Ave',
-          notes: 'Hot stone massage'
-        },
-        {
-          _id: 'appt-006',
-          serviceName: 'Plumbing Repair',
-          serviceCategory: 'Home Repair',
-          date: new Date(Date.now() + 86400000 * 1), // Tomorrow
-          time: '1:00 PM',
-          status: 'scheduled',
-          provider: 'Fast Fix Plumbing',
-          location: 'Your Home',
-          notes: 'Leaky faucet in master bathroom'
-        }
-      ];
+    try {
+      // Get token from localStorage
+      const token = localStorage.getItem('token');
       
-      setAppointments(mockAppointments);
+      if (!token) {
+        console.log("No authentication token found");
+        setError('You must be logged in to view appointments');
+        setLoading(false);
+        return;
+      }
+      
+      console.log("Fetching appointments...");
+      
+      // Fetch appointments from API with timeout
+      const response = await axios.get('http://localhost:5001/appointments', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        },
+        timeout: 10000 // 10 second timeout
+      });
+      
+      console.log("Appointments response:", response.data);
+      
+      if (response.data && response.data.success) {
+        if (response.data.appointments && response.data.appointments.length > 0) {
+          console.log("Loaded", response.data.appointments.length, "appointments");
+          setAppointments(response.data.appointments);
+        } else {
+          console.log("No appointments found");
+          setAppointments([]);
+        }
+      } else {
+        console.error("Failed response structure:", response.data);
+        throw new Error(response.data?.message || 'Failed to load appointments');
+      }
+    } catch (err) {
+      console.error('Error fetching appointments:', err);
+      
+      // More detailed error reporting
+      let errorMessage = 'Error loading appointments. Please try again.';
+      
+      if (err.response) {
+        console.error('Server response:', err.response.data);
+        console.error('Status code:', err.response.status);
+        errorMessage = `Error ${err.response.status}: ${err.response.data?.message || 'Unknown server error'}`;
+      } else if (err.request) {
+        console.error('No response received:', err.request);
+        errorMessage = 'Server did not respond. Please check your connection.';
+        
+        // Check if it's a timeout
+        if (err.code === 'ECONNABORTED') {
+          errorMessage = 'Request timed out. The server is taking too long to respond.';
+        }
+      } else {
+        console.error('Error message:', err.message);
+        errorMessage = `Error: ${err.message}`;
+      }
+      
+      setError(errorMessage);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
+  };
+
+  // Use effect to fetch appointments on component mount
+  useEffect(() => {
+    fetchAppointments();
   }, []);
 
   // Format appointments for FullCalendar
@@ -171,20 +164,42 @@ const AppointmentCalendar = () => {
     }
   };
 
-  // Mock cancel appointment function
-  const cancelAppointment = (id) => {
+  // Cancel appointment function - calls the API
+  const cancelAppointment = async (id) => {
     if (window.confirm('Are you sure you want to cancel this appointment?')) {
-      // In a real app, you would make an API call here
-      const updatedAppointments = appointments.map(appt => 
-        appt._id === id ? { ...appt, status: 'cancelled' } : appt
-      );
-      setAppointments(updatedAppointments);
-      closeModal();
-      alert('Appointment cancelled successfully');
+      try {
+        const token = localStorage.getItem('token');
+        
+        // Call API to update appointment status
+        const response = await axios.patch(
+          `http://localhost:5001/appointments/${id}/status`,
+          { status: 'cancelled' },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        
+        if (response.data && response.data.success) {
+          // Update local state
+          const updatedAppointments = appointments.map(appt => 
+            appt._id === id ? { ...appt, status: 'cancelled' } : appt
+          );
+          setAppointments(updatedAppointments);
+          closeModal();
+          alert('Appointment cancelled successfully');
+        } else {
+          alert('Failed to cancel appointment. Please try again.');
+        }
+      } catch (err) {
+        console.error('Error cancelling appointment:', err);
+        alert('Error cancelling appointment. Please try again.');
+      }
     }
   };
 
-  // Mock reschedule appointment function
+  // Reschedule appointment function
   const rescheduleAppointment = (id) => {
     closeModal();
     // In a real app, this would open a form to reschedule
@@ -228,7 +243,12 @@ const AppointmentCalendar = () => {
       >
         <h3>Error loading appointments</h3>
         <p>{error}</p>
-        <button onClick={() => window.location.reload()}>Retry</button>
+        <button 
+          className="retry-button" 
+          onClick={fetchAppointments}
+        >
+          <FaSync /> Retry
+        </button>
       </motion.div>
     );
   }
