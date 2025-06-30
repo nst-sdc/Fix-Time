@@ -4,10 +4,10 @@ import RatingDisplay from './RatingDisplay';
 import './ServiceCard.css';
 
 const ServiceCard = ({ service }) => {
-  const { name, icon, avgRating, totalReviews } = service;
+  const { _id, name, icon, avgRating, totalReviews, price, duration } = service;
 
   return (
-    <Link to={`/book?service=${encodeURIComponent(name)}`} className="service-link">
+    <Link to={`/book?service=${encodeURIComponent(name)}${_id ? `&serviceId=${_id}` : ''}`} className="service-link">
       <div className="service-card">
         <div className="service-icon">{icon}</div>
         <div className="service-details">
@@ -18,6 +18,8 @@ const ServiceCard = ({ service }) => {
               totalReviews={totalReviews} 
             />
           )}
+          {price && <p className="service-price">${price}</p>}
+          {duration && <p className="service-duration">{duration} min</p>}
           <button className="book-now-btn">Book Now</button>
         </div>
       </div>

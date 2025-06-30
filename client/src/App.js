@@ -21,6 +21,7 @@ import AutomobileService from './pages/categories/AutomobileService';
 import RetailLocalBusinesses from './pages/categories/RetailLocalBusinesses';
 import PrivateEvents from './pages/categories/PrivateEvents';
 import HotelRestaurant from './pages/categories/HotelRestaurant';
+import AppointmentCalendar from './pages/AppointmentCalendar';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -146,6 +147,10 @@ function App() {
             />
             <Route path="/profile" element={isLoggedIn ? 
               <UserProfile isLoggedIn={isLoggedIn} setIsLoggedIn={handleLogin} setUserProfile={setUserProfile} /> 
+              : <Navigate to="/login" />} 
+            />
+            <Route path="/calendar" element={isLoggedIn ? 
+              <AppointmentCalendar /> 
               : <Navigate to="/login" />} 
             />
           </Routes>

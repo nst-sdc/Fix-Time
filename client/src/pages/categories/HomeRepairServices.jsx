@@ -33,11 +33,11 @@ const HomeRepairServices = () => {
       {loading ? (
         <div className="loading-state">Loading services...</div>
       ) : (
-        <div className="services-list">
-          {services.map((service, idx) => (
+      <div className="services-list">
+        {services.map((service, idx) => (
             <ServiceCard key={idx} service={service} />
-          ))}
-        </div>
+        ))}
+      </div>
       )}
     </div>
   );

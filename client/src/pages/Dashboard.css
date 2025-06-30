@@ -64,6 +64,7 @@ body.dark .dashboard-panel {
   padding-bottom: 0.8rem;
   border-bottom: 1px solid #f0f0f0;
   cursor: pointer;
+  justify-content: space-between;
 }
 
 .panel-header .header-content {
@@ -300,4 +301,30 @@ body.dark .loading-container {
   .profile-info-item {
     justify-content: center;
   }
+}
+
+.view-calendar-link {
+  font-size: 0.9rem;
+  color: #FF758C;
+  text-decoration: none;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  background-color: rgba(255, 117, 140, 0.1);
+  transition: all 0.2s ease;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.view-calendar-link:hover {
+  background-color: rgba(255, 117, 140, 0.2);
+  color: #FF758C;
+}
+
+body.dark .view-calendar-link {
+  color: #FF7EB3;
+  background-color: rgba(255, 126, 179, 0.1);
+}
+
+body.dark .view-calendar-link:hover {
+  background-color: rgba(255, 126, 179, 0.2);
 } 

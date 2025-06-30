@@ -36,7 +36,7 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => 
     setDropdownOpen(false);
     navigate('/');
   };
-
+  
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -59,6 +59,14 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => 
             <li className="nav-item">
               <Link to="/appointments" className="nav-link" onClick={() => setMenuOpen(false)}>
                 Appointments
+              </Link>
+            </li>
+          )}
+
+          {isLoggedIn && (
+            <li className="nav-item">
+              <Link to="/calendar" className="nav-link" onClick={() => setMenuOpen(false)}>
+                Calendar
               </Link>
             </li>
           )}

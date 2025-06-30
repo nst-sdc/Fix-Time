@@ -26,6 +26,14 @@ const serviceSchema = new mongoose.Schema({
     min: 5, 
     comment: 'Duration in minutes' 
   },
+  provider: {
+    type: String,
+    default: ''
+  },
+  location: {
+    type: String,
+    default: ''
+  },
   available: { 
     type: Boolean, 
     default: true 
