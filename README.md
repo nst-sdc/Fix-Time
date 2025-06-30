@@ -2,7 +2,7 @@
 
 **FixTime** is an open-source appointment booking platform built using the **MERN stack (MongoDB, Express, React, Node.js)**.
 
-It helps eliminate long queues by allowing users to book time slots in advance — whether it’s a hospital, clinic, salon, or any local service provider.
+It helps eliminate long queues by allowing users to book time slots in advance — whether it's a hospital, clinic, salon, or any local service provider.
 
 ---
 
@@ -110,7 +110,7 @@ Fix-Time/
 
 ## 🤝 Contributing
 Want to contribute to FixTime? Awesome!
-We’re just getting started, and we welcome contributions of all kinds:
+We're just getting started, and we welcome contributions of all kinds:
 
 •Code improvements
 
@@ -147,3 +147,37 @@ We’re just getting started, and we welcome contributions of all kinds:
 This project is licensed under the MIT License.
 
 ### ⚡ If this repo helped you, consider giving it a ⭐ and sharing it with others!
+
+## Troubleshooting Common Issues
+
+### Appointment IDs Not Fetching
+
+If you're experiencing issues with appointments not appearing or appointment IDs not fetching correctly:
+
+1. **Environment Setup**
+   - Create a `.env` file in the server directory with these required variables:
+     ```
+     MONGODB_URI=mongodb://localhost:27017/fixtime
+     JWT_SECRET=your_jwt_secret_here
+     PORT=5001
+     ```
+   - Create a `.env` file in the client directory with:
+     ```
+     REACT_APP_API_URL=http://localhost:5001
+     ```
+
+2. **MongoDB Compatibility**
+   - This project now uses Mongoose 6.x (downgraded from 8.x) for better compatibility
+   - Make sure your MongoDB version is compatible (4.x or 5.x recommended)
+
+3. **Authentication Check**
+   - Verify you're properly logged in (check for token in localStorage)
+   - Try logging out and back in if appointments don't appear
+
+4. **Server Connection**
+   - Ensure the server is running on the correct port
+   - Check browser console for any connection errors
+   
+5. **Data Integrity**
+   - If you still have issues, check MongoDB directly to see if appointments exist
+   - Verify appointment documents have the required fields (especially _id)

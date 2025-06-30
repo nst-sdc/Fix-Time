@@ -4,6 +4,9 @@ import axios from 'axios';
 import "./AppointmentBooking.css";
 import ReviewForm from './ReviewForm';
 
+// Set API base URL with fallback
+const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
+
 const timeSlots = [
   "8:00 AM", "9:00 AM", "10:00 AM",
   "10:30 AM", "11:30 AM", "1:00 PM",
@@ -80,7 +83,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
       alert("Please select both a date and time for your appointment");
       return;
     }
-
+    
     // Validate phone number
     const phoneToUse = formData.phone.trim();
     if (!validatePhone(phoneToUse)) {
@@ -107,7 +110,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
       }
       
       // Get user profile to use for customer details
-      const userResponse = await axios.get('http://localhost:5001/auth/profile', {
+      const userResponse = await axios.get(`${API_BASE_URL}/auth/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -129,7 +132,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
       if (!finalServiceId && preSelectedService) {
         // Try to find a service with the matching name
         try {
-          const servicesResponse = await axios.get('http://localhost:5001/services', {
+          const servicesResponse = await axios.get(`${API_BASE_URL}/services`, {
             params: { name: preSelectedService }
           });
           
@@ -145,7 +148,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
       if (!finalServiceId) {
         // If we still don't have a serviceId, get the first service from any category
         try {
-          const servicesResponse = await axios.get('http://localhost:5001/services');
+          const servicesResponse = await axios.get(`${API_BASE_URL}/services`);
           
           if (servicesResponse.data && servicesResponse.data.services && servicesResponse.data.services.length > 0) {
             finalServiceId = servicesResponse.data.services[0]._id;
@@ -175,7 +178,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
       
       // Create the appointment
       const response = await axios.post(
-        'http://localhost:5001/appointments',
+        `${API_BASE_URL}/appointments`,
         appointmentData,
         {
           headers: {

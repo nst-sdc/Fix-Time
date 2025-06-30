@@ -1,3 +1,30 @@
+# Fix-Time Client
+
+## Setup Instructions
+
+1. Create a `.env` file in the client directory with the following variables:
+```
+# API Base URL
+REACT_APP_API_URL=http://localhost:5001
+```
+
+2. Install dependencies:
+```
+npm install
+```
+
+3. Start the client:
+```
+npm start
+```
+
+## Troubleshooting
+
+If you encounter issues with appointment fetching:
+- Make sure the server is running and accessible
+- Check that you're logged in (JWT token is present in localStorage)
+- Check the browser console for specific error messages
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
