@@ -398,7 +398,7 @@ const AppointmentCalendar = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <button className="close-modal-btn" onClick={closeModal}>
-                <FaTimes />
+                ×
               </button>
               <div className="modal-header">
                 <h2>{selectedAppointment.serviceName}</h2>

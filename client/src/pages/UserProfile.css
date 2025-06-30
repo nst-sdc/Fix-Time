@@ -199,6 +199,13 @@
   box-shadow: 0 0 0 3px rgba(90, 61, 255, 0.1);
 }
 
+.date-help-text {
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-top: 0.25rem;
+  font-style: italic;
+}
+
 .profile-input::placeholder {
   color: #94a3b8;
 }
@@ -271,6 +278,10 @@ body.dark .profile-input {
 body.dark .profile-input:focus {
   border-color: #5a3dff;
   box-shadow: 0 0 0 3px rgba(90, 61, 255, 0.2);
+}
+
+body.dark .date-help-text {
+  color: #94a3b8;
 }
 
 body.dark .profile-input::placeholder {

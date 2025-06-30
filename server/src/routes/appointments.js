@@ -15,6 +15,9 @@ router.get('/', appointmentController.getUserAppointments);
 // Update appointment status
 router.patch('/:id/status', appointmentController.updateAppointmentStatus);
 
+// Reschedule an appointment
+router.put('/:id/reschedule', appointmentController.rescheduleAppointment);
+
 // Delete an appointment
 router.delete('/:id', appointmentController.deleteAppointment);
 

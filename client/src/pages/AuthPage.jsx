@@ -21,6 +21,20 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Calculate min and max dates for age validation (10 years minimum age)
+  const calculateDateLimits = () => {
+    const today = new Date();
+    const maxDate = new Date(today.getFullYear() - 10, today.getMonth(), today.getDate());
+    const minDate = new Date(today.getFullYear() - 120, today.getMonth(), today.getDate()); // Reasonable upper limit
+    
+    return {
+      max: maxDate.toISOString().split('T')[0],
+      min: minDate.toISOString().split('T')[0]
+    };
+  };
+
+  const dateLimits = calculateDateLimits();
+
   // Update local state when prop changes and reset form fields
   useEffect(() => {
     setIsLogin(initialIsLogin);
@@ -42,6 +56,30 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
   const toggleForm = () => {
     // Navigate to the respective route instead of just toggling the form
     navigate(isLogin ? '/register' : '/login');
+  };
+
+  const validateAge = (dateString) => {
+    if (!dateString) return null; // Date of birth is optional
+    
+    const birthDate = new Date(dateString);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    // Adjust age if birthday hasn't occurred this year
+    const actualAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) 
+      ? age - 1 
+      : age;
+    
+    if (actualAge < 10) {
+      return 'You must be at least 10 years old to register.';
+    }
+    
+    if (actualAge > 120) {
+      return 'Please enter a valid date of birth.';
+    }
+    
+    return null;
   };
 
   const validateForm = () => {
@@ -71,6 +109,12 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
       }
       if (passwd.length < 6) {
         return 'Password must be at least 6 characters long.';
+      }
+      
+      // Validate age if date of birth is provided
+      const ageError = validateAge(dateOfBirth);
+      if (ageError) {
+        return ageError;
       }
     }
 
@@ -219,12 +263,15 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
 
           {!isLogin && (
             <div className="form-group">
+              <label className="form-label">Date of Birth (Optional - Must be at least 10 years old)</label>
               <input
                 type="date"
                 placeholder="Date of Birth (Optional)"
                 className="form-input"
                 value={dateOfBirth}
                 onChange={(e) => setDateOfBirth(e.target.value)}
+                min={dateLimits.min}
+                max={dateLimits.max}
               />
             </div>
           )}

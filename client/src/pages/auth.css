@@ -72,6 +72,14 @@
   color: #444;
 }
 
+.form-label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  color: #444;
+  display: block;
+}
+
 .form-field input,
 .form-field textarea,
 .form-field select {
@@ -439,15 +447,19 @@ body.dark .auth-header p {
 }
 
 body.dark .form-field label {
-  color: #ccc;
+  color: #e0e0e0;
+}
+
+body.dark .form-label {
+  color: #e0e0e0;
 }
 
 body.dark .form-field input,
 body.dark .form-field textarea,
 body.dark .form-field select {
-  background-color: #2d3748;
-  border-color: #4a5568;
-  color: #e2e8f0;
+  background-color: #2a2a2a;
+  border-color: #444;
+  color: #e0e0e0;
 }
 
 body.dark .form-field input:focus,

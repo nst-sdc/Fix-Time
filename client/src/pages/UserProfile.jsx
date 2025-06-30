@@ -23,6 +23,20 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
     gender: ''
   });
 
+  // Calculate min and max dates for age validation (10 years minimum age)
+  const calculateDateLimits = () => {
+    const today = new Date();
+    const maxDate = new Date(today.getFullYear() - 10, today.getMonth(), today.getDate());
+    const minDate = new Date(today.getFullYear() - 120, today.getMonth(), today.getDate()); // Reasonable upper limit
+    
+    return {
+      max: maxDate.toISOString().split('T')[0],
+      min: minDate.toISOString().split('T')[0]
+    };
+  };
+
+  const dateLimits = calculateDateLimits();
+
   useEffect(() => {
     if (!isLoggedIn) {
       navigate('/login');
@@ -73,6 +87,30 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
     }));
   };
 
+  const validateAge = (dateString) => {
+    if (!dateString) return null; // Date of birth is optional
+    
+    const birthDate = new Date(dateString);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    
+    // Adjust age if birthday hasn't occurred this year
+    const actualAge = monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate()) 
+      ? age - 1 
+      : age;
+    
+    if (actualAge < 10) {
+      return 'You must be at least 10 years old.';
+    }
+    
+    if (actualAge > 120) {
+      return 'Please enter a valid date of birth.';
+    }
+    
+    return null;
+  };
+
   const handleSave = async () => {
     try {
       setSaving(true);
@@ -83,6 +121,13 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(formData.email)) {
         setError('Please enter a valid email address');
+        return;
+      }
+
+      // Validate age if date of birth is provided
+      const ageError = validateAge(formData.dateOfBirth);
+      if (ageError) {
+        setError(ageError);
         return;
       }
 
@@ -252,13 +297,18 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
                   <FiCalendar /> Date of Birth
                 </div>
                 {isEditing ? (
-                  <input
-                    type="date"
-                    name="dateOfBirth"
-                    value={formData.dateOfBirth}
-                    onChange={handleInputChange}
-                    className="profile-input"
-                  />
+                  <div>
+                    <input
+                      type="date"
+                      name="dateOfBirth"
+                      value={formData.dateOfBirth}
+                      onChange={handleInputChange}
+                      className="profile-input"
+                      min={dateLimits.min}
+                      max={dateLimits.max}
+                    />
+                    <small className="date-help-text">Must be at least 10 years old</small>
+                  </div>
                 ) : (
                   <div className="info-value">{formatDate(user.dateOfBirth)}</div>
                 )}

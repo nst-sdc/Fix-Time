@@ -57,8 +57,16 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => 
           
           {isLoggedIn && (
             <li className="nav-item">
-              <Link to="/appointments" className="nav-link" onClick={() => setMenuOpen(false)}>
-                Appointments
+              <Link to="/services" className="nav-link" onClick={() => setMenuOpen(false)}>
+                Schedule
+              </Link>
+            </li>
+          )}
+
+          {isLoggedIn && (
+            <li className="nav-item">
+              <Link to="/my-appointments" className="nav-link" onClick={() => setMenuOpen(false)}>
+                My Appointments
               </Link>
             </li>
           )}
