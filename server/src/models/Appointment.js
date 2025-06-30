@@ -43,6 +43,10 @@ const appointmentSchema = new mongoose.Schema({
   hasReviewed: {
     type: Boolean,
     default: false
+  },
+  remindersSent: {
+    type: [String], // e.g. ['24h', '12h', ...]
+    default: []
   }
 }, { timestamps: true });
 

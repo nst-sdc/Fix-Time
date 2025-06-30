@@ -14,7 +14,8 @@ const timeSlots = [
 const AppointmentBooking = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const preSelectedService = searchParams.get('service');
+  const serviceId = searchParams.get('serviceId');
+  const serviceName = searchParams.get('serviceName');
 
   // Generate 10 upcoming dates starting from today
   const [dateOptions, setDateOptions] = useState([]);
@@ -25,12 +26,24 @@ const AppointmentBooking = () => {
     name: "",
     email: "",
     phone: "",
-    reason: preSelectedService || ""
+    reason: ""
   });
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [bookedAppointmentId, setBookedAppointmentId] = useState(null);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
+    // Pre-fill form with logged-in user's data
+    const loggedInUser = JSON.parse(localStorage.getItem('user'));
+    if (loggedInUser) {
+      setUser(loggedInUser);
+      setFormData(prev => ({
+        ...prev,
+        name: loggedInUser.fullName || "",
+        email: loggedInUser.email || ""
+      }));
+    }
+
     const generateDates = () => {
       const dates = [];
       const today = new Date();
@@ -53,12 +66,6 @@ const AppointmentBooking = () => {
     generateDates();
   }, []);
 
-  useEffect(() => {
-    if (preSelectedService) {
-      setFormData(prev => ({...prev, reason: preSelectedService}));
-    }
-  }, [preSelectedService]);
-
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -70,63 +77,47 @@ const AppointmentBooking = () => {
       alert("Please select both a date and time for your appointment");
       return;
     }
+
+    // Convert the friendly date string to a proper Date object for the backend
+    const [dayName, monthStr, dayNum] = selectedDate.replace(',', '').split(' ');
+    const year = new Date().getFullYear();
+    const isoDate = new Date(`${monthStr} ${dayNum}, ${year}`).toISOString();
     
     const appointmentData = {
-      ...formData,
-      date: selectedDate,
+      serviceId, // Use the real serviceId from the URL
+      date: isoDate,
       time: selectedTime,
-      // In a real app, these would come from the database:
-      serviceId: "mock-service-id", 
-      userId: "mock-user-id"
+      customerName: formData.name,
+      customerEmail: formData.email,
+      customerPhone: formData.phone,
+      notes: formData.reason,
     };
     
-    // In a real app, you would send this to the backend API
-    // try {
-    //   const token = localStorage.getItem('token');
-    //   const response = await axios.post(
-    //     'http://localhost:5001/appointments/book',
-    //     appointmentData,
-    //     {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`
-    //       }
-    //     }
-    //   );
-    //   
-    //   setBookedAppointmentId(response.data.appointment._id);
-    //   setBookedSlots([...bookedSlots, { date: selectedDate, time: selectedTime }]);
-    //   
-    //   // For demo purposes, let's immediately mark the appointment as completed
-    //   // In a real app, this would happen when the actual appointment is completed
-    //   const mockCompleteResponse = await axios.patch(
-    //     `http://localhost:5001/appointments/${response.data.appointment._id}/complete`,
-    //     {},
-    //     {
-    //       headers: {
-    //         Authorization: `Bearer ${token}`
-    //       }
-    //     }
-    //   );
-    //   
-    //   setShowReviewForm(true);
-    //   
-    // } catch (err) {
-    //   console.error('Error booking appointment:', err);
-    //   alert('Failed to book appointment. Please try again.');
-    // }
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert("You must be logged in to book an appointment.");
+        return;
+      }
 
-    // For demo purposes, let's just simulate a successful booking
-    setBookedSlots([...bookedSlots, { date: selectedDate, time: selectedTime }]);
-    setBookedAppointmentId("mock-appointment-id-" + Date.now());
-    setShowReviewForm(true);
-    
-    alert(
-      `✅ Appointment booked on ${selectedDate} at ${selectedTime}\n👤 Name: ${formData.name}`
-    );
-    
-    // Reset form
-    setSelectedTime("");
-    setFormData({ name: "", email: "", phone: "", reason: preSelectedService || "" });
+      const response = await axios.post(
+        'http://localhost:5001/api/appointments/book',
+        appointmentData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      
+      setBookedAppointmentId(response.data.data._id);
+      setBookedSlots([...bookedSlots, { date: selectedDate, time: selectedTime }]);
+      setShowReviewForm(true);
+      
+    } catch (err) {
+      console.error('Error booking appointment:', err.response ? err.response.data : err.message);
+      alert(`Failed to book appointment. ${err.response?.data?.message || 'Please try again.'}`);
+    }
   };
 
   const isSlotDisabled = (date, time) => {
@@ -164,12 +155,12 @@ const AppointmentBooking = () => {
       <div className="booking-container">
         <h2>Thank You for Booking!</h2>
         <p className="booking-success-message">
-          Your appointment has been confirmed. We look forward to serving you!
+          Your appointment for <strong>{serviceName}</strong> has been confirmed. We look forward to serving you!
         </p>
         <div className="review-form-wrapper">
           <ReviewForm 
             appointmentId={bookedAppointmentId} 
-            onReviewSubmitted={handleReviewSubmitted}
+            onReviewSubmitted={() => setShowReviewForm(false)}
           />
         </div>
       </div>
@@ -180,12 +171,16 @@ const AppointmentBooking = () => {
   return (
     <div className="booking-container">
       <h2>Book Your Appointment!</h2>
-      {preSelectedService && (
+      {serviceName && (
         <div className="selected-service">
           <span>Service: </span>
-          <strong>{preSelectedService}</strong>
+          <strong>{serviceName}</strong>
         </div>
       )}
+
+      <div className="reminder-message" style={{marginBottom: '1rem', color: '#1976d2', fontWeight: 500}}>
+        You'll receive timely reminders before your appointment.
+      </div>
 
       <h4 className="section-heading">📅 Select a Date</h4>
       <div className="date-selector">
@@ -245,6 +240,7 @@ const AppointmentBooking = () => {
             onChange={handleChange}
             value={formData.email}
             required
+            readOnly={!!user?.email} // Make email read-only if logged in
           />
         </div>
 
@@ -262,15 +258,14 @@ const AppointmentBooking = () => {
         </div>
 
         <div className="form-group">
-          <label htmlFor="reason">Enter your reason for Visit:</label>
+          <label htmlFor="reason">Notes or Reason for Visit (Optional):</label>
           <textarea
             id="reason"
             name="reason"
-            placeholder="Reason for Visit"
+            placeholder="e.g., Color preference, specific issue"
             rows={3}
             onChange={handleChange}
             value={formData.reason}
-            required
           />
         </div>
 
