@@ -32,7 +32,6 @@ const AppointmentBooking = ({ serviceId = null }) => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [bookedAppointmentId, setBookedAppointmentId] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   useEffect(() => {
     const generateDates = () => {
@@ -76,17 +75,16 @@ const AppointmentBooking = ({ serviceId = null }) => {
   // Update handleSubmit function to validate phone before submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
     
     if (!selectedDate || !selectedTime) {
-      setError("Please select both a date and time for your appointment");
+      alert("Please select both a date and time for your appointment");
       return;
     }
     
     // Validate phone number
     const phoneToUse = formData.phone.trim();
     if (!validatePhone(phoneToUse)) {
-      setError("Please enter a valid phone number (at least 10 digits)");
+      alert("Please enter a valid phone number (at least 10 digits)");
       return;
     }
     
@@ -103,7 +101,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
       const token = localStorage.getItem('token');
       
       if (!token) {
-        setError("You must be logged in to book an appointment");
+        alert("You must be logged in to book an appointment");
         navigate('/login');
         return;
       }
@@ -115,60 +113,51 @@ const AppointmentBooking = ({ serviceId = null }) => {
       
       console.log("User profile response:", userResponse.data);
       
-      if (!userResponse.data) {
+      if (!userResponse.data || !userResponse.data.success || !userResponse.data.user) {
         console.error("Invalid user profile response:", userResponse.data);
         throw new Error("Could not fetch user profile");
       }
       
-      const user = userResponse.data;
+      const user = userResponse.data.user;
       const effectiveServiceId = preSelectedServiceId || serviceId;
       
       console.log("Booking appointment with serviceId:", effectiveServiceId);
       
-      // If no serviceId is provided, let's fetch the first available service
+      // If no serviceId is provided, let's fetch the first available service of the requested name
       let finalServiceId = effectiveServiceId;
       
-      if (!finalServiceId) {
-        // Get all available services
+      if (!finalServiceId && preSelectedService) {
+        // Try to find a service with the matching name
         try {
-          const servicesResponse = await axios.get('http://localhost:5001/services');
+          const servicesResponse = await axios.get('http://localhost:5001/services', {
+            params: { name: preSelectedService }
+          });
           
           if (servicesResponse.data && servicesResponse.data.services && servicesResponse.data.services.length > 0) {
-            // If we have a service name, try to find it
-            if (preSelectedService) {
-              const matchingService = servicesResponse.data.services.find(
-                service => service.name.toLowerCase().includes(preSelectedService.toLowerCase())
-              );
-              if (matchingService) {
-                finalServiceId = matchingService._id;
-                console.log("Found matching service:", matchingService.name, finalServiceId);
-              } else {
-                setError("No matching service found. Please select a specific service.");
-                setLoading(false);
-                return;
-              }
-            } else {
-              setError("Please select a specific service to book an appointment.");
-              setLoading(false);
-              return;
-            }
-          } else {
-            setError("No services are currently available. Please contact the administrator.");
-            setLoading(false);
-            return;
+            finalServiceId = servicesResponse.data.services[0]._id;
+            console.log("Found service by name:", finalServiceId);
           }
         } catch (err) {
-          console.error("Error fetching services:", err);
-          setError("Failed to fetch available services. Please try again.");
-          setLoading(false);
-          return;
+          console.error("Error finding service by name:", err);
         }
       }
       
       if (!finalServiceId) {
-        setError("No service available for booking. Please contact support.");
-        setLoading(false);
-        return;
+        // If we still don't have a serviceId, get the first service from any category
+        try {
+          const servicesResponse = await axios.get('http://localhost:5001/services');
+          
+          if (servicesResponse.data && servicesResponse.data.services && servicesResponse.data.services.length > 0) {
+            finalServiceId = servicesResponse.data.services[0]._id;
+            console.log("Using first available service:", finalServiceId);
+          }
+        } catch (err) {
+          console.error("Error getting any services:", err);
+        }
+      }
+      
+      if (!finalServiceId) {
+        throw new Error("No service ID available for booking");
       }
       
       // Use the correct user fields from the profile response
@@ -177,7 +166,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
         date: appointmentDate.toISOString(),
         time: selectedTime,
         notes: formData.reason,
-        customerName: formData.name || user.fullName || user.email?.split('@')[0] || 'User',
+        customerName: formData.name || user.name,
         customerEmail: formData.email || user.email,
         customerPhone: phoneToUse
       };
@@ -195,8 +184,6 @@ const AppointmentBooking = ({ serviceId = null }) => {
         }
       );
       
-      console.log("Appointment creation response:", response.data);
-      
       if (response.data && response.data.success) {
         setBookedAppointmentId(response.data.appointment._id);
         setBookedSlots([...bookedSlots, { date: selectedDate, time: selectedTime }]);
@@ -210,17 +197,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
       }
     } catch (err) {
       console.error('Error booking appointment:', err);
-      
-      // Provide more specific error messages
-      let errorMessage = 'Failed to book appointment. Please try again.';
-      
-      if (err.response?.data?.message) {
-        errorMessage = err.response.data.message;
-      } else if (err.message) {
-        errorMessage = err.message;
-      }
-      
-      setError(errorMessage);
+      alert(`Failed to book appointment: ${err.message || 'Please try again.'}`);
     } finally {
       setLoading(false);
     }
@@ -277,13 +254,6 @@ const AppointmentBooking = ({ serviceId = null }) => {
   return (
     <div className="booking-container">
       <h2>Book Your Appointment!</h2>
-      
-      {error && (
-        <div className="error-message">
-          {error}
-        </div>
-      )}
-      
       {preSelectedService && (
         <div className="selected-service">
           <span>Service: </span>
