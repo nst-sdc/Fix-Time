@@ -2,7 +2,7 @@
 
 **FixTime** is an open-source appointment booking platform built using the **MERN stack (MongoDB, Express, React, Node.js)**.
 
-It helps eliminate long queues by allowing users to book time slots in advance — whether it’s a hospital, clinic, salon, or any local service provider.
+It helps eliminate long queues by allowing users to book time slots in advance — whether it's a hospital, clinic, salon, or any local service provider.
 
 ---
 
@@ -87,6 +87,50 @@ npm start
 ```
 Frontend runs at: http://localhost:3000
 
+
+
+#### Ensure MongoDB is Running
+Make sure MongoDB is installed and running on your local machine. On most systems, you can check with:
+```bash
+# Check if MongoDB is running
+mongod --version
+```
+
+If not installed, follow these steps to install MongoDB:
+
+##### macOS Installation
+```bash
+# Using Homebrew
+brew tap mongodb/brew
+brew install mongodb-community
+brew services start mongodb-community
+```
+
+For other operating systems, follow the [official MongoDB installation guide](https://www.mongodb.com/docs/manual/installation/).
+
+#### Start the Applications
+```bash
+# Start the server (from server directory)
+cd server
+npm run dev
+
+# Start the client (from client directory)
+cd ../client
+npm start
+```
+
+#### 5. Seed the Database with Demo Services
+If you encounter the error **"No service ID available for booking"** when trying to book an appointment, you need to seed the database with services:
+
+```bash
+# Seed sample services (with server running)
+curl -X POST http://localhost:5001/services/sample
+```
+
+This will create several sample services in different categories that you can use for testing appointment bookings.
+
+---
+
 🧪 API Endpoints
 | Method | Route            | Description         |
 | ------ | ---------------- | ------------------- |
@@ -97,20 +141,54 @@ Frontend runs at: http://localhost:3000
 📌 Project Structure
 ```bash
 Fix-Time/
-├── client/     # React frontend
-├── server/     # Express backend
+├── client/            # React frontend
+│   ├── public/        # Public assets
 │   ├── src/
-│   │   ├── models/   # Mongoose schemas
-│   │   ├── routes/   # API routes
-│   │   └── index.js  # Main server file
-├── .env
-├── README.md
-└── .gitignore
+│   │   ├── components/  # Reusable UI components
+│   │   │   ├── AppointmentBooking.jsx
+│   │   │   ├── AppointmentDetails.jsx
+│   │   │   ├── Navbar.jsx
+│   │   │   ├── Footer.jsx
+│   │   │   └── ...
+│   │   ├── pages/     # Page components
+│   │   │   ├── Home.jsx
+│   │   │   ├── AppointmentPage.jsx
+│   │   │   ├── Dashboard.jsx
+│   │   │   ├── categories/  # Category-specific pages
+│   │   │   └── ...
+│   │   ├── utils/     # Utility functions
+│   │   ├── App.js     # Main application component
+│   │   └── index.js   # Entry point
+│   └── package.json   # Frontend dependencies
+├── server/            # Express backend
+│   ├── src/
+│   │   ├── controllers/  # Route controllers
+│   │   │   ├── appointmentController.js
+│   │   │   ├── authController.js
+│   │   │   ├── reviewController.js
+│   │   │   └── serviceController.js
+│   │   ├── middleware/  # Express middleware
+│   │   │   └── auth.js
+│   │   ├── models/    # Mongoose models
+│   │   │   ├── Appointment.js
+│   │   │   ├── Review.js
+│   │   │   ├── Service.js
+│   │   │   └── User.js
+│   │   ├── routes/    # API routes
+│   │   │   ├── appointments.js
+│   │   │   ├── auth.js
+│   │   │   ├── reviews.js
+│   │   │   └── services.js
+│   │   └── index.js   # Server entry point
+│   └── package.json   # Backend dependencies
+├── .env               # Environment variables (gitignored)
+├── README.md          # Project documentation
+└── package.json       # Root dependencies
 ```
 
 ## 🤝 Contributing
 Want to contribute to FixTime? Awesome!
-We’re just getting started, and we welcome contributions of all kinds:
+We're just getting started, and we welcome contributions of all kinds:
 
 •Code improvements
 
