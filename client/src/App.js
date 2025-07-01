@@ -22,6 +22,7 @@ import RetailLocalBusinesses from './pages/categories/RetailLocalBusinesses';
 import PrivateEvents from './pages/categories/PrivateEvents';
 import HotelRestaurant from './pages/categories/HotelRestaurant';
 import AppointmentCalendar from './pages/AppointmentCalendar';
+import RescheduleAppointment from './pages/RescheduleAppointment';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -141,6 +142,7 @@ function App() {
             <Route path="/categories/hotel-restaurant" element={<HotelRestaurant />} />
             <Route path="/appointments" element={isLoggedIn ? <AppointmentPage /> : <Navigate to="/login" />} />
             <Route path="/book" element={isLoggedIn ? <AppointmentPage /> : <Navigate to="/login" />} />
+            <Route path="/reschedule" element={isLoggedIn ? <RescheduleAppointment /> : <Navigate to="/login" />} />
             <Route path="/dashboard" element={isLoggedIn ? 
               <Dashboard userProfile={userProfile} setUserProfile={setUserProfile} /> 
               : <Navigate to="/login" />} 

@@ -825,4 +825,26 @@
     width: 100%;
     justify-content: center;
   }
+}
+
+.calendar-notification {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background-color: #10B981;
+  color: white;
+  padding: 12px 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1100;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 400px;
+}
+
+:root.dark-mode .calendar-notification {
+  background-color: #059669;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
 } 

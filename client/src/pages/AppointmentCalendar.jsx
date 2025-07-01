@@ -4,9 +4,10 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import './AppointmentCalendar.css';
-import { FaFilter, FaCalendarDay, FaTimes, FaEdit, FaTrash, FaMapMarkerAlt, FaBuilding, FaClock, FaCalendarAlt, FaStickyNote, FaChevronDown, FaSync } from 'react-icons/fa';
+import { FaFilter, FaCalendarDay, FaTimes, FaEdit, FaTrash, FaMapMarkerAlt, FaBuilding, FaClock, FaCalendarAlt, FaStickyNote, FaChevronDown, FaSync, FaAngleUp, FaAngleDown, FaCalendarWeek } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 const AppointmentCalendar = () => {
   const [appointments, setAppointments] = useState([]);
@@ -18,6 +19,9 @@ const AppointmentCalendar = () => {
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
   const [viewType, setViewType] = useState('dayGridMonth');
   const calendarRef = useRef(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [notification, setNotification] = useState({ show: false, message: '' });
 
   // Service categories with their corresponding colors
   const categoryColors = {
@@ -33,71 +37,95 @@ const AppointmentCalendar = () => {
     'default': '#6c757d'      // gray
   };
 
-  // Fetch real appointments from the API
+  // Fetch appointments data
   const fetchAppointments = async () => {
     setLoading(true);
     setError(null);
     
     try {
-      // Get token from localStorage
-      const token = localStorage.getItem('token');
-      
-      if (!token) {
-        console.log("No authentication token found");
-        setError('You must be logged in to view appointments');
-        setLoading(false);
-        return;
-      }
-      
-      console.log("Fetching appointments...");
-      
-      // Fetch appointments from API with timeout
-      const response = await axios.get('http://localhost:5001/appointments', {
-        headers: {
-          Authorization: `Bearer ${token}`
-        },
-        timeout: 10000 // 10 second timeout
-      });
-      
-      console.log("Appointments response:", response.data);
-      
-      if (response.data && response.data.success) {
-        if (response.data.appointments && response.data.appointments.length > 0) {
-          console.log("Loaded", response.data.appointments.length, "appointments");
-          setAppointments(response.data.appointments);
-        } else {
-          console.log("No appointments found");
-          setAppointments([]);
+      // Check if we have appointments in localStorage first
+      const storedAppointments = localStorage.getItem('appointments');
+      if (storedAppointments) {
+        const parsedAppointments = JSON.parse(storedAppointments);
+        if (parsedAppointments.length > 0) {
+          setAppointments(parsedAppointments);
+          setLoading(false);
+          return;
         }
-      } else {
-        console.error("Failed response structure:", response.data);
-        throw new Error(response.data?.message || 'Failed to load appointments');
       }
+      
+      // If no appointments in localStorage or empty array, fetch from API
+      // In a real app, this would be an API call
+      setTimeout(() => {
+        // Mock data
+        const mockAppointments = [
+          {
+            _id: 'appt-001',
+            serviceName: 'Haircut & Styling',
+            serviceCategory: 'beauty',
+            provider: 'Style Studio',
+            location: '123 Beauty Ave',
+            date: new Date(Date.now() + 86400000 * 3), // 3 days from now
+            time: '10:00 AM',
+            status: 'scheduled',
+            notes: 'Regular haircut with styling'
+          },
+          {
+            _id: 'appt-002',
+            serviceName: 'Dental Checkup',
+            serviceCategory: 'healthcare',
+            provider: 'Smile Dental Clinic',
+            location: '456 Health St',
+            date: new Date(Date.now() + 86400000 * 7), // 7 days from now
+            time: '2:30 PM',
+            status: 'scheduled',
+            notes: 'Annual dental examination'
+          },
+          {
+            _id: 'appt-003',
+            serviceName: 'Car Maintenance',
+            serviceCategory: 'automobile',
+            provider: 'Quick Auto Service',
+            location: '789 Motor Rd',
+            date: new Date(Date.now() - 86400000 * 5), // 5 days ago
+            time: '3:30 PM',
+            status: 'completed',
+            notes: 'Oil change and tire rotation'
+          },
+          {
+            _id: 'appt-004',
+            serviceName: 'House Cleaning',
+            serviceCategory: 'home-repair',
+            provider: 'Clean Home Services',
+            location: '101 Main St',
+            date: new Date(Date.now() + 86400000 * 14), // 14 days from now
+            time: '11:00 AM',
+            status: 'scheduled',
+            notes: 'Full house deep cleaning'
+          },
+          {
+            _id: 'appt-005',
+            serviceName: 'Legal Consultation',
+            serviceCategory: 'government-legal',
+            provider: 'Legal Advisors Inc',
+            location: '202 Justice Ave',
+            date: new Date(Date.now() + 86400000 * 10), // 10 days from now
+            time: '9:00 AM',
+            status: 'scheduled',
+            notes: 'Initial consultation for legal advice'
+          }
+        ];
+        
+        // Save to localStorage for future use
+        localStorage.setItem('appointments', JSON.stringify(mockAppointments));
+        
+        setAppointments(mockAppointments);
+        setLoading(false);
+      }, 1000);
+      
     } catch (err) {
       console.error('Error fetching appointments:', err);
-      
-      // More detailed error reporting
-      let errorMessage = 'Error loading appointments. Please try again.';
-      
-      if (err.response) {
-        console.error('Server response:', err.response.data);
-        console.error('Status code:', err.response.status);
-        errorMessage = `Error ${err.response.status}: ${err.response.data?.message || 'Unknown server error'}`;
-      } else if (err.request) {
-        console.error('No response received:', err.request);
-        errorMessage = 'Server did not respond. Please check your connection.';
-        
-        // Check if it's a timeout
-        if (err.code === 'ECONNABORTED') {
-          errorMessage = 'Request timed out. The server is taking too long to respond.';
-        }
-      } else {
-        console.error('Error message:', err.message);
-        errorMessage = `Error: ${err.message}`;
-      }
-      
-      setError(errorMessage);
-    } finally {
+      setError('Failed to load appointments. Please try again.');
       setLoading(false);
     }
   };
@@ -106,6 +134,76 @@ const AppointmentCalendar = () => {
   useEffect(() => {
     fetchAppointments();
   }, []);
+
+  // Use effect to check for appointment updates in localStorage
+  useEffect(() => {
+    // Check if there are any appointment updates in localStorage
+    const appointmentUpdated = localStorage.getItem('appointmentUpdated');
+    const storedAppointments = localStorage.getItem('appointments');
+    
+    if (appointmentUpdated === 'true' && storedAppointments) {
+      try {
+        const updatedAppointments = JSON.parse(storedAppointments);
+        setAppointments(prevAppointments => {
+          // Merge the updated appointments with existing ones
+          const merged = [...prevAppointments];
+          
+          updatedAppointments.forEach(updatedAppt => {
+            const index = merged.findIndex(appt => appt._id === updatedAppt._id);
+            if (index !== -1) {
+              merged[index] = updatedAppt;
+            } else {
+              merged.push(updatedAppt);
+            }
+          });
+          
+          return merged;
+        });
+        
+        // Clear the update flag
+        localStorage.setItem('appointmentUpdated', 'false');
+        
+        // Show notification
+        setNotification({
+          show: true,
+          message: 'Calendar updated with rescheduled appointment'
+        });
+        
+        // Hide notification after 3 seconds
+        setTimeout(() => {
+          setNotification({ show: false, message: '' });
+        }, 3000);
+      } catch (error) {
+        console.error('Error parsing appointments from localStorage:', error);
+      }
+    }
+  }, []);
+
+  // Check if we're coming from the reschedule page
+  useEffect(() => {
+    const searchParams = new URLSearchParams(location.search);
+    const fromReschedule = searchParams.get('fromReschedule');
+    
+    if (fromReschedule === 'true') {
+      // Clear the parameter from URL without page refresh
+      const newUrl = window.location.pathname;
+      window.history.replaceState({}, '', newUrl);
+      
+      // Show notification
+      setNotification({
+        show: true,
+        message: 'Calendar updated with rescheduled appointment'
+      });
+      
+      // Hide notification after 3 seconds
+      setTimeout(() => {
+        setNotification({ show: false, message: '' });
+      }, 3000);
+      
+      // Refresh appointments
+      fetchAppointments();
+    }
+  }, [location.search]);
 
   // Format appointments for FullCalendar
   const formattedEvents = appointments
@@ -202,8 +300,7 @@ const AppointmentCalendar = () => {
   // Reschedule appointment function
   const rescheduleAppointment = (id) => {
     closeModal();
-    // In a real app, this would open a form to reschedule
-    alert('Reschedule functionality would open here');
+    navigate(`/reschedule?id=${id}`);
   };
 
   // Format date for display
@@ -260,6 +357,17 @@ const AppointmentCalendar = () => {
       animate={{ opacity: 1 }}
       transition={{ duration: 0.5 }}
     >
+      {notification.show && (
+        <motion.div 
+          className="calendar-notification"
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -20 }}
+        >
+          {notification.message}
+        </motion.div>
+      )}
+      
       <div className="calendar-header">
         <motion.h1
           initial={{ y: -20, opacity: 0 }}
@@ -283,19 +391,19 @@ const AppointmentCalendar = () => {
               className={`view-btn ${viewType === 'dayGridMonth' ? 'active' : ''}`} 
               onClick={() => handleViewChange('dayGridMonth')}
             >
-              Month
+              <FaCalendarAlt /> Month
             </button>
             <button 
               className={`view-btn ${viewType === 'timeGridWeek' ? 'active' : ''}`} 
               onClick={() => handleViewChange('timeGridWeek')}
             >
-              Week
+              <FaCalendarWeek /> Week
             </button>
             <button 
               className={`view-btn ${viewType === 'timeGridDay' ? 'active' : ''}`} 
               onClick={() => handleViewChange('timeGridDay')}
             >
-              Day
+              <FaCalendarDay /> Day
             </button>
           </div>
           
