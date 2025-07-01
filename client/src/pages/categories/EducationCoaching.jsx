@@ -3,6 +3,7 @@ import './CategoryPage.css';
 import { FaCalculator, FaMusic, FaPalette, FaLanguage, FaDumbbell, FaChild } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
 import { addRatingsToServices } from '../../utils/serviceUtils';
+import CategoryPage from './CategoryPage';
 
 const serviceData = [
   { name: "Tuition Sessions (Math, Science, etc.)", icon: <FaCalculator /> },
@@ -27,6 +28,7 @@ const EducationCoaching = () => {
   }, []);
 
   return (
+    <CategoryPage categoryName="Education & Coaching">
     <div className="category-page">
       <h1 className="category-title">🧑‍🏫 Education & Coaching</h1>
       {loading ? (
@@ -39,6 +41,7 @@ const EducationCoaching = () => {
       </div>
       )}
     </div>
+    </CategoryPage>
   );
 };
 

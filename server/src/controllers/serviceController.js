@@ -182,3 +182,26 @@ exports.createSampleServices = async (req, res) => {
     });
   }
 }; 
+
+// Added for AddServiceForm
+// POST /services - Add a new service
+exports.addService = async (req, res) => {
+  try {
+    const newService = new Service(req.body);
+    await newService.save();
+    res.status(201).json({ success: true, message: "Service added", data: newService });
+  } catch (err) {
+    res.status(400).json({ success: false, message: err.message });
+  }
+};
+
+// GET /services/category/:category - Fetch services by category
+exports.getServicesByCategory = async (req, res) => {
+  try {
+    const category = req.params.category;
+    const services = await Service.find({ category });
+    res.status(200).json(services);
+  } catch (err) {
+    res.status(500).json({ success: false, message: err.message });
+  }
+};

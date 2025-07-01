@@ -3,6 +3,7 @@ import './CategoryPage.css';
 import { FaTshirt, FaGem, FaStore, FaDog, FaGift, FaShoppingBag } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
 import { addRatingsToServices } from '../../utils/serviceUtils';
+import CategoryPage from './CategoryPage';
 
 const serviceData = [
   { name: "Tailor Appointments (custom fitting)", icon: <FaTshirt /> },
@@ -27,6 +28,7 @@ const RetailLocalBusinesses = () => {
   }, []);
 
   return (
+    <CategoryPage categoryName="Private Events">
     <div className="category-page">
       <h1 className="category-title">🛍️ Retail & Local Businesses</h1>
       {loading ? (
@@ -39,6 +41,7 @@ const RetailLocalBusinesses = () => {
       </div>
       )}
     </div>
+    </CategoryPage>
   );
 };
 

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './CategoryPage.css';
 import { FaCar, FaWind, FaUserCog, FaOilCan, FaShower } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
+import CategoryPage from './CategoryPage';
 import { addRatingsToServices } from '../../utils/serviceUtils';
 
 const serviceData = [
@@ -26,6 +27,7 @@ const AutomobileService = () => {
   }, []);
 
   return (
+    <CategoryPage categoryName="Automobile Services">
     <div className="category-page">
       <h1 className="category-title">🚗 Automobile Services</h1>
       {loading ? (
@@ -38,6 +40,7 @@ const AutomobileService = () => {
       </div>
       )}
     </div>
+    </CategoryPage>
   );
 };
 

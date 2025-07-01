@@ -3,6 +3,7 @@ import './CategoryPage.css';
 import { FaUserMd, FaTooth, FaEye, FaWalking, FaVial, FaSyringe, FaCommentMedical, FaAppleAlt } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
 import { addRatingsToServices } from '../../utils/serviceUtils';
+import CategoryPage from './CategoryPage';
 
 const serviceData = [
   { name: "General Physician Appointments", icon: <FaUserMd /> },
@@ -29,6 +30,7 @@ const HealthcareCate = () => {
   }, []);
 
   return (
+    <CategoryPage categoryName="Healthcare & Wellness">
     <div className="category-page">
       <h1 className="category-title">🏥 Healthcare & Wellness</h1>
       {loading ? (
@@ -41,6 +43,7 @@ const HealthcareCate = () => {
       </div>
       )}
     </div>
+    </CategoryPage>
   );
 };
 
