@@ -86,14 +86,14 @@ const BeautyCate = () => {
         <div className="loading-state">
           <div className="spinner"></div>
           <p>Loading services...</p>
-        </div>
+              </div>
       ) : error ? (
         <div className="error-state">
           <p>{error}</p>
           <button onClick={fetchServices} className="retry-button">
             <FaSync /> Try Again
           </button>
-        </div>
+            </div>
       ) : (
         <div className="services-list">
           {services.length > 0 ? (
@@ -103,7 +103,7 @@ const BeautyCate = () => {
           ) : (
             <p className="no-services">No beauty services available at this time.</p>
           )}
-        </div>
+      </div>
       )}
     </div>
   );

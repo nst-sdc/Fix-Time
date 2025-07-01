@@ -61,9 +61,8 @@ exports.createAppointment = async (req, res) => {
 
     // Check if service exists
     console.log("Looking up service with ID:", serviceId);
-    let service;
     try {
-      service = await Service.findById(serviceId);
+      const service = await Service.findById(serviceId);
       if (!service) {
         console.log("Service not found with ID:", serviceId);
         return res.status(404).json({
@@ -77,14 +76,6 @@ exports.createAppointment = async (req, res) => {
       return res.status(400).json({
         success: false,
         message: 'Invalid service ID format'
-      });
-    }
-
-    // Validate that service is available
-    if (!service.available) {
-      return res.status(400).json({
-        success: false,
-        message: 'This service is currently unavailable'
       });
     }
 
@@ -108,14 +99,6 @@ exports.createAppointment = async (req, res) => {
     // Populate service details
     const populatedAppointment = await Appointment.findById(appointment._id)
       .populate('serviceId', 'name category provider location');
-
-    if (!populatedAppointment) {
-      console.error("Failed to populate appointment after creation");
-      return res.status(500).json({
-        success: false,
-        message: 'Appointment created but failed to retrieve details'
-      });
-    }
 
     res.status(201).json({
       success: true,
@@ -155,17 +138,12 @@ exports.createAppointment = async (req, res) => {
  */
 exports.getUserAppointments = async (req, res) => {
   try {
-    console.log('getUserAppointments called');
     const userId = req.user.id;
-    console.log('User ID:', userId);
 
     // Get appointments with service details
     const appointments = await Appointment.find({ userId })
       .populate('serviceId', 'name category provider location')
       .sort({ date: 1 }); // Sort by date ascending
-
-    console.log('Found appointments:', appointments.length);
-    console.log('Raw appointments:', appointments);
 
     // Format appointments for frontend display
     const formattedAppointments = appointments.map(appointment => {
@@ -186,8 +164,6 @@ exports.getUserAppointments = async (req, res) => {
         customerPhone: appointment.customerPhone
       };
     });
-
-    console.log('Formatted appointments:', formattedAppointments);
 
     res.status(200).json({
       success: true,
@@ -292,91 +268,36 @@ exports.deleteAppointment = async (req, res) => {
  */
 exports.rescheduleAppointment = async (req, res) => {
   try {
-    console.log('Reschedule request received:', {
-      appointmentId: req.params.id,
-      body: req.body,
-      userId: req.user.id
-    });
-
     const { id } = req.params;
     const { date, time } = req.body;
     const userId = req.user.id;
 
-    // Validate required fields
+    // Validate inputs
     if (!date || !time) {
-      console.log('Missing required fields:', { date, time });
       return res.status(400).json({
         success: false,
-        message: 'Date and time are required for rescheduling'
-      });
-    }
-
-    // Validate date format
-    const dateObj = new Date(date);
-    if (isNaN(dateObj.getTime())) {
-      console.log('Invalid date format:', date);
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid date format'
-      });
-    }
-
-    // Check if new date is in the future
-    const now = new Date();
-    if (dateObj <= now) {
-      console.log('Attempted to reschedule to past date:', date);
-      return res.status(400).json({
-        success: false,
-        message: 'Cannot reschedule to a past date'
+        message: 'Please provide both date and time'
       });
     }
 
     // Find appointment and check ownership
-    console.log('Looking for appointment:', { id, userId });
     const appointment = await Appointment.findOne({ _id: id, userId });
     if (!appointment) {
-      console.log('Appointment not found or unauthorized:', { id, userId });
       return res.status(404).json({
         success: false,
         message: 'Appointment not found or you are not authorized'
       });
     }
 
-    console.log('Found appointment:', {
-      id: appointment._id,
-      status: appointment.status,
-      currentDate: appointment.date,
-      currentTime: appointment.time
-    });
-
-    // Check if appointment can be rescheduled (only scheduled or confirmed appointments)
-    if (!['scheduled', 'confirmed'].includes(appointment.status)) {
-      console.log('Appointment cannot be rescheduled due to status:', appointment.status);
-      return res.status(400).json({
-        success: false,
-        message: 'Only scheduled or confirmed appointments can be rescheduled'
-      });
-    }
-
-    // Update appointment date and time
+    // Update appointment
     appointment.date = date;
     appointment.time = time;
-    appointment.status = 'scheduled'; // Reset to scheduled status
-    
-    console.log('Updating appointment with new data:', {
-      newDate: date,
-      newTime: time,
-      newStatus: 'scheduled'
-    });
-
     await appointment.save();
-    console.log('Appointment updated successfully');
 
-    // Populate service details for response
+    // Populate service details
     const populatedAppointment = await Appointment.findById(appointment._id)
       .populate('serviceId', 'name category provider location');
 
-    console.log('Sending success response');
     res.status(200).json({
       success: true,
       message: 'Appointment rescheduled successfully',

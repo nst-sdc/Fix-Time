@@ -220,7 +220,19 @@ const MyAppointments = () => {
 
   const openReschedule = (appointment) => {
     setSelectedAppointment(appointment);
-    setRescheduleDate(new Date(appointment.date).toISOString().split('T')[0]);
+    
+    // Calculate appropriate initial date:
+    // Use appointment date if it's in the future, otherwise use tomorrow
+    const appointmentDate = new Date(appointment.date);
+    const tomorrow = new Date();
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    // Use the later of appointment date or tomorrow
+    const initialDate = appointmentDate > tomorrow ? appointmentDate : tomorrow;
+    
+    // Format as YYYY-MM-DD for the date input
+    setRescheduleDate(initialDate.toISOString().split('T')[0]);
+    
     setRescheduleTime(appointment.time);
     setShowReschedule(true);
   };
@@ -236,6 +248,36 @@ const MyAppointments = () => {
     if (!rescheduleDate || !rescheduleTime) {
       alert('Please select both date and time');
       return;
+    }
+
+    // Check if the selected date and time are valid for rescheduling
+    if (selectedAppointment) {
+      const currentAppointmentDate = new Date(selectedAppointment.date);
+      
+      // Parse the selected date
+      const newDateObj = new Date(rescheduleDate);
+      
+      // Parse the selected time
+      const [time, period] = rescheduleTime.split(' ');
+      const [hours, minutes] = time.split(':');
+      let hour = parseInt(hours);
+      if (period === 'PM' && hour !== 12) hour += 12;
+      if (period === 'AM' && hour === 12) hour = 0;
+      
+      // Set the time on the new date
+      newDateObj.setHours(hour, parseInt(minutes), 0);
+      
+      // Check if the new date/time is after the current appointment
+      if (newDateObj <= currentAppointmentDate) {
+        alert('Please select a date and time after the current appointment');
+        return;
+      }
+      
+      // Check if the new date/time is in the past
+      if (newDateObj <= new Date()) {
+        alert('Please select a future date and time');
+        return;
+      }
     }
 
     try {
@@ -263,6 +305,21 @@ const MyAppointments = () => {
       console.log('Reschedule response:', response.data);
 
       if (response.data.success) {
+        // Update localStorage for consistency across components
+        const appointmentsInStorage = JSON.parse(localStorage.getItem('appointments') || '[]');
+        
+        // Update the appointment in the array or add if not exists
+        const updatedAppointments = appointmentsInStorage.map(appt => 
+          appt._id === selectedAppointment._id ? response.data.appointment : appt
+        );
+        
+        if (!appointmentsInStorage.find(appt => appt._id === selectedAppointment._id)) {
+          updatedAppointments.push(response.data.appointment);
+        }
+        
+        localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
+        localStorage.setItem('appointmentUpdated', 'true');
+        
         alert('Appointment rescheduled successfully!');
         fetchAppointments(); // Refresh the appointments list
         closeReschedule();
@@ -303,9 +360,22 @@ const MyAppointments = () => {
       // Left swipe - show quick actions
       handleQuickAction(appointment, 'view');
     } else if (isRightSwipe) {
-      // Right swipe - reschedule if available
+      // Right swipe - depends on appointment status
       if (['scheduled', 'confirmed'].includes(appointment.status)) {
-        handleQuickAction(appointment, 'reschedule');
+        // Show menu of actions
+        const action = window.confirm(
+          'What would you like to do with this appointment?\n\n' +
+          'OK - Reschedule\n' +
+          'Cancel - Cancel Appointment'
+        );
+        
+        if (action) {
+          // User clicked OK - Reschedule
+          handleQuickAction(appointment, 'reschedule');
+        } else {
+          // User clicked Cancel - Cancel appointment
+          handleQuickAction(appointment, 'cancel');
+        }
       }
     }
   };
@@ -318,8 +388,54 @@ const MyAppointments = () => {
       case 'reschedule':
         openReschedule(appointment);
         break;
+      case 'cancel':
+        cancelAppointment(appointment._id);
+        break;
       default:
         break;
+    }
+  };
+
+  // Add a function to cancel appointments
+  const cancelAppointment = async (id) => {
+    if (window.confirm('Are you sure you want to cancel this appointment?')) {
+      try {
+        const token = localStorage.getItem('token');
+        
+        // Call API to update appointment status
+        const response = await axios.patch(
+          `http://localhost:5001/appointments/${id}/status`,
+          { status: 'cancelled' },
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
+          }
+        );
+        
+        if (response.data && response.data.success) {
+          // Update local state
+          const updatedAppointments = appointments.map(appt => 
+            appt._id === id ? { ...appt, status: 'cancelled' } : appt
+          );
+          setAppointments(updatedAppointments);
+          
+          // Update localStorage for consistency across components
+          localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
+          localStorage.setItem('appointmentUpdated', 'true');
+          
+          // Close the details modal
+          closeDetails();
+          
+          // Show success message
+          alert('Appointment cancelled successfully');
+        } else {
+          alert('Failed to cancel appointment. Please try again.');
+        }
+      } catch (err) {
+        console.error('Error cancelling appointment:', err);
+        alert('Error cancelling appointment. Please try again.');
+      }
     }
   };
 
@@ -525,16 +641,28 @@ const MyAppointments = () => {
                     View Details
                   </button>
                   {(appointment.status === 'scheduled' || appointment.status === 'confirmed') && (
-                    <button 
-                      className="reschedule-btn"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        openReschedule(appointment);
-                      }}
-                    >
-                      <FaCalendarAlt />
-                      Reschedule
-                    </button>
+                    <>
+                      <button 
+                        className="reschedule-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          openReschedule(appointment);
+                        }}
+                      >
+                        <FaCalendarAlt />
+                        Reschedule
+                      </button>
+                      <button 
+                        className="cancel-btn"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          cancelAppointment(appointment._id);
+                        }}
+                      >
+                        <FaTimesCircle />
+                        Cancel
+                      </button>
+                    </>
                   )}
                   {appointment.status === 'completed' && !appointment.hasReviewed && (
                     <button className="review-btn">
@@ -626,16 +754,25 @@ const MyAppointments = () => {
 
             <div className="modal-footer">
               {(selectedAppointment.status === 'scheduled' || selectedAppointment.status === 'confirmed') && (
-                <button 
-                  className="reschedule-btn"
-                  onClick={() => {
-                    closeDetails();
-                    openReschedule(selectedAppointment);
-                  }}
-                >
-                  <FaCalendarAlt />
-                  Reschedule
-                </button>
+                <>
+                  <button 
+                    className="reschedule-btn"
+                    onClick={() => {
+                      closeDetails();
+                      openReschedule(selectedAppointment);
+                    }}
+                  >
+                    <FaCalendarAlt />
+                    Reschedule
+                  </button>
+                  <button 
+                    className="cancel-btn"
+                    onClick={() => cancelAppointment(selectedAppointment._id)}
+                  >
+                    <FaTimesCircle />
+                    Cancel Appointment
+                  </button>
+                </>
               )}
               {selectedAppointment.status === 'completed' && !selectedAppointment.hasReviewed && (
                 <button className="review-btn">
@@ -676,7 +813,13 @@ const MyAppointments = () => {
                     id="reschedule-date"
                     value={rescheduleDate}
                     onChange={(e) => setRescheduleDate(e.target.value)}
-                    min={new Date().toISOString().split('T')[0]}
+                    min={
+                      selectedAppointment 
+                        ? new Date(selectedAppointment.date) > new Date() 
+                          ? new Date(selectedAppointment.date).toISOString().split('T')[0] 
+                          : new Date().toISOString().split('T')[0]
+                        : new Date().toISOString().split('T')[0]
+                    }
                     className="form-input"
                   />
                 </div>

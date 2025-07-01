@@ -8,7 +8,6 @@ import AuthPage from './pages/AuthPage';
 import AppointmentPage from './pages/AppointmentPage';
 import Dashboard from './pages/Dashboard';
 import UserProfile from './pages/UserProfile';
-import MyAppointments from './pages/MyAppointments';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
@@ -23,6 +22,7 @@ import RetailLocalBusinesses from './pages/categories/RetailLocalBusinesses';
 import PrivateEvents from './pages/categories/PrivateEvents';
 import HotelRestaurant from './pages/categories/HotelRestaurant';
 import AppointmentCalendar from './pages/AppointmentCalendar';
+import RescheduleAppointment from './pages/RescheduleAppointment';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -142,6 +142,7 @@ function App() {
             <Route path="/categories/hotel-restaurant" element={<HotelRestaurant />} />
             <Route path="/appointments" element={isLoggedIn ? <AppointmentPage /> : <Navigate to="/login" />} />
             <Route path="/book" element={isLoggedIn ? <AppointmentPage /> : <Navigate to="/login" />} />
+            <Route path="/reschedule" element={isLoggedIn ? <RescheduleAppointment /> : <Navigate to="/login" />} />
             <Route path="/dashboard" element={isLoggedIn ? 
               <Dashboard userProfile={userProfile} setUserProfile={setUserProfile} /> 
               : <Navigate to="/login" />} 
@@ -154,7 +155,6 @@ function App() {
               <AppointmentCalendar /> 
               : <Navigate to="/login" />} 
             />
-            <Route path="/my-appointments" element={isLoggedIn ? <MyAppointments /> : <Navigate to="/login" />} />
           </Routes>
         </main>
         <Footer />
