@@ -17,6 +17,10 @@ const AppointmentCalendar = () => {
   const [categoryFilter, setCategoryFilter] = useState('all');
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
   const [viewType, setViewType] = useState('dayGridMonth');
+  const [rescheduleModalOpen, setRescheduleModalOpen] = useState(false);
+  const [rescheduleDate, setRescheduleDate] = useState('');
+  const [rescheduleTime, setRescheduleTime] = useState('');
+  const [rescheduling, setRescheduling] = useState(false);
   const calendarRef = useRef(null);
 
   // Service categories with their corresponding colors
@@ -32,6 +36,14 @@ const AppointmentCalendar = () => {
     'Events': '#f5e642',      // yellow
     'default': '#6c757d'      // gray
   };
+
+  // Available time slots
+  const timeSlots = [
+    '9:00 AM', '9:30 AM', '10:00 AM', '10:30 AM', '11:00 AM', '11:30 AM',
+    '12:00 PM', '12:30 PM', '1:00 PM', '1:30 PM', '2:00 PM', '2:30 PM',
+    '3:00 PM', '3:30 PM', '4:00 PM', '4:30 PM', '5:00 PM', '5:30 PM',
+    '6:00 PM', '6:30 PM', '7:00 PM', '7:30 PM', '8:00 PM', '8:30 PM'
+  ];
 
   // Fetch real appointments from the API
   const fetchAppointments = async () => {
@@ -202,8 +214,73 @@ const AppointmentCalendar = () => {
   // Reschedule appointment function
   const rescheduleAppointment = (id) => {
     closeModal();
-    // In a real app, this would open a form to reschedule
-    alert('Reschedule functionality would open here');
+    setSelectedAppointment(appointments.find(appt => appt._id === id));
+    setRescheduleModalOpen(true);
+  };
+
+  // Handle reschedule submission
+  const handleReschedule = async () => {
+    if (!rescheduleDate || !rescheduleTime) {
+      alert('Please select both date and time');
+      return;
+    }
+
+    setRescheduling(true);
+    try {
+      const token = localStorage.getItem('token');
+      
+      console.log('Calendar: Rescheduling appointment:', selectedAppointment._id);
+      console.log('Calendar: New date:', rescheduleDate);
+      console.log('Calendar: New time:', rescheduleTime);
+
+      const response = await axios.put(
+        `http://localhost:5001/appointments/${selectedAppointment._id}/reschedule`,
+        {
+          date: rescheduleDate,
+          time: rescheduleTime
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log('Calendar: Reschedule response:', response.data);
+
+      if (response.data && response.data.success) {
+        // Update local state
+        const updatedAppointments = appointments.map(appt => 
+          appt._id === selectedAppointment._id 
+            ? { ...appt, date: rescheduleDate, time: rescheduleTime }
+            : appt
+        );
+        setAppointments(updatedAppointments);
+        
+        // Close modals and reset state
+        setRescheduleModalOpen(false);
+        setRescheduleDate('');
+        setRescheduleTime('');
+        setSelectedAppointment(null);
+        
+        alert('Appointment rescheduled successfully!');
+      } else {
+        alert('Failed to reschedule appointment. Please try again.');
+      }
+    } catch (err) {
+      console.error('Calendar: Error rescheduling appointment:', err);
+      let errorMessage = 'Error rescheduling appointment. Please try again.';
+      
+      if (err.response) {
+        console.error('Calendar: Server response:', err.response.data);
+        errorMessage = err.response.data?.message || errorMessage;
+      }
+      
+      alert(errorMessage);
+    } finally {
+      setRescheduling(false);
+    }
   };
 
   // Format date for display
@@ -376,7 +453,7 @@ const AppointmentCalendar = () => {
         >
           <h3>No Appointments Yet</h3>
           <p>You don't have any scheduled appointments. Ready to book your first?</p>
-          <a href="/appointments" className="book-appointment-btn">Book Your First Appointment</a>
+          <a href="/services" className="book-appointment-btn">Book Your First Appointment</a>
         </motion.div>
       )}
 
@@ -398,7 +475,7 @@ const AppointmentCalendar = () => {
               onClick={(e) => e.stopPropagation()}
             >
               <button className="close-modal-btn" onClick={closeModal}>
-                <FaTimes />
+                ×
               </button>
               <div className="modal-header">
                 <h2>{selectedAppointment.serviceName}</h2>
@@ -474,6 +551,80 @@ const AppointmentCalendar = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {rescheduleModalOpen && (
+        <motion.div 
+          className="reschedule-modal"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
+          <motion.div 
+            className="modal-content"
+            initial={{ scale: 0.9, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            exit={{ scale: 0.9, opacity: 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 30 }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button className="close-modal-btn" onClick={() => {
+              setRescheduleModalOpen(false);
+              setRescheduleDate('');
+              setRescheduleTime('');
+            }}>
+              ×
+            </button>
+            <div className="modal-header">
+              <h2>Reschedule Appointment</h2>
+            </div>
+            <div className="modal-body">
+              <div className="reschedule-form">
+                <div className="form-group">
+                  <label htmlFor="reschedule-date">Date</label>
+                  <input
+                    type="date"
+                    id="reschedule-date"
+                    value={rescheduleDate}
+                    onChange={(e) => setRescheduleDate(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label htmlFor="reschedule-time">Time</label>
+                  <select
+                    id="reschedule-time"
+                    value={rescheduleTime}
+                    onChange={(e) => setRescheduleTime(e.target.value)}
+                  >
+                    {timeSlots.map(slot => (
+                      <option key={slot} value={slot}>{slot}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+                         <div className="modal-actions">
+               <button 
+                 className="cancel-btn"
+                 onClick={() => {
+                   setRescheduleModalOpen(false);
+                   setRescheduleDate('');
+                   setRescheduleTime('');
+                 }}
+                 disabled={rescheduling}
+               >
+                 Cancel
+               </button>
+               <button 
+                 className="reschedule-btn"
+                 onClick={handleReschedule}
+                 disabled={rescheduling || !rescheduleDate || !rescheduleTime}
+               >
+                 {rescheduling ? 'Rescheduling...' : 'Reschedule'}
+               </button>
+             </div>
+          </motion.div>
+        </motion.div>
+      )}
     </motion.div>
   );
 };

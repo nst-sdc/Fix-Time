@@ -1,8 +1,9 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+console.log('INDEX.JS STARTED');
 require('dotenv').config();
-
+console.log('JWT_SECRET:', process.env.JWT_SECRET);
 const app = express();
 
 // Configure CORS with more specific options
@@ -12,7 +13,8 @@ app.use(cors({
 }));
 app.use(express.json());
 
-// Import routes
+// Import 
+
 const authRoutes = require('./routes/auth');
 const reviewRoutes = require('./routes/reviews');
 const appointmentRoutes = require('./routes/appointments');
@@ -23,6 +25,11 @@ app.use('/auth', authRoutes);
 app.use('/reviews', reviewRoutes);
 app.use('/appointments', appointmentRoutes);
 app.use('/services', serviceRoutes);
+
+// Test route to verify appointments routes are working
+app.get('/test-appointments', (req, res) => {
+  res.json({ message: 'Appointments routes are accessible' });
+});
 
 // Root endpoint
 app.get('/', (req, res) => {
