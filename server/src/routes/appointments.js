@@ -18,4 +18,7 @@ router.patch('/:id/status', appointmentController.updateAppointmentStatus);
 // Delete an appointment
 router.delete('/:id', appointmentController.deleteAppointment);
 
+// Reschedule an appointment
+router.put('/:id/reschedule', appointmentController.rescheduleAppointment);
+
 module.exports = router; 

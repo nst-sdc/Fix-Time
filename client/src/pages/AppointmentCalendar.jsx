@@ -43,86 +43,33 @@ const AppointmentCalendar = () => {
     setError(null);
     
     try {
-      // Check if we have appointments in localStorage first
-      const storedAppointments = localStorage.getItem('appointments');
-      if (storedAppointments) {
-        const parsedAppointments = JSON.parse(storedAppointments);
-        if (parsedAppointments.length > 0) {
-          setAppointments(parsedAppointments);
-          setLoading(false);
-          return;
-        }
+      const token = localStorage.getItem('token');
+      
+      if (!token) {
+        console.error('No authentication token found');
+        setError('Please log in to view your appointments');
+        setLoading(false);
+        return;
       }
       
-      // If no appointments in localStorage or empty array, fetch from API
-      // In a real app, this would be an API call
-      setTimeout(() => {
-        // Mock data
-        const mockAppointments = [
-          {
-            _id: 'appt-001',
-            serviceName: 'Haircut & Styling',
-            serviceCategory: 'beauty',
-            provider: 'Style Studio',
-            location: '123 Beauty Ave',
-            date: new Date(Date.now() + 86400000 * 3), // 3 days from now
-            time: '10:00 AM',
-            status: 'scheduled',
-            notes: 'Regular haircut with styling'
-          },
-          {
-            _id: 'appt-002',
-            serviceName: 'Dental Checkup',
-            serviceCategory: 'healthcare',
-            provider: 'Smile Dental Clinic',
-            location: '456 Health St',
-            date: new Date(Date.now() + 86400000 * 7), // 7 days from now
-            time: '2:30 PM',
-            status: 'scheduled',
-            notes: 'Annual dental examination'
-          },
-          {
-            _id: 'appt-003',
-            serviceName: 'Car Maintenance',
-            serviceCategory: 'automobile',
-            provider: 'Quick Auto Service',
-            location: '789 Motor Rd',
-            date: new Date(Date.now() - 86400000 * 5), // 5 days ago
-            time: '3:30 PM',
-            status: 'completed',
-            notes: 'Oil change and tire rotation'
-          },
-          {
-            _id: 'appt-004',
-            serviceName: 'House Cleaning',
-            serviceCategory: 'home-repair',
-            provider: 'Clean Home Services',
-            location: '101 Main St',
-            date: new Date(Date.now() + 86400000 * 14), // 14 days from now
-            time: '11:00 AM',
-            status: 'scheduled',
-            notes: 'Full house deep cleaning'
-          },
-          {
-            _id: 'appt-005',
-            serviceName: 'Legal Consultation',
-            serviceCategory: 'government-legal',
-            provider: 'Legal Advisors Inc',
-            location: '202 Justice Ave',
-            date: new Date(Date.now() + 86400000 * 10), // 10 days from now
-            time: '9:00 AM',
-            status: 'scheduled',
-            notes: 'Initial consultation for legal advice'
-          }
-        ];
-        
-        // Save to localStorage for future use
-        localStorage.setItem('appointments', JSON.stringify(mockAppointments));
-        
-        setAppointments(mockAppointments);
-        setLoading(false);
-      }, 1000);
+      // Fetch appointments from API
+      const response = await axios.get('http://localhost:5001/appointments', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
       
+      if (response.data && response.data.success) {
+        setAppointments(response.data.appointments);
+        
+        // Also update localStorage for other components that might use it
+        localStorage.setItem('appointments', JSON.stringify(response.data.appointments));
+        localStorage.setItem('appointmentUpdated', 'false');
+      } else {
+        throw new Error(response.data?.message || 'Failed to fetch appointments');
+      }
+      
+      setLoading(false);
     } catch (err) {
       console.error('Error fetching appointments:', err);
       setError('Failed to load appointments. Please try again.');
@@ -207,7 +154,11 @@ const AppointmentCalendar = () => {
 
   // Format appointments for FullCalendar
   const formattedEvents = appointments
-    .filter(appt => categoryFilter === 'all' || appt.serviceCategory === categoryFilter)
+    .filter(appt => 
+      // Only show appointments that aren't cancelled AND match the category filter
+      (categoryFilter === 'all' || appt.serviceCategory === categoryFilter) && 
+      appt.status !== 'cancelled'
+    )
     .map(appointment => {
       const [time, period] = appointment.time.split(' ');
       const [hours, minutes] = time.split(':');
@@ -285,8 +236,22 @@ const AppointmentCalendar = () => {
             appt._id === id ? { ...appt, status: 'cancelled' } : appt
           );
           setAppointments(updatedAppointments);
+          
+          // Update localStorage for consistency across components
+          localStorage.setItem('appointments', JSON.stringify(updatedAppointments));
+          
+          // Show notification
+          setNotification({
+            show: true,
+            message: 'Appointment cancelled successfully'
+          });
+          
+          // Hide notification after 3 seconds
+          setTimeout(() => {
+            setNotification({ show: false, message: '' });
+          }, 3000);
+          
           closeModal();
-          alert('Appointment cancelled successfully');
         } else {
           alert('Failed to cancel appointment. Please try again.');
         }

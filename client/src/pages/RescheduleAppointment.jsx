@@ -20,9 +20,15 @@ const RescheduleAppointment = () => {
     const options = [];
     const today = new Date();
     
+    // Get the current appointment date if available
+    const appointmentDate = appointment ? new Date(appointment.date) : null;
+    
+    // Use today or appointment date (whichever is later) as the starting point
+    const startDate = appointmentDate && appointmentDate > today ? appointmentDate : today;
+    
     for (let i = 0; i < 14; i++) {
       const date = new Date();
-      date.setDate(today.getDate() + i);
+      date.setDate(startDate.getDate() + i);
       
       const formattedDate = date.toLocaleDateString('en-US', {
         weekday: 'short',
@@ -36,57 +42,141 @@ const RescheduleAppointment = () => {
     return options;
   };
 
-  const dateOptions = generateDateOptions();
+  // Get date options based on the current appointment
+  const dateOptions = appointment ? generateDateOptions() : [];
   
-  // Generate time slots
-  const timeSlots = [
-    '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', 
-    '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'
-  ];
-
-  useEffect(() => {
-    // Extract appointment ID from URL parameters
-    const searchParams = new URLSearchParams(location.search);
-    const appointmentId = searchParams.get('id');
+  // Generate time slots for the selected date
+  const generateTimeSlots = (selectedDate) => {
+    // Default time slots
+    const allTimeSlots = [
+      '9:00 AM', '10:00 AM', '11:00 AM', '12:00 PM', 
+      '1:00 PM', '2:00 PM', '3:00 PM', '4:00 PM', '5:00 PM'
+    ];
     
-    if (!appointmentId) {
-      setError('Appointment ID is missing');
-      setLoading(false);
-      return;
+    if (!appointment || !selectedDate) return allTimeSlots;
+    
+    // Parse the selected date
+    const dateParts = selectedDate.split(' ');
+    const month = new Date(Date.parse(dateParts[1] + " 1, 2000")).getMonth();
+    const day = parseInt(dateParts[2]);
+    const year = new Date().getFullYear();
+    const selectedDateObj = new Date(year, month, day);
+    
+    // Current appointment date
+    const appointmentDateObj = new Date(appointment.date);
+    
+    // If selected date is the same as the appointment date,
+    // only show time slots after the current appointment time
+    if (selectedDateObj.getDate() === appointmentDateObj.getDate() &&
+        selectedDateObj.getMonth() === appointmentDateObj.getMonth() &&
+        selectedDateObj.getFullYear() === appointmentDateObj.getFullYear()) {
+      
+      // Parse appointment time
+      const [apptTime, apptPeriod] = appointment.time.split(' ');
+      const [apptHours, apptMinutes] = apptTime.split(':');
+      let apptHour = parseInt(apptHours);
+      if (apptPeriod === 'PM' && apptHour !== 12) apptHour += 12;
+      if (apptPeriod === 'AM' && apptHour === 12) apptHour = 0;
+      
+      // Filter time slots after appointment time
+      return allTimeSlots.filter(slot => {
+        const [time, period] = slot.split(' ');
+        const [hours, minutes] = time.split(':');
+        let hour = parseInt(hours);
+        if (period === 'PM' && hour !== 12) hour += 12;
+        if (period === 'AM' && hour === 12) hour = 0;
+        
+        // Return true if this time slot is after the appointment time
+        return hour > apptHour || (hour === apptHour && parseInt(minutes) > parseInt(apptMinutes));
+      });
     }
     
-    // In a real app, fetch the appointment details from the server
-    // For this example, we'll simulate an API call with mock data
+    return allTimeSlots;
+  };
+  
+  // Get time slots based on the selected date
+  const timeSlots = generateTimeSlots(selectedDate);
+
+  useEffect(() => {
+    // Fetch appointment details
     const fetchAppointment = async () => {
+      const searchParams = new URLSearchParams(location.search);
+      const appointmentId = searchParams.get('id');
+      
+      if (!appointmentId) {
+        setError('No appointment ID provided');
+        setLoading(false);
+        return;
+      }
+      
       try {
-        // In a real app, replace this with actual API call
-        // const response = await axios.get(`/api/appointments/${appointmentId}`);
+        const token = localStorage.getItem('token');
         
-        // Mock data for demonstration
-        setTimeout(() => {
-          const mockAppointment = {
-            _id: appointmentId,
-            serviceName: 'Haircut & Styling',
-            date: new Date(),
-            time: '1:00 PM',
-            provider: 'Style Studio',
-            location: '123 Beauty Ave',
-            notes: 'Haircut & Styling',
-            status: 'scheduled'
-          };
-          
-          setAppointment(mockAppointment);
+        if (!token) {
+          setError('You must be logged in to view this appointment');
           setLoading(false);
-        }, 1000);
+          return;
+        }
+        
+        // Fetch appointments from API
+        const response = await axios.get('http://localhost:5001/appointments', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        
+        if (response.data && response.data.success) {
+          const appt = response.data.appointments.find(a => a._id === appointmentId);
+          
+          if (!appt) {
+            throw new Error('Appointment not found');
+          }
+          
+          setAppointment(appt);
+          
+          // Set initial selected date and time
+          const date = new Date(appt.date);
+          const formattedDate = date.toLocaleDateString('en-US', {
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
+          });
+          
+          setSelectedDate(formattedDate);
+          setSelectedTime(appt.time);
+        } else {
+          throw new Error(response.data?.message || 'Failed to fetch appointment');
+        }
       } catch (err) {
         console.error('Error fetching appointment:', err);
-        setError('Failed to load appointment details');
+        setError('Failed to load appointment. Please try again.');
+      } finally {
         setLoading(false);
       }
     };
     
     fetchAppointment();
   }, [location.search]);
+
+  // Update time slots when a date is selected
+  const handleDateSelect = (date) => {
+    setSelectedDate(date);
+    
+    // Reset time selection
+    setSelectedTime('');
+  };
+
+  // Use effect to update time slots when date changes
+  useEffect(() => {
+    if (selectedDate) {
+      // If the available time slots for the selected date don't include
+      // the currently selected time, reset it
+      const availableTimeSlots = generateTimeSlots(selectedDate);
+      if (selectedTime && !availableTimeSlots.includes(selectedTime)) {
+        setSelectedTime('');
+      }
+    }
+  }, [selectedDate]);
 
   const handleReschedule = async (e) => {
     e.preventDefault();
@@ -96,32 +186,70 @@ const RescheduleAppointment = () => {
       return;
     }
     
+    // Check if the selected date and time are valid for rescheduling
+    if (appointment) {
+      const currentAppointmentDate = new Date(appointment.date);
+      
+      // Parse the selected date
+      const dateParts = selectedDate.split(' ');
+      const month = new Date(Date.parse(dateParts[1] + " 1, 2000")).getMonth();
+      const day = parseInt(dateParts[2]);
+      const year = new Date().getFullYear();
+      const newDateObj = new Date(year, month, day);
+      
+      // Parse the selected time
+      const [time, period] = selectedTime.split(' ');
+      const [hours, minutes] = time.split(':');
+      let hour = parseInt(hours);
+      if (period === 'PM' && hour !== 12) hour += 12;
+      if (period === 'AM' && hour === 12) hour = 0;
+      
+      // Set the time on the new date
+      newDateObj.setHours(hour, parseInt(minutes), 0);
+      
+      // Check if the new date/time is after the current appointment
+      if (newDateObj <= currentAppointmentDate) {
+        setError('Please select a date and time after the current appointment');
+        return;
+      }
+    }
+    
     setSubmitting(true);
     setError(null);
     
     try {
-      // In a real app, make an API call to update the appointment
-      // const response = await axios.patch(`/api/appointments/${appointment._id}/reschedule`, {
-      //   date: selectedDate,
-      //   time: selectedTime
-      // });
+      const token = localStorage.getItem('token');
       
-      // Simulate API call
-      setTimeout(() => {
-        // Create a new date object from the selected date string
-        const dateParts = selectedDate.split(' ');
-        const month = new Date(Date.parse(dateParts[1] + " 1, 2000")).getMonth();
-        const day = parseInt(dateParts[2]);
-        const today = new Date();
-        const newDate = new Date(today.getFullYear(), month, day);
-        
-        // Create updated appointment object
-        const updatedAppointment = {
-          ...appointment,
+      if (!token) {
+        setError('You must be logged in to reschedule an appointment');
+        setSubmitting(false);
+        return;
+      }
+      
+      // Parse the selected date into a date object
+      const dateParts = selectedDate.split(' ');
+      const month = new Date(Date.parse(dateParts[1] + " 1, 2000")).getMonth();
+      const day = parseInt(dateParts[2]);
+      const today = new Date();
+      const newDate = new Date(today.getFullYear(), month, day);
+      
+      // Call API to reschedule appointment
+      const response = await axios.put(
+        `http://localhost:5001/appointments/${appointment._id}/reschedule`,
+        {
           date: newDate.toISOString(),
-          time: selectedTime,
-          lastUpdated: new Date().toISOString()
-        };
+          time: selectedTime
+        },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      
+      if (response.data && response.data.success) {
+        // Create updated appointment object
+        const updatedAppointment = response.data.appointment;
         
         // Store in localStorage to communicate with calendar component
         const appointmentsInStorage = JSON.parse(localStorage.getItem('appointments') || '[]');
@@ -140,7 +268,9 @@ const RescheduleAppointment = () => {
         
         setSuccess(true);
         setSubmitting(false);
-      }, 1500);
+      } else {
+        throw new Error(response.data?.message || 'Failed to reschedule appointment');
+      }
     } catch (err) {
       console.error('Error rescheduling appointment:', err);
       setError('Failed to reschedule. Please try again.');
@@ -254,7 +384,7 @@ const RescheduleAppointment = () => {
                 key={date}
                 type="button"
                 className={`date-button ${selectedDate === date ? "selected" : ""}`}
-                onClick={() => setSelectedDate(date)}
+                onClick={() => handleDateSelect(date)}
               >
                 {date}
               </button>

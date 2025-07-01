@@ -259,4 +259,56 @@ exports.deleteAppointment = async (req, res) => {
       error: error.message
     });
   }
+};
+
+/**
+ * Reschedule an appointment
+ * @route PUT /api/appointments/:id/reschedule
+ * @access Private - For logged-in users
+ */
+exports.rescheduleAppointment = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { date, time } = req.body;
+    const userId = req.user.id;
+
+    // Validate inputs
+    if (!date || !time) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide both date and time'
+      });
+    }
+
+    // Find appointment and check ownership
+    const appointment = await Appointment.findOne({ _id: id, userId });
+    if (!appointment) {
+      return res.status(404).json({
+        success: false,
+        message: 'Appointment not found or you are not authorized'
+      });
+    }
+
+    // Update appointment
+    appointment.date = date;
+    appointment.time = time;
+    await appointment.save();
+
+    // Populate service details
+    const populatedAppointment = await Appointment.findById(appointment._id)
+      .populate('serviceId', 'name category provider location');
+
+    res.status(200).json({
+      success: true,
+      message: 'Appointment rescheduled successfully',
+      appointment: populatedAppointment
+    });
+  } catch (error) {
+    console.error('Error rescheduling appointment:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Server error',
+      error: error.message
+    });
+  }
 }; 
