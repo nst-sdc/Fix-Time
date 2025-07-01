@@ -8,6 +8,7 @@ import AuthPage from './pages/AuthPage';
 import AppointmentPage from './pages/AppointmentPage';
 import Dashboard from './pages/Dashboard';
 import UserProfile from './pages/UserProfile';
+import MyAppointments from './pages/MyAppointments';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
@@ -155,6 +156,7 @@ function App() {
               <AppointmentCalendar /> 
               : <Navigate to="/login" />} 
             />
+            <Route path="/my-appointments" element={isLoggedIn ? <MyAppointments /> : <Navigate to="/login" />} />
           </Routes>
         </main>
         <Footer />
