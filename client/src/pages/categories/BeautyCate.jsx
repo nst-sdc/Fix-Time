@@ -3,7 +3,7 @@ import axios from 'axios';
 import './CategoryPage.css';
 import { FaCut, FaMale, FaPaintBrush, FaHands, FaSmile, FaRing, FaSpa, FaHotjar, FaSync } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
-
+import CategoryPage from './CategoryPage';
 // Icon mapping for services
 const serviceIcons = {
   "Haircut & Styling": <FaCut />,
@@ -80,6 +80,7 @@ const BeautyCate = () => {
   }, []);
 
   return (
+    <CategoryPage categoryName="Beauty & Personal Care">
     <div className="category-page">
       <h1 className="category-title">💇 Beauty & Personal Care</h1>
       {loading ? (
@@ -106,6 +107,7 @@ const BeautyCate = () => {
       </div>
       )}
     </div>
+    </CategoryPage>
   );
 };
 

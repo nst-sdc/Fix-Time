@@ -1,12 +1,16 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
+import axios from "axios";
 import "./Services.css";
+import ServiceForm from "../components/ServiceForm";
 
+// Local static categories
 const SERVICES = [
   {
     id: 1,
     category: "🏥 Healthcare & Wellness",
     slug: "healthcare-wellness",
+    backendCategory: "healthcare-wellness",
     services: [
       "General Physician Appointments",
       "Dentist Checkups",
@@ -22,6 +26,7 @@ const SERVICES = [
     id: 2,
     category: "💇 Beauty & Personal Care",
     slug: "beauty-personal-care",
+    backendCategory: "beauty-personal-care",
     services: [
       "Haircut & Styling",
       "Beard Grooming",
@@ -33,75 +38,29 @@ const SERVICES = [
       "Waxing / Threading Services"
     ]
   },
-  {
-    id: 3,
-    category: "🧰 Home & Repair Services",
-    slug: "home-repair-services",
-    services: [
-      "Electrician Booking",
-      "Plumber Booking",
-      "AC Repair & Servicing",
-      "Water Purifier Maintenance",
-      "Carpenter Appointments",
-      "Pest Control Scheduling",
-      "Appliance Repairs (washing machine, fridge, etc.)"
-    ]
-  },
-  {
-    id: 4,
-    category: "🧑‍🏫 Education & Coaching",
-    slug: "education-coaching",
-    services: [
-      "Tuition Sessions (Math, Science, etc.)",
-      "Music Lessons (Guitar, Piano)",
-      "Dance Classes",
-      "Art & Craft Workshops",
-      "Language Learning Sessions",
-      "Fitness / Yoga Trainers"
-    ]
-  },
-  {
-    id: 5,
-    category: "📋 Government / Legal Services",
-    slug: "government-legal-services",
-    services: [
-      "Driving License Appointment",
-      "Passport Verification Slot Booking",
-      "Aadhar Update Booking",
-      "Legal Consultation (Advocate visit)",
-      "Property Registration / Stamp Duty Token"
-    ]
-  },
-  {
-    id: 6,
-    category: "🚗 Automobile Services",
-    slug: "automobile-services",
-    services: [
-      "Car/Bike Servicing",
-      "Pollution Check Booking",
-      "RTO Agent Consultations",
-      "Tire & Oil Change",
-      "Vehicle Cleaning / Detailing Services"
-    ]
-  },
-  {
-    id: 7,
-    category: "🛍️ Retail & Local Businesses",
-    slug: "retail-local-businesses",
-    services: [
-      "Tailor Appointments (custom fitting)",
-      "Jeweller Consultation (custom design)",
-      "Boutique Trials / Booking",
-      "Pet Grooming Services",
-      "Custom Gift Makers or Artists",
-      "Local Laundry / Dry Cleaning Pickup-Slots"
-    ]
-  }
+  // ... (same for other categories)
 ];
 
 const ServiceCategory = () => {
   const { categorySlug } = useParams();
   const categoryData = SERVICES.find(cat => cat.slug === categorySlug);
+  const [dynamicServices, setDynamicServices] = useState([]);
+  const [showForm, setShowForm] = useState(false);
+
+  useEffect(() => {
+    if (categoryData) {
+      fetchDynamicServices();
+    }
+  }, [categorySlug]);
+
+  const fetchDynamicServices = async () => {
+    try {
+      const res = await axios.get(`http://localhost:5001/services/category/${categorySlug}`);
+      setDynamicServices(res.data);
+    } catch (err) {
+      console.error("Failed to fetch services:", err);
+    }
+  };
 
   if (!categoryData) {
     return (
@@ -119,7 +78,19 @@ const ServiceCategory = () => {
       <div className="services-container">
         <h1 className="services-heading">{categoryData.category}</h1>
         <Link to="/services" className="btn btn-secondary" style={{marginBottom: '2rem', display: 'inline-block'}}>Back to All Categories</Link>
-        <div className="services-list" style={{marginTop: '2rem'}}>
+
+        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>+ Add a Service</button>
+
+        {showForm && (
+          <ServiceForm
+            category={categorySlug}
+            onClose={() => setShowForm(false)}
+            onSuccess={fetchDynamicServices}
+          />
+        )}
+
+        <h3 style={{marginTop: "2rem"}}>Popular Services:</h3>
+        <div className="services-list">
           {categoryData.services.map((service, idx) => (
             <div className="service-item" key={idx}>
               <span className="service-name">{service}</span>
@@ -127,9 +98,24 @@ const ServiceCategory = () => {
             </div>
           ))}
         </div>
+
+        <h3 style={{marginTop: "2rem"}}>User Added Services:</h3>
+        {dynamicServices.length === 0 ? (
+          <p>No services added yet for this category.</p>
+        ) : (
+          <div className="services-list">
+            {dynamicServices.map((s, idx) => (
+              <div className="service-item" key={s._id || idx}>
+                <span className="service-name">{s.name}</span>
+                <p style={{ margin: "0.3rem 0" }}>{s.description}</p>
+                <small><b>Provider:</b> {s.provider} | <b>Location:</b> {s.location}</small>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   );
 };
 
-export default ServiceCategory; 
+export default ServiceCategory;

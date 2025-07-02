@@ -3,6 +3,7 @@ import './CategoryPage.css';
 import { FaBolt, FaWrench, FaSnowflake, FaWater, FaHammer, FaBug, FaCogs } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
 import { addRatingsToServices } from '../../utils/serviceUtils';
+import CategoryPage from './CategoryPage';
 
 const serviceData = [
   { name: "Electrician Booking", icon: <FaBolt /> },
@@ -28,6 +29,7 @@ const HomeRepairServices = () => {
   }, []);
 
   return (
+    <CategoryPage categoryName="Home & Repair Services">
     <div className="category-page">
       <h1 className="category-title">🧰 Home & Repair Services</h1>
       {loading ? (
@@ -40,6 +42,7 @@ const HomeRepairServices = () => {
       </div>
       )}
     </div>
+    </CategoryPage>
   );
 };
 
