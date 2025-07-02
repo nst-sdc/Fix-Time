@@ -1,7 +1,7 @@
 // src/components/ServiceForm.jsx
 import React, { useState } from "react";
 import axios from "axios";
-import "./ServiceForm.css"; 
+import "./ServiceForm.css";
 
 const ServiceForm = ({ category, onClose, onSuccess }) => {
   const [form, setForm] = useState({
@@ -12,9 +12,12 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
     city: "",
     contact: "",
     imageUrl: "",
+    price: "",
+    duration: "",
     timeSlots: [],
     category
   });
+
   const [slot, setSlot] = useState("");
 
   const handleChange = (e) => {
@@ -30,12 +33,27 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const transformedData = {
+      name: form.serviceName,
+      category: form.category,
+      description: form.description,
+      price: Number(form.price),
+      duration: Number(form.duration),
+      provider: form.companyName,
+      location: `${form.address}, ${form.city}`,
+      contact: form.contact,
+      imageUrl: form.imageUrl,
+      timeSlots: form.timeSlots,
+    };
+
     try {
-      await axios.post("http://localhost:5001/services", form);
+      await axios.post("http://localhost:5001/services", transformedData);
       alert("Service added!");
       onSuccess();
       onClose();
     } catch (err) {
+      console.error("Error adding service:", err.response?.data || err.message);
       alert("Error adding service.");
     }
   };
@@ -48,6 +66,8 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
           <input name="serviceName" placeholder="Service Name" onChange={handleChange} required />
           <input name="companyName" placeholder="Company Name" onChange={handleChange} required />
           <textarea name="description" placeholder="Description" onChange={handleChange} required />
+          <input name="price" placeholder="Price (e.g. 100)" type="number" onChange={handleChange} required />
+          <input name="duration" placeholder="Duration in mins (e.g. 60)" type="number" onChange={handleChange} required />
           <input name="address" placeholder="Address" onChange={handleChange} required />
           <input name="city" placeholder="City" onChange={handleChange} required />
           <input name="contact" placeholder="Contact Email or Phone" onChange={handleChange} required />
@@ -79,3 +99,4 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
 };
 
 export default ServiceForm;
+
