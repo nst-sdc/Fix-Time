@@ -371,7 +371,7 @@ const MyAppointments = () => {
         
         if (action) {
           // User clicked OK - Reschedule
-          handleQuickAction(appointment, 'reschedule');
+        handleQuickAction(appointment, 'reschedule');
         } else {
           // User clicked Cancel - Cancel appointment
           handleQuickAction(appointment, 'cancel');
@@ -642,16 +642,16 @@ const MyAppointments = () => {
                   </button>
                   {(appointment.status === 'scheduled' || appointment.status === 'confirmed') && (
                     <>
-                      <button 
-                        className="reschedule-btn"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          openReschedule(appointment);
-                        }}
-                      >
-                        <FaCalendarAlt />
-                        Reschedule
-                      </button>
+                    <button 
+                      className="reschedule-btn"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        openReschedule(appointment);
+                      }}
+                    >
+                      <FaCalendarAlt />
+                      Reschedule
+                    </button>
                       <button 
                         className="cancel-btn"
                         onClick={(e) => {
@@ -755,16 +755,16 @@ const MyAppointments = () => {
             <div className="modal-footer">
               {(selectedAppointment.status === 'scheduled' || selectedAppointment.status === 'confirmed') && (
                 <>
-                  <button 
-                    className="reschedule-btn"
-                    onClick={() => {
-                      closeDetails();
-                      openReschedule(selectedAppointment);
-                    }}
-                  >
-                    <FaCalendarAlt />
-                    Reschedule
-                  </button>
+                <button 
+                  className="reschedule-btn"
+                  onClick={() => {
+                    closeDetails();
+                    openReschedule(selectedAppointment);
+                  }}
+                >
+                  <FaCalendarAlt />
+                  Reschedule
+                </button>
                   <button 
                     className="cancel-btn"
                     onClick={() => cancelAppointment(selectedAppointment._id)}
