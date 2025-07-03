@@ -34,6 +34,18 @@ const serviceSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  contact: {
+    type: String,
+    default: ''
+  },
+  imageUrl: {
+    type: String,
+    default: ''
+  },
+  timeSlots: {
+    type: [String],
+    default: []
+  },
   available: { 
     type: Boolean, 
     default: true 

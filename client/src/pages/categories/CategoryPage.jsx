@@ -1,8 +1,17 @@
 import React, { useState } from 'react';
 import ServiceForm from '../../components/ServiceForm';
 
-const CategoryPage = ({ categoryName, children }) => {
+const CategoryPage = ({ categoryName, children, onServiceAdded }) => {
   const [showForm, setShowForm] = useState(false);
+
+  const handleServiceSuccess = (newService) => {
+    setShowForm(false);
+    
+    // Call the parent callback if provided
+    if (onServiceAdded && typeof onServiceAdded === 'function') {
+      onServiceAdded(newService);
+    }
+  };
 
   return (
     <div className="category-page-wrapper">
@@ -29,10 +38,7 @@ const CategoryPage = ({ categoryName, children }) => {
         <ServiceForm
           category={categoryName}
           onClose={() => setShowForm(false)}
-          onSuccess={() => {
-            setShowForm(false);
-            console.log('Service added');
-          }}
+          onSuccess={handleServiceSuccess}
         />
       )}
 
