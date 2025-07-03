@@ -229,4 +229,26 @@ body.dark .book-now-btn:hover {
     font-size: 1.5rem;
     margin-right: 0.8rem;
   }
+}
+
+/* Add these styles to the existing CSS file */
+
+.error-message {
+  background-color: #ffebee;
+  color: #d32f2f;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
+  border-left: 4px solid #d32f2f;
+  text-align: center;
+}
+
+.no-services-message {
+  text-align: center;
+  padding: 2rem;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  margin: 1rem 0;
+  color: #666;
+  font-style: italic;
 } 

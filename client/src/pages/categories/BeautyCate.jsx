@@ -1,44 +1,89 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import './CategoryPage.css';
 import { FaCut, FaMale, FaPaintBrush, FaHands, FaSmile, FaRing, FaSpa, FaHotjar } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
 import CategoryPage from './CategoryPage';
-import { addRatingsToServices } from '../../utils/serviceUtils';
 
-const serviceData = [
-  { name: "Haircut & Styling", icon: <FaCut /> },
-  { name: "Beard Grooming", icon: <FaMale /> },
-  { name: "Hair Coloring / Smoothening", icon: <FaPaintBrush /> },
-  { name: "Manicure & Pedicure", icon: <FaHands /> },
-  { name: "Facial & Skin Treatment", icon: <FaSmile /> },
-  { name: "Bridal/Party Makeup Sessions", icon: <FaRing /> },
-  { name: "Spa & Massage", icon: <FaSpa /> },
-  { name: "Waxing / Threading Services", icon: <FaHotjar /> }
-];
+// Default icon mapping for this category
+const iconMapping = {
+  "Haircut & Styling": <FaCut />,
+  "Beard Grooming": <FaMale />,
+  "Hair Coloring / Smoothening": <FaPaintBrush />,
+  "Manicure & Pedicure": <FaHands />,
+  "Facial & Skin Treatment": <FaSmile />,
+  "Bridal/Party Makeup Sessions": <FaRing />,
+  "Spa & Massage": <FaSpa />,
+  "Waxing / Threading Services": <FaHotjar />,
+  // Default icon for any other service
+  "default": <FaSpa />
+};
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
 
 const BeautyCate = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
-    // In a real app, this would be an API call to fetch services with ratings
-    // For demo purposes, we're adding mock ratings to our static data
-    setLoading(true);
-    const servicesWithRatings = addRatingsToServices(serviceData);
-    setServices(servicesWithRatings);
-    setLoading(false);
-  }, []);
+    const fetchServices = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        
+        const response = await axios.get(`${API_BASE_URL}/services`, {
+          params: { category: 'Beauty & Personal Care' }
+        });
+        
+        // Add icons to the services based on the mapping
+        const servicesWithIcons = response.data.services.map(service => ({
+          ...service,
+          icon: iconMapping[service.name] || iconMapping.default
+        }));
+        
+        setServices(servicesWithIcons);
+      } catch (err) {
+        console.error('Error fetching services:', err);
+        setError('Failed to load services. Please try again later.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchServices();
+  }, [refreshTrigger]);
+
+  const handleServiceAdded = (newService) => {
+    // Trigger a refresh when a new service is added
+    setRefreshTrigger(prev => prev + 1);
+  };
 
   return (
-    <CategoryPage categoryName="Beauty & Personal Care">
+    <CategoryPage 
+      categoryName="Beauty & Personal Care"
+      onServiceAdded={handleServiceAdded}
+    >
       <div className="category-page">
         <h1 className="category-title">💇 Beauty & Personal Care</h1>
+        
+        {error && (
+          <div className="error-message">
+            {error}
+          </div>
+        )}
+        
         {loading ? (
           <div className="loading-state">Loading services...</div>
+        ) : services.length === 0 ? (
+          <div className="no-services-message">
+            No services available in this category yet.
+          </div>
         ) : (
           <div className="services-list">
-            {services.map((service, idx) => (
-              <ServiceCard key={idx} service={service} />
+            {services.map((service) => (
+              <ServiceCard key={service._id} service={service} />
             ))}
           </div>
         )}

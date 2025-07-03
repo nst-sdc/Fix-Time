@@ -97,7 +97,7 @@ exports.createSampleServices = async (req, res) => {
       // Beauty services
       {
         name: 'Haircut & Styling',
-        category: 'Beauty',
+        category: 'Beauty & Personal Care',
         description: 'Professional haircut and styling by expert stylists',
         price: 45,
         duration: 60,
@@ -106,7 +106,7 @@ exports.createSampleServices = async (req, res) => {
       },
       {
         name: 'Beard Grooming',
-        category: 'Beauty',
+        category: 'Beauty & Personal Care',
         description: 'Complete beard trim, shape and maintenance',
         price: 30,
         duration: 30,
@@ -115,7 +115,7 @@ exports.createSampleServices = async (req, res) => {
       },
       {
         name: 'Hair Coloring / Smoothening',
-        category: 'Beauty',
+        category: 'Beauty & Personal Care',
         description: 'Professional hair coloring or smoothening treatment',
         price: 80,
         duration: 120,
@@ -124,7 +124,7 @@ exports.createSampleServices = async (req, res) => {
       },
       {
         name: 'Spa & Massage',
-        category: 'Beauty',
+        category: 'Beauty & Personal Care',
         description: 'Relaxing full body massage and spa treatment',
         price: 90,
         duration: 90,
@@ -183,25 +183,97 @@ exports.createSampleServices = async (req, res) => {
   }
 }; 
 
-// Added for AddServiceForm
-// POST /services - Add a new service
+/**
+ * Add a new service
+ * @route POST /services
+ * @access Public
+ */
 exports.addService = async (req, res) => {
   try {
+    // Validate required fields
+    const requiredFields = ['name', 'category', 'description', 'price', 'duration'];
+    for (const field of requiredFields) {
+      if (!req.body[field]) {
+        return res.status(400).json({ 
+          success: false, 
+          message: `${field} is required` 
+        });
+      }
+    }
+
+    // Validate numeric fields
+    if (isNaN(req.body.price) || req.body.price < 0) {
+      return res.status(400).json({
+        success: false,
+        message: 'Price must be a positive number'
+      });
+    }
+
+    if (isNaN(req.body.duration) || req.body.duration < 5) {
+      return res.status(400).json({
+        success: false,
+        message: 'Duration must be at least 5 minutes'
+      });
+    }
+
+    // Create and save the new service
     const newService = new Service(req.body);
     await newService.save();
-    res.status(201).json({ success: true, message: "Service added", data: newService });
+    
+    res.status(201).json({ 
+      success: true, 
+      message: "Service added successfully", 
+      data: newService 
+    });
   } catch (err) {
-    res.status(400).json({ success: false, message: err.message });
+    console.error('Error adding service:', err);
+    
+    // Handle validation errors from Mongoose
+    if (err.name === 'ValidationError') {
+      const messages = Object.values(err.errors).map(val => val.message);
+      return res.status(400).json({ 
+        success: false, 
+        message: messages.join(', ') 
+      });
+    }
+    
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error', 
+      error: err.message 
+    });
   }
 };
 
-// GET /services/category/:category - Fetch services by category
+/**
+ * Get services by category
+ * @route GET /services/category/:category
+ * @access Public
+ */
 exports.getServicesByCategory = async (req, res) => {
   try {
     const category = req.params.category;
+    
+    if (!category) {
+      return res.status(400).json({
+        success: false,
+        message: 'Category parameter is required'
+      });
+    }
+    
     const services = await Service.find({ category });
-    res.status(200).json(services);
+    
+    res.status(200).json({
+      success: true,
+      count: services.length,
+      services
+    });
   } catch (err) {
-    res.status(500).json({ success: false, message: err.message });
+    console.error('Error fetching services by category:', err);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Server error', 
+      error: err.message 
+    });
   }
 };
