@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './CategoryPage.css';
 import { FaCut, FaMale, FaPaintBrush, FaHands, FaSmile, FaRing, FaSpa, FaHotjar } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
+import CategoryPage from './CategoryPage';
 import { addRatingsToServices } from '../../utils/serviceUtils';
 
 const serviceData = [
@@ -29,18 +30,20 @@ const BeautyCate = () => {
   }, []);
 
   return (
-    <div className="category-page">
-      <h1 className="category-title">💇 Beauty & Personal Care</h1>
-      {loading ? (
-        <div className="loading-state">Loading services...</div>
-      ) : (
-      <div className="services-list">
-        {services.map((service, idx) => (
-            <ServiceCard key={idx} service={service} />
-        ))}
+    <CategoryPage categoryName="Beauty & Personal Care">
+      <div className="category-page">
+        <h1 className="category-title">💇 Beauty & Personal Care</h1>
+        {loading ? (
+          <div className="loading-state">Loading services...</div>
+        ) : (
+          <div className="services-list">
+            {services.map((service, idx) => (
+              <ServiceCard key={idx} service={service} />
+            ))}
+          </div>
+        )}
       </div>
-      )}
-    </div>
+    </CategoryPage>
   );
 };
 

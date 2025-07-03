@@ -3,6 +3,7 @@ import './CategoryPage.css';
 import { FaUtensils, FaBed, FaConciergeBell, FaGlassWhiskey, FaUsers, FaHotel } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
 import { addRatingsToServices } from '../../utils/serviceUtils';
+import CategoryPage from './CategoryPage';
 
 const serviceData = [
   { name: "Table Reservation", icon: <FaUtensils /> },
@@ -27,6 +28,7 @@ const HotelRestaurant = () => {
   }, []);
 
   return (
+    <CategoryPage categoryName="Hotel & Restaurant">
     <div className="category-page">
       <h1 className="category-title">🏨 Hotel & Restaurant</h1>
       {loading ? (
@@ -39,6 +41,7 @@ const HotelRestaurant = () => {
       </div>
       )}
     </div>
+    </CategoryPage>
   );
 };
 

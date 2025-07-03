@@ -3,6 +3,7 @@ import './CategoryPage.css';
 import { FaIdCard, FaPassport, FaUserCheck, FaGavel, FaFileContract } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
 import { addRatingsToServices } from '../../utils/serviceUtils';
+import CategoryPage from './CategoryPage';
 
 const serviceData = [
   { name: "Driving License Appointment", icon: <FaIdCard /> },
@@ -26,6 +27,7 @@ const GovernmentLegalServices = () => {
   }, []);
 
   return (
+    <CategoryPage categoryName="Government / Legal Services">
     <div className="category-page">
       <h1 className="category-title">📋 Government / Legal Services</h1>
       {loading ? (
@@ -38,6 +40,7 @@ const GovernmentLegalServices = () => {
       </div>
       )}
     </div>
+    </CategoryPage>
   );
 };
 

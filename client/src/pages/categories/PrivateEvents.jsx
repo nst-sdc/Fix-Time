@@ -3,6 +3,7 @@ import './CategoryPage.css';
 import { FaCalendarAlt, FaChalkboardTeacher, FaBirthdayCake, FaRing, FaBuilding, FaGlassCheers } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
 import { addRatingsToServices } from '../../utils/serviceUtils';
+import CategoryPage from './CategoryPage';
 
 const serviceData = [
   { name: "Webinar Booking", icon: <FaChalkboardTeacher /> },
@@ -27,6 +28,7 @@ const PrivateEvents = () => {
   }, []);
 
   return (
+    <CategoryPage categoryName="Private Events">
     <div className="category-page">
       <h1 className="category-title">🎉 Private Events</h1>
       {loading ? (
@@ -39,6 +41,7 @@ const PrivateEvents = () => {
       </div>
       )}
     </div>
+    </CategoryPage>
   );
 };
 
