@@ -65,6 +65,7 @@ const AppointmentDetails = ({ appointment }) => {
           <ReviewForm 
             appointmentId={appointment._id} 
             onReviewSubmitted={handleReviewSubmit} 
+            onClose={() => setShowReviewForm(false)}
           />
         </div>
       )}
