@@ -1,4 +1,5 @@
 const Service = require('../models/Service');
+const Appointment = require('../models/Appointment');
 
 /**
  * Get all services or filtered by category
@@ -187,7 +188,11 @@ exports.createSampleServices = async (req, res) => {
 // POST /services - Add a new service
 exports.addService = async (req, res) => {
   try {
-    const newService = new Service(req.body);
+    const userId = req.user?.id;
+    if (!userId) {
+      return res.status(401).json({ success: false, message: 'Unauthorized: userId missing' });
+    }
+    const newService = new Service({ ...req.body, userId });
     await newService.save();
     res.status(201).json({ success: true, message: "Service added", data: newService });
   } catch (err) {
@@ -203,5 +208,69 @@ exports.getServicesByCategory = async (req, res) => {
     res.status(200).json(services);
   } catch (err) {
     res.status(500).json({ success: false, message: err.message });
+  }
+};
+
+/**
+ * Get all services owned by the logged-in user, with appointment info
+ * @route GET /api/services/my
+ * @access Private
+ */
+exports.getMyServices = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    // 1. Find all services owned by this user
+    const ownedServices = await Service.find({ userId });
+    // 2. Find all appointments booked by this user
+    const myAppointments = await Appointment.find({ userId })
+      .populate('serviceId')
+      .sort({ date: 1, time: 1 });
+    // 3. Build a map of serviceId to user's bookings
+    const bookedServiceMap = {};
+    myAppointments.forEach(appt => {
+      if (appt.serviceId && appt.serviceId._id) {
+        const sid = appt.serviceId._id.toString();
+        if (!bookedServiceMap[sid]) bookedServiceMap[sid] = [];
+        bookedServiceMap[sid].push(appt);
+      }
+    });
+    // 4. Collect all unique services: owned + booked
+    const allServiceIds = new Set([
+      ...ownedServices.map(s => s._id.toString()),
+      ...Object.keys(bookedServiceMap)
+    ]);
+    // 5. For each unique service, build the response
+    const servicesWithAppointments = await Promise.all(
+      Array.from(allServiceIds).map(async (sid) => {
+        // Try to find in ownedServices first
+        let service = ownedServices.find(s => s._id.toString() === sid);
+        if (!service) {
+          // If not owned, fetch from DB (from booked)
+          service = await Service.findById(sid);
+        }
+        if (!service) return null; // skip if not found
+        // If owned, get all appointments for this service
+        let appointments = [];
+        if (service.userId && service.userId.toString() === userId) {
+          appointments = await Appointment.find({ serviceId: sid })
+            .select('customerName customerEmail customerPhone date time status userId')
+            .sort({ date: 1, time: 1 });
+        }
+        // Always include user's own bookings for this service
+        const myBookings = bookedServiceMap[sid] || [];
+        return {
+          ...service.toObject(),
+          appointments,
+          bookedByMe: myBookings.length > 0,
+          myAppointments: myBookings
+        };
+      })
+    );
+    // Remove any nulls (in case of missing services)
+    const filtered = servicesWithAppointments.filter(Boolean);
+    res.status(200).json({ success: true, services: filtered });
+  } catch (error) {
+    console.error('Error fetching my services:', error);
+    res.status(500).json({ success: false, message: 'Failed to fetch your services', error: error.message });
   }
 };
