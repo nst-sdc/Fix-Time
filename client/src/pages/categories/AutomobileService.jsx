@@ -1,90 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import './CategoryPage.css';
 import { FaCar, FaWind, FaUserCog, FaOilCan, FaShower } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
 import CategoryPage from './CategoryPage';
+import { addRatingsToServices } from '../../utils/serviceUtils';
 
-// Default icon mapping for this category
-const iconMapping = {
-  "Car/Bike Servicing": <FaCar />,
-  "Pollution Check Booking": <FaWind />,
-  "RTO Agent Consultations": <FaUserCog />,
-  "Tire & Oil Change": <FaOilCan />,
-  "Vehicle Cleaning / Detailing Services": <FaShower />,
-  // Default icon for any other service
-  "default": <FaCar />
-};
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+const serviceData = [
+  { name: "Car/Bike Servicing", icon: <FaCar />, price: 800, description: "Routine servicing for cars and bikes.", provider: "AutoCare Garage", location: "12 Motorway, Mumbai", contact: "autocare@email.com", imageUrl: "https://images.unsplash.com/photo-1511918984145-48de785d4c4e?auto=format&fit=facearea&w=400&q=80", timeSlots: ["9AM - 11AM", "2PM - 4PM"] },
+  { name: "Pollution Check Booking", icon: <FaWind />, price: 200, description: "Certified pollution check for all vehicles.", provider: "GreenTest Center", location: "88 Clean Dr, Pune", contact: "greentest@email.com", imageUrl: "https://images.unsplash.com/photo-1503736334956-4c8f8e92946d?auto=format&fit=facearea&w=400&q=80", timeSlots: ["10AM - 12PM", "3PM - 5PM"] },
+  { name: "RTO Agent Consultations", icon: <FaUserCog />, price: 500, description: "RTO paperwork and consultation services.", provider: "RTO Assist", location: "22 License Rd, Delhi", contact: "rtoassist@email.com", imageUrl: "https://images.unsplash.com/photo-1465101178521-c1a9136a3b99?auto=format&fit=facearea&w=400&q=80", timeSlots: ["11AM - 1PM", "4PM - 6PM"] },
+  { name: "Tire & Oil Change", icon: <FaOilCan />, price: 600, description: "Quick tire and oil change for all vehicles.", provider: "QuickLube", location: "55 Service Ln, Bangalore", contact: "quicklube@email.com", imageUrl: "https://images.unsplash.com/photo-1502877338535-766e1452684a?auto=format&fit=facearea&w=400&q=80", timeSlots: ["8AM - 10AM", "5PM - 7PM"] },
+  { name: "Vehicle Cleaning / Detailing Services", icon: <FaShower />, price: 450, description: "Professional vehicle cleaning and detailing.", provider: "ShinePro Detailing", location: "33 Shine St, Hyderabad", contact: "shinepro@email.com", imageUrl: "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=facearea&w=400&q=80", timeSlots: ["7AM - 9AM", "6PM - 8PM"] }
+];
 
 const AutomobileService = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const response = await axios.get(`${API_BASE_URL}/services`, {
-          params: { category: 'Automobile' }
-        });
-        
-        // Add icons to the services based on the mapping
-        const servicesWithIcons = response.data.services.map(service => ({
-          ...service,
-          icon: iconMapping[service.name] || iconMapping.default
-        }));
-        
-        setServices(servicesWithIcons);
-      } catch (err) {
-        console.error('Error fetching services:', err);
-        setError('Failed to load services. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchServices();
-  }, [refreshTrigger]);
-
-  const handleServiceAdded = (newService) => {
-    // Trigger a refresh when a new service is added
-    setRefreshTrigger(prev => prev + 1);
-  };
+    // In a real app, this would be an API call to fetch services with ratings
+    // For demo purposes, we're adding mock ratings to our static data
+    setLoading(true);
+    const servicesWithRatings = addRatingsToServices(serviceData);
+    setServices(servicesWithRatings);
+    setLoading(false);
+  }, []);
 
   return (
-    <CategoryPage 
-      categoryName="Automobile Services"
-      onServiceAdded={handleServiceAdded}
-    >
-      <div className="category-page">
-        <h1 className="category-title">🚗 Automobile Services</h1>
-        
-        {error && (
-          <div className="error-message">
-            {error}
-          </div>
-        )}
-        
-        {loading ? (
-          <div className="loading-state">Loading services...</div>
-        ) : services.length === 0 ? (
-          <div className="no-services-message">
-            No services available in this category yet.
-          </div>
-        ) : (
-          <div className="services-list">
-            {services.map((service) => (
-              <ServiceCard key={service._id} service={service} />
-            ))}
-          </div>
-        )}
+    <CategoryPage categoryName="Automobile Services">
+    <div className="category-page">
+      <h1 className="category-title">🚗 Automobile Services</h1>
+      {loading ? (
+        <div className="loading-state">Loading services...</div>
+      ) : (
+      <div className="services-list">
+        {services.map((service, idx) => (
+            <ServiceCard key={idx} service={service} />
+        ))}
       </div>
+      )}
+    </div>
     </CategoryPage>
   );
 };
