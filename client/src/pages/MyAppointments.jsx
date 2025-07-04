@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { 
@@ -19,6 +19,20 @@ import {
 } from 'react-icons/fa';
 import './MyAppointments.css';
 
+const REMINDER_INTERVALS = [
+  24 * 60, // 24 hours
+  12 * 60, // 12 hours
+  6 * 60,  // 6 hours
+  60,      // 1 hour
+  30,      // 30 minutes
+  5,       // 5 minutes
+  0        // at time
+];
+
+function getMinutesDiff(date1, date2) {
+  return Math.round((date1 - date2) / (1000 * 60));
+}
+
 const MyAppointments = () => {
   const [appointments, setAppointments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -35,11 +49,42 @@ const MyAppointments = () => {
   const [rescheduling, setRescheduling] = useState(false);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+  const [reminderPopup, setReminderPopup] = useState(null);
+  const reminderTimeoutRef = useRef();
   const navigate = useNavigate();
 
   useEffect(() => {
     fetchAppointments();
   }, []);
+
+  useEffect(() => {
+    if (!appointments.length) return;
+    // Find the next upcoming appointment
+    const now = new Date();
+    const upcoming = appointments.filter(a => ['scheduled','confirmed'].includes(a.status))
+      .map(a => ({
+        ...a,
+        apptTime: new Date(a.date)
+      }))
+      .filter(a => a.apptTime > now)
+      .sort((a, b) => a.apptTime - b.apptTime);
+    if (!upcoming.length) return;
+    const next = upcoming[0];
+    const diff = getMinutesDiff(next.apptTime, now);
+    // Find the closest interval
+    const interval = REMINDER_INTERVALS.find(i => diff === i);
+    if (interval !== undefined) {
+      let msg = '';
+      if (interval === 0) msg = 'Your appointment is starting now!';
+      else if (interval < 60) msg = `${interval} minutes left for your appointment!`;
+      else if (interval % 60 === 0) msg = `${interval/60} hour${interval/60>1?'s':''} left for your appointment!`;
+      else msg = `${interval} minutes left for your appointment!`;
+      setReminderPopup(msg);
+      // Hide popup after 30 seconds
+      clearTimeout(reminderTimeoutRef.current);
+      reminderTimeoutRef.current = setTimeout(() => setReminderPopup(null), 30000);
+    }
+  }, [appointments]);
 
   const fetchAppointments = async () => {
     try {
@@ -451,6 +496,11 @@ const MyAppointments = () => {
 
   return (
     <div className="appointments-container">
+      {reminderPopup && (
+        <div className="reminder-popup">
+          {reminderPopup}
+        </div>
+      )}
       <div className="appointments-card">
         <div className="appointments-header">
           <div className="header-content">

@@ -188,7 +188,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
         setBookedAppointmentId(response.data.appointment._id);
         setBookedSlots([...bookedSlots, { date: selectedDate, time: selectedTime }]);
         
-        alert(`✅ Appointment booked successfully on ${selectedDate} at ${selectedTime}`);
+        alert(`✅ Appointment booked successfully on ${selectedDate} at ${selectedTime}\n\nYou'll receive timely reminders before your appointment.`);
         
         // Navigate to calendar view to see the appointment
         navigate('/calendar');
