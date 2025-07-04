@@ -1,7 +1,6 @@
 const Appointment = require('../models/Appointment');
 const Service = require('../models/Service');
 const mongoose = require('mongoose');
-const { filterKnownServicesWithDB, isKnownServiceWithDB } = require('../utils/knownServices');
 
 /**
  * Create a new appointment
@@ -72,15 +71,6 @@ exports.createAppointment = async (req, res) => {
         });
       }
       console.log("Found service:", service.name);
-      
-      // Check if the service is a known service (including database services)
-      if (!(await isKnownServiceWithDB(service.name, Service))) {
-        console.log("Unknown service attempted:", service.name);
-        return res.status(400).json({
-          success: false,
-          message: 'Cannot create appointment for unknown service'
-        });
-      }
     } catch (serviceErr) {
       console.error("Error finding service:", serviceErr);
       return res.status(400).json({
@@ -175,12 +165,9 @@ exports.getUserAppointments = async (req, res) => {
       };
     });
 
-    // Filter out appointments with unknown services (including database services)
-    const filteredAppointments = await filterKnownServicesWithDB(formattedAppointments, Service);
-
     res.status(200).json({
       success: true,
-      appointments: filteredAppointments
+      appointments: formattedAppointments
     });
   } catch (error) {
     console.error('Error fetching appointments:', error);
@@ -302,22 +289,14 @@ exports.rescheduleAppointment = async (req, res) => {
       });
     }
 
-    // Check if the service is known before allowing reschedule
-    const populatedAppointment = await Appointment.findById(appointment._id)
-      .populate('serviceId', 'name category provider location');
-    
-    const service = populatedAppointment.serviceId;
-    if (!service || !(await isKnownServiceWithDB(service.name, Service))) {
-      return res.status(400).json({
-        success: false,
-        message: 'Cannot reschedule appointment for unknown service'
-      });
-    }
-
     // Update appointment
     appointment.date = date;
     appointment.time = time;
     await appointment.save();
+
+    // Populate service details
+    const populatedAppointment = await Appointment.findById(appointment._id)
+      .populate('serviceId', 'name category provider location');
 
     res.status(200).json({
       success: true,
