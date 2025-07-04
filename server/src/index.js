@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 require('dotenv').config();
 
+const errorHandler = require('./middleware/errorHandler'); // ✅ Import error handler
+
 const app = express();
 
 // Configure CORS with more specific options
@@ -29,15 +31,8 @@ app.get('/', (req, res) => {
   res.send('Backend is running!');
 });
 
-// Add a general error handler
-app.use((err, req, res, next) => {
-  console.error('Global error handler:', err);
-  res.status(500).json({
-    success: false,
-    message: 'Server error',
-    error: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message
-  });
-});
+// ✅ Centralized Error Handler (MUST BE LAST MIDDLEWARE)
+app.use(errorHandler);
 
 // Connect to MongoDB with better error handling
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/fixtime')
