@@ -143,21 +143,9 @@ const AppointmentBooking = ({ serviceId = null }) => {
       }
       
       if (!finalServiceId) {
-        // If we still don't have a serviceId, get the first service from any category
-        try {
-          const servicesResponse = await axios.get('http://localhost:5001/services');
-          
-          if (servicesResponse.data && servicesResponse.data.services && servicesResponse.data.services.length > 0) {
-            finalServiceId = servicesResponse.data.services[0]._id;
-            console.log("Using first available service:", finalServiceId);
-          }
-        } catch (err) {
-          console.error("Error getting any services:", err);
-        }
-      }
-      
-      if (!finalServiceId) {
-        throw new Error("No service ID available for booking");
+        alert("Could not determine the service to book. Please try again from the service list.");
+        setLoading(false);
+        return;
       }
       
       // Use the correct user fields from the profile response

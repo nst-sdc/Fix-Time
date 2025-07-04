@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import './Dashboard.css';
 import { FaUser, FaCalendarAlt, FaClock, FaHistory, FaAngleDown, FaAngleUp, FaEnvelope, FaCalendarDay } from 'react-icons/fa';
 import AppointmentDetails from '../components/AppointmentDetails';
+import axios from 'axios';
 
 const Dashboard = ({ userProfile, setUserProfile }) => {
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
@@ -13,58 +14,43 @@ const Dashboard = ({ userProfile, setUserProfile }) => {
 
   // Mock appointments data - in a real app, would come from API
   useEffect(() => {
-    // Simulate API call
-    setLoading(true);
-    
-    setTimeout(() => {
-      // Mock data
-      const mockUpcoming = [
-        {
-          _id: 'appt-001',
-          serviceName: 'Haircut & Styling',
-          date: new Date(Date.now() + 86400000 * 3), // 3 days from now
-          time: '10:00 AM',
-          status: 'scheduled'
-        },
-        {
-          _id: 'appt-002',
-          serviceName: 'Beard Grooming',
-          date: new Date(Date.now() + 86400000 * 7), // 7 days from now
-          time: '2:30 PM',
-          status: 'scheduled'
+    const fetchAppointments = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setError('You must be logged in to view appointments.');
+          setLoading(false);
+          return;
         }
-      ];
-      
-      const mockPast = [
-        {
-          _id: 'appt-003',
-          serviceName: 'Spa & Massage',
-          date: new Date(Date.now() - 86400000 * 5), // 5 days ago
-          time: '3:30 PM',
-          status: 'completed',
-          hasReviewed: true
-        },
-        {
-          _id: 'appt-004',
-          serviceName: 'Facial Treatment',
-          date: new Date(Date.now() - 86400000 * 10), // 10 days ago
-          time: '11:30 AM',
-          status: 'completed',
-          hasReviewed: false
-        },
-        {
-          _id: 'appt-005',
-          serviceName: 'Hair Coloring',
-          date: new Date(Date.now() - 86400000 * 15), // 15 days ago
-          time: '9:00 AM',
-          status: 'cancelled'
+        const response = await axios.get('http://localhost:5001/appointments', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data.success) {
+          // Show all scheduled, confirmed, or in-progress appointments as upcoming, regardless of date
+          const upcoming = response.data.appointments.filter(appt =>
+            appt.status === 'scheduled' || appt.status === 'confirmed' || appt.status === 'in-progress'
+          );
+          // Show all appointments with a date before today in history, regardless of status
+          const now = new Date();
+          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          const past = response.data.appointments.filter(appt => {
+            const apptDate = new Date(appt.date);
+            return apptDate < today;
+          });
+          setUpcomingAppointments(upcoming);
+          setPastAppointments(past);
+        } else {
+          setError('Failed to fetch appointments.');
         }
-      ];
-      
-      setUpcomingAppointments(mockUpcoming);
-      setPastAppointments(mockPast);
-      setLoading(false);
-    }, 1000);
+      } catch (err) {
+        setError('Failed to load appointments.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAppointments();
   }, []);
 
   if (!userProfile) {
@@ -77,6 +63,12 @@ const Dashboard = ({ userProfile, setUserProfile }) => {
         <h1>Dashboard</h1>
         <p>Welcome back, <span className="user-name">{userProfile.email?.split('@')[0] || 'User'}</span>!</p>
       </div>
+
+      {error && (
+        <div className="error-message" style={{ color: 'red', margin: '1rem 0' }}>
+          {error}
+        </div>
+      )}
 
       <div className="dashboard-content">
         <div className="dashboard-panel user-profile-panel">

@@ -1,92 +1,115 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import './CategoryPage.css';
-import { FaBalanceScale, FaPassport, FaFileContract, FaGavel, FaIdCard, FaFileSignature, FaUniversity } from 'react-icons/fa';
+import { FaIdCard, FaPassport, FaUserCheck, FaGavel, FaFileContract } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
+import { addRatingsToServices } from '../../utils/serviceUtils';
 import CategoryPage from './CategoryPage';
 
-// Default icon mapping for this category
-const iconMapping = {
-  "Legal Consultations": <FaBalanceScale />,
-  "Passport & Visa Services": <FaPassport />,
-  "Document Notarization": <FaFileContract />,
-  "Court Appointment Scheduling": <FaGavel />,
-  "ID & License Services": <FaIdCard />,
-  "Contract Review Services": <FaFileSignature />,
-  "Tax Filing Assistance": <FaUniversity />,
-  // Default icon for any other service
-  "default": <FaBalanceScale />
-};
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+const serviceData = [
+  {
+    name: "Driving License Appointment",
+    icon: <FaIdCard />,
+    provider: "RTO Express",
+    description: "Book your slot for driving license application or renewal.",
+    price: 350,
+    duration: 30,
+    address: "45 License Lane",
+    city: "Mumbai",
+    contact: "support@rtoexpress.com",
+    timeSlots: ["10AM - 11AM", "2PM - 3PM"],
+    avgRating: 4.1,
+    totalReviews: 67,
+    review: "Quick and efficient process!"
+  },
+  {
+    name: "Passport Verification Slot Booking",
+    icon: <FaPassport />,
+    provider: "Passport Seva Kendra",
+    description: "Book a slot for passport document verification.",
+    price: 500,
+    duration: 20,
+    address: "12 Embassy Rd",
+    city: "Delhi",
+    contact: "help@passportseva.com",
+    timeSlots: ["9AM - 10AM", "1PM - 2PM"],
+    avgRating: 4.3,
+    totalReviews: 52,
+    review: "Staff was very helpful and polite."
+  },
+  {
+    name: "Aadhar Update Booking",
+    icon: <FaUserCheck />,
+    provider: "UIDAI Center",
+    description: "Book your slot for Aadhar card update or correction.",
+    price: 100,
+    duration: 15,
+    address: "88 ID Park",
+    city: "Bangalore",
+    contact: "aadhar@uidai.gov.in",
+    timeSlots: ["11AM - 12PM", "4PM - 5PM"],
+    avgRating: 4.0,
+    totalReviews: 39,
+    review: "Fast service, minimal waiting."
+  },
+  {
+    name: "Legal Consultation (Advocate visit)",
+    icon: <FaGavel />,
+    provider: "LegalEase Associates",
+    description: "Consult with experienced advocates for your legal needs.",
+    price: 1200,
+    duration: 60,
+    address: "101 Justice Ave",
+    city: "Chennai",
+    contact: "consult@legalease.com",
+    timeSlots: ["3PM - 4PM", "6PM - 7PM"],
+    avgRating: 4.6,
+    totalReviews: 24,
+    review: "Very knowledgeable and professional."
+  },
+  {
+    name: "Property Registration / Stamp Duty Token",
+    icon: <FaFileContract />,
+    provider: "Registrar Office",
+    description: "Book your slot for property registration and stamp duty.",
+    price: 2500,
+    duration: 45,
+    address: "55 Registry Rd",
+    city: "Pune",
+    contact: "registry@maharashtra.gov.in",
+    timeSlots: ["10AM - 11AM", "12PM - 1PM"],
+    avgRating: 4.2,
+    totalReviews: 31,
+    review: "Smooth process, staff was supportive."
+  }
+];
 
 const GovernmentLegalServices = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
   useEffect(() => {
-    const fetchServices = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        const response = await axios.get(`${API_BASE_URL}/services`, {
-          params: { category: 'Government & Legal' }
-        });
-        
-        // Add icons to the services based on the mapping
-        const servicesWithIcons = response.data.services.map(service => ({
-          ...service,
-          icon: iconMapping[service.name] || iconMapping.default
-        }));
-        
-        setServices(servicesWithIcons);
-      } catch (err) {
-        console.error('Error fetching services:', err);
-        setError('Failed to load services. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchServices();
-  }, [refreshTrigger]);
-
-  const handleServiceAdded = (newService) => {
-    // Trigger a refresh when a new service is added
-    setRefreshTrigger(prev => prev + 1);
-  };
+    // In a real app, this would be an API call to fetch services with ratings
+    // For demo purposes, we're adding mock ratings to our static data
+    setLoading(true);
+    const servicesWithRatings = addRatingsToServices(serviceData);
+    setServices(servicesWithRatings);
+    setLoading(false);
+  }, []);
 
   return (
-    <CategoryPage 
-      categoryName="Government & Legal"
-      onServiceAdded={handleServiceAdded}
-    >
-      <div className="category-page">
-        <h1 className="category-title">⚖️ Government & Legal Services</h1>
-        
-        {error && (
-          <div className="error-message">
-            {error}
-          </div>
-        )}
-        
-        {loading ? (
-          <div className="loading-state">Loading services...</div>
-        ) : services.length === 0 ? (
-          <div className="no-services-message">
-            No services available in this category yet.
-          </div>
-        ) : (
-          <div className="services-list">
-            {services.map((service) => (
-              <ServiceCard key={service._id} service={service} />
-            ))}
-          </div>
-        )}
+    <CategoryPage categoryName="Government / Legal Services">
+    <div className="category-page">
+      <h1 className="category-title">📋 Government / Legal Services</h1>
+      {loading ? (
+        <div className="loading-state">Loading services...</div>
+      ) : (
+      <div className="services-list">
+        {services.map((service, idx) => (
+            <ServiceCard key={idx} service={service} />
+        ))}
       </div>
+      )}
+    </div>
     </CategoryPage>
   );
 };
