@@ -23,7 +23,6 @@ import PrivateEvents from './pages/categories/PrivateEvents';
 import HotelRestaurant from './pages/categories/HotelRestaurant';
 import AppointmentCalendar from './pages/AppointmentCalendar';
 import RescheduleAppointment from './pages/RescheduleAppointment';
-import MyAppointments from './pages/MyAppointments';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -156,7 +155,6 @@ function App() {
               <AppointmentCalendar /> 
               : <Navigate to="/login" />} 
             />
-            <Route path="/my-appointments" element={isLoggedIn ? <MyAppointments /> : <Navigate to="/login" />} />
           </Routes>
         </main>
         <Footer />
