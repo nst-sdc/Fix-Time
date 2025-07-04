@@ -163,6 +163,7 @@ const MyAppointments = () => {
   };
 
   const filteredAndSortedAppointments = appointments
+    .filter(appointment => appointment.serviceName !== 'Unknown Service')
     .filter(appointment => {
       // Status filter
       const statusMatch = filterStatus === 'all' || appointment.status === filterStatus;
@@ -336,7 +337,7 @@ const MyAppointments = () => {
   };
 
   const getStatusCount = (status) => {
-    return appointments.filter(app => app.status === status).length;
+    return appointments.filter(app => app.status === status && app.serviceName !== 'Unknown Service').length;
   };
 
   // Mobile swipe functionality
@@ -459,7 +460,7 @@ const MyAppointments = () => {
           </div>
           <div className="stats-overview">
             <div className="stat-item">
-              <span className="stat-number">{appointments.length}</span>
+              <span className="stat-number">{appointments.filter(app => app.serviceName !== 'Unknown Service').length}</span>
               <span className="stat-label">Total</span>
             </div>
             <div className="stat-item">
