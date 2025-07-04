@@ -1,4 +1,5 @@
 // src/components/ServiceForm.jsx
+// src/components/ServiceForm.jsx
 import React, { useState } from "react";
 import axios from "axios";
 import "./ServiceForm.css";
@@ -17,7 +18,7 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
     price: "",
     duration: "",
     timeSlots: [],
-    category
+    category,
   });
 
   const [slot, setSlot] = useState("");
@@ -27,30 +28,30 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!form.serviceName.trim()) newErrors.serviceName = "Service name is required";
     if (!form.description.trim()) newErrors.description = "Description is required";
     if (!form.companyName.trim()) newErrors.companyName = "Company name is required";
     if (!form.address.trim()) newErrors.address = "Address is required";
     if (!form.city.trim()) newErrors.city = "City is required";
     if (!form.contact.trim()) newErrors.contact = "Contact information is required";
-    
+
     if (!form.price) {
       newErrors.price = "Price is required";
     } else if (isNaN(form.price) || Number(form.price) < 0) {
       newErrors.price = "Price must be a positive number";
     }
-    
+
     if (!form.duration) {
       newErrors.duration = "Duration is required";
     } else if (isNaN(form.duration) || Number(form.duration) < 5) {
       newErrors.duration = "Duration must be at least 5 minutes";
     }
-    
+
     if (form.timeSlots.length === 0) {
       newErrors.timeSlots = "At least one time slot is required";
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -58,8 +59,7 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm({ ...form, [name]: value });
-    
-    // Clear error for this field when user types
+
     if (errors[name]) {
       setErrors({ ...errors, [name]: "" });
     }
@@ -69,8 +69,6 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
     if (slot.trim()) {
       setForm({ ...form, timeSlots: [...form.timeSlots, slot.trim()] });
       setSlot("");
-      
-      // Clear time slot error if it exists
       if (errors.timeSlots) {
         setErrors({ ...errors, timeSlots: "" });
       }
@@ -80,17 +78,15 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
   const handleRemoveSlot = (indexToRemove) => {
     setForm({
       ...form,
-      timeSlots: form.timeSlots.filter((_, index) => index !== indexToRemove)
+      timeSlots: form.timeSlots.filter((_, index) => index !== indexToRemove),
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError("");
-    
-    if (!validateForm()) {
-      return;
-    }
+
+    if (!validateForm()) return;
 
     const transformedData = {
       name: form.serviceName,
@@ -108,7 +104,7 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
     try {
       setIsSubmitting(true);
       const response = await axios.post(`${API_BASE_URL}/services`, transformedData);
-      
+
       if (response.data.success) {
         onSuccess(response.data.data);
         onClose();
@@ -128,24 +124,26 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
       <div className="service-form-wrapper">
         <h3>Add New Service</h3>
         {submitError && <div className="error-message">{submitError}</div>}
-        
+
         <form className="service-form" onSubmit={handleSubmit}>
+          <h4>📌 Basic Info</h4>
           <div className="form-group">
-            <input 
-              name="serviceName" 
-              placeholder="Service Name" 
-              onChange={handleChange} 
+            <input
+              name="serviceName"
+              placeholder="Service Name"
+              onChange={handleChange}
               value={form.serviceName}
               className={errors.serviceName ? "error" : ""}
+              autoFocus
             />
             {errors.serviceName && <span className="error-text">{errors.serviceName}</span>}
           </div>
 
           <div className="form-group">
-            <input 
-              name="companyName" 
-              placeholder="Company Name" 
-              onChange={handleChange} 
+            <input
+              name="companyName"
+              placeholder="Company Name"
+              onChange={handleChange}
               value={form.companyName}
               className={errors.companyName ? "error" : ""}
             />
@@ -153,23 +151,24 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
           </div>
 
           <div className="form-group">
-            <textarea 
-              name="description" 
-              placeholder="Description" 
-              onChange={handleChange} 
+            <textarea
+              name="description"
+              placeholder="Brief Description"
+              onChange={handleChange}
               value={form.description}
               className={errors.description ? "error" : ""}
             />
             {errors.description && <span className="error-text">{errors.description}</span>}
           </div>
 
+          <h4>💰 Pricing</h4>
           <div className="form-row">
             <div className="form-group half">
-              <input 
-                name="price" 
-                placeholder="Price (e.g. 100)" 
-                type="number" 
-                onChange={handleChange} 
+              <input
+                name="price"
+                placeholder="Price in ₹ (e.g. 499)"
+                type="number"
+                onChange={handleChange}
                 value={form.price}
                 className={errors.price ? "error" : ""}
               />
@@ -177,11 +176,11 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
             </div>
 
             <div className="form-group half">
-              <input 
-                name="duration" 
-                placeholder="Duration in mins (e.g. 60)" 
-                type="number" 
-                onChange={handleChange} 
+              <input
+                name="duration"
+                placeholder="Duration in minutes (e.g. 45)"
+                type="number"
+                onChange={handleChange}
                 value={form.duration}
                 className={errors.duration ? "error" : ""}
               />
@@ -189,11 +188,12 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
             </div>
           </div>
 
+          <h4>📍 Location</h4>
           <div className="form-group">
-            <input 
-              name="address" 
-              placeholder="Address" 
-              onChange={handleChange} 
+            <input
+              name="address"
+              placeholder="Address"
+              onChange={handleChange}
               value={form.address}
               className={errors.address ? "error" : ""}
             />
@@ -201,10 +201,10 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
           </div>
 
           <div className="form-group">
-            <input 
-              name="city" 
-              placeholder="City" 
-              onChange={handleChange} 
+            <input
+              name="city"
+              placeholder="City (e.g. Mumbai)"
+              onChange={handleChange}
               value={form.city}
               className={errors.city ? "error" : ""}
             />
@@ -212,10 +212,10 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
           </div>
 
           <div className="form-group">
-            <input 
-              name="contact" 
-              placeholder="Contact Email or Phone" 
-              onChange={handleChange} 
+            <input
+              name="contact"
+              placeholder="Contact (Phone or Email)"
+              onChange={handleChange}
               value={form.contact}
               className={errors.contact ? "error" : ""}
             />
@@ -223,19 +223,20 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
           </div>
 
           <div className="form-group">
-            <input 
-              name="imageUrl" 
-              placeholder="Image URL (optional)" 
-              onChange={handleChange} 
+            <input
+              name="imageUrl"
+              placeholder="Image URL (optional)"
+              onChange={handleChange}
               value={form.imageUrl}
             />
           </div>
 
+          <h4>🕒 Availability</h4>
           <div className="time-slot-section">
             <input
               value={slot}
               onChange={(e) => setSlot(e.target.value)}
-              placeholder="Add Availability Slot (e.g. 10AM - 12PM)"
+              placeholder="Add Time Slot (e.g. 10AM - 12PM)"
               className={errors.timeSlots ? "error" : ""}
             />
             <button type="button" className="add-slot-btn" onClick={handleAddSlot}>Add Slot</button>
@@ -244,13 +245,13 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
 
           {form.timeSlots.length > 0 && (
             <div className="slot-display">
-              <strong>Time Slots:</strong>
+              <strong>Time Slots ({form.timeSlots.length}):</strong>
               <ul className="time-slots-list">
                 {form.timeSlots.map((timeSlot, index) => (
                   <li key={index}>
                     {timeSlot}
-                    <button 
-                      type="button" 
+                    <button
+                      type="button"
                       className="remove-slot-btn"
                       onClick={() => handleRemoveSlot(index)}
                     >
@@ -264,9 +265,14 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
 
           <div className="form-actions">
             <button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? "Submitting..." : "Submit"}
+              {isSubmitting ? "⏳ Submitting..." : "Submit"}
             </button>
-            <button type="button" className="cancel-btn" onClick={onClose} disabled={isSubmitting}>
+            <button
+              type="button"
+              className="cancel-btn"
+              onClick={onClose}
+              disabled={isSubmitting}
+            >
               Cancel
             </button>
           </div>
@@ -277,4 +283,3 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
 };
 
 export default ServiceForm;
-

@@ -1,8 +1,9 @@
+// src/pages/categories/ServiceCategory.jsx
 import React, { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import "./Services.css";
-import ServiceForm from "../components/ServiceForm";
+import ServiceForm from "../../components/ServiceForm";
 
 // Local static categories
 const SERVICES = [
@@ -38,7 +39,7 @@ const SERVICES = [
       "Waxing / Threading Services"
     ]
   },
-  // ... (same for other categories)
+  // Add other categories as needed...
 ];
 
 const ServiceCategory = () => {
@@ -77,9 +78,13 @@ const ServiceCategory = () => {
     <div className="services-page">
       <div className="services-container">
         <h1 className="services-heading">{categoryData.category}</h1>
-        <Link to="/services" className="btn btn-secondary" style={{marginBottom: '2rem', display: 'inline-block'}}>Back to All Categories</Link>
+        <Link to="/services" className="btn btn-secondary" style={{ marginBottom: '2rem', display: 'inline-block' }}>
+          Back to All Categories
+        </Link>
 
-        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>+ Add a Service</button>
+        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>
+          + Add a Service
+        </button>
 
         {showForm && (
           <ServiceForm
@@ -89,7 +94,8 @@ const ServiceCategory = () => {
           />
         )}
 
-        <h3 style={{marginTop: "2rem"}}>Popular Services:</h3>
+        {/* Static popular services */}
+        <h3 style={{ marginTop: "2rem" }}>Popular Services:</h3>
         <div className="services-list">
           {categoryData.services.map((service, idx) => (
             <div className="service-item" key={idx}>
@@ -99,16 +105,30 @@ const ServiceCategory = () => {
           ))}
         </div>
 
-        <h3 style={{marginTop: "2rem"}}>User Added Services:</h3>
+        {/* Dynamic user-added services */}
+        <h3 style={{ marginTop: "2rem" }}>User Added Services:</h3>
         {dynamicServices.length === 0 ? (
-          <p>No services added yet for this category.</p>
+          <p
+            style={{
+              background: "#f9f9f9",
+              padding: "1rem",
+              borderRadius: "10px",
+              fontStyle: "italic",
+              color: "#666"
+            }}
+          >
+            No services added yet. Be the first to list a service in this category!
+          </p>
         ) : (
           <div className="services-list">
             {dynamicServices.map((s, idx) => (
               <div className="service-item" key={s._id || idx}>
                 <span className="service-name">{s.name}</span>
                 <p style={{ margin: "0.3rem 0" }}>{s.description}</p>
-                <small><b>Provider:</b> {s.provider} | <b>Location:</b> {s.location}</small>
+                <small>
+                  <b>Provider:</b> {s.provider} | <b>Location:</b> {s.location}<br />
+                  <b>Price:</b> ₹{s.price} | <b>Duration:</b> {s.duration} mins
+                </small>
               </div>
             ))}
           </div>

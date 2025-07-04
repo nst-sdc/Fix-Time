@@ -167,6 +167,7 @@ const Services = () => {
           />
 
           <select
+            className="custom-dropdown"
             value={categoryFilter}
             onChange={(e) => setCategoryFilter(e.target.value)}
           >

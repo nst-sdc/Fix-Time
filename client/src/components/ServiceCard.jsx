@@ -12,14 +12,19 @@ const ServiceCard = ({ service }) => {
         <div className="service-icon">{icon}</div>
         <div className="service-details">
           <p className="service-name">{name}</p>
-          {avgRating !== undefined && (
+
+          {avgRating !== undefined && totalReviews > 0 ? (
             <RatingDisplay 
               rating={parseFloat(avgRating)} 
               totalReviews={totalReviews} 
             />
+          ) : (
+            <p className="no-reviews">⭐ No reviews yet</p>
           )}
-          {price && <p className="service-price">${price}</p>}
-          {duration && <p className="service-duration">{duration} min</p>}
+
+          {price && <p className="service-price">Price: ₹{price}</p>}
+          {duration && <p className="service-duration">Duration: {duration} min</p>}
+
           <button className="book-now-btn">Book Now</button>
         </div>
       </div>
@@ -27,4 +32,4 @@ const ServiceCard = ({ service }) => {
   );
 };
 
-export default ServiceCard; 
+export default ServiceCard;
