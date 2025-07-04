@@ -23,12 +23,14 @@ import PrivateEvents from './pages/categories/PrivateEvents';
 import HotelRestaurant from './pages/categories/HotelRestaurant';
 import AppointmentCalendar from './pages/AppointmentCalendar';
 import RescheduleAppointment from './pages/RescheduleAppointment';
+import MyServices from './pages/MyServices';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userProfile, setUserProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState('light');
+  const [hasServices, setHasServices] = useState(false);
 
   // Initialize AOS animation library
   useEffect(() => {
@@ -80,8 +82,21 @@ function App() {
         }
       };
       fetchUserProfile();
+      // Fetch if user has services
+      const fetchHasServices = async () => {
+        try {
+          const res = await axios.get('http://localhost:5001/services/my', {
+            headers: { Authorization: `Bearer ${token}` }
+          });
+          setHasServices(res.data.services && res.data.services.length > 0);
+        } catch (err) {
+          setHasServices(false);
+        }
+      };
+      fetchHasServices();
     } else {
       setLoading(false);
+      setHasServices(false);
     }
   }, []);
 
@@ -155,6 +170,7 @@ function App() {
               <AppointmentCalendar /> 
               : <Navigate to="/login" />} 
             />
+            <Route path="/my-services" element={isLoggedIn ? <MyServices /> : <Navigate to="/login" />} />
           </Routes>
         </main>
         <Footer />

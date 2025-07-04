@@ -71,6 +71,14 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => 
             </li>
           )}
 
+          {isLoggedIn && (
+            <li className="nav-item">
+              <Link to="/my-services" className="nav-link" onClick={() => setMenuOpen(false)}>
+                My Services
+              </Link>
+            </li>
+          )}
+
           {/* Theme Toggle Button */}
           <li className="nav-item">
             <button 
