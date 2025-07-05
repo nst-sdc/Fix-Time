@@ -1095,4 +1095,24 @@ body.dark .clear-date-btn:hover {
   .sort-select {
     font-size: 16px; /* Prevents zoom on iOS */
   }
+}
+
+.reminder-popup {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #372a72;
+  color: #fff;
+  padding: 1rem 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(55,42,114,0.15);
+  font-size: 1.2rem;
+  z-index: 1000;
+  animation: fadeInScale 0.3s;
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: translateX(-50%) scale(0.95); }
+  to { opacity: 1; transform: translateX(-50%) scale(1); }
 } 
