@@ -153,7 +153,8 @@ const AppointmentCalendar = () => {
   }, [location.search]);
 
   // Format appointments for FullCalendar
-  const formattedEvents = appointments
+  const filteredAppointments = appointments.filter(appt => appt.serviceName !== 'Unknown Service');
+  const formattedEvents = filteredAppointments
     .filter(appt => 
       // Only show appointments that aren't cancelled AND match the category filter
       (categoryFilter === 'all' || appt.serviceCategory === categoryFilter) && 

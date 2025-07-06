@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import './Dashboard.css';
 import { FaUser, FaCalendarAlt, FaClock, FaHistory, FaAngleDown, FaAngleUp, FaEnvelope, FaCalendarDay } from 'react-icons/fa';
 import AppointmentDetails from '../components/AppointmentDetails';
+import axios from 'axios';
 
 const Dashboard = ({ userProfile, setUserProfile }) => {
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
@@ -11,60 +12,43 @@ const Dashboard = ({ userProfile, setUserProfile }) => {
   const [error, setError] = useState(null);
   const [expandHistory, setExpandHistory] = useState(false);
 
-  // Mock appointments data - in a real app, would come from API
   useEffect(() => {
-    // Simulate API call
-    setLoading(true);
-    
-    setTimeout(() => {
-      // Mock data
-      const mockUpcoming = [
-        {
-          _id: 'appt-001',
-          serviceName: 'Haircut & Styling',
-          date: new Date(Date.now() + 86400000 * 3), // 3 days from now
-          time: '10:00 AM',
-          status: 'scheduled'
-        },
-        {
-          _id: 'appt-002',
-          serviceName: 'Beard Grooming',
-          date: new Date(Date.now() + 86400000 * 7), // 7 days from now
-          time: '2:30 PM',
-          status: 'scheduled'
+    const fetchAppointments = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const token = localStorage.getItem('token');
+        if (!token) {
+          setError('You must be logged in to view appointments.');
+          setLoading(false);
+          return;
         }
-      ];
-      
-      const mockPast = [
-        {
-          _id: 'appt-003',
-          serviceName: 'Spa & Massage',
-          date: new Date(Date.now() - 86400000 * 5), // 5 days ago
-          time: '3:30 PM',
-          status: 'completed',
-          hasReviewed: true
-        },
-        {
-          _id: 'appt-004',
-          serviceName: 'Facial Treatment',
-          date: new Date(Date.now() - 86400000 * 10), // 10 days ago
-          time: '11:30 AM',
-          status: 'completed',
-          hasReviewed: false
-        },
-        {
-          _id: 'appt-005',
-          serviceName: 'Hair Coloring',
-          date: new Date(Date.now() - 86400000 * 15), // 15 days ago
-          time: '9:00 AM',
-          status: 'cancelled'
+        const response = await axios.get('http://localhost:5001/appointments', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data.success) {
+          const validAppointments = response.data.appointments.filter(appt => appt.serviceName !== 'Unknown Service');
+          const now = new Date();
+          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+          setUpcomingAppointments(validAppointments.filter(appt => {
+            const apptDate = new Date(appt.date);
+            return apptDate >= today && ['scheduled', 'confirmed', 'in-progress'].includes(appt.status);
+          }));
+          setPastAppointments(validAppointments.filter(appt => {
+            const apptDate = new Date(appt.date);
+            // Past if before today, or if status is completed/cancelled/no-show (even if in the future)
+            return apptDate < today || ['completed', 'cancelled', 'no-show'].includes(appt.status);
+          }));
+        } else {
+          setError('Failed to fetch appointments');
         }
-      ];
-      
-      setUpcomingAppointments(mockUpcoming);
-      setPastAppointments(mockPast);
-      setLoading(false);
-    }, 1000);
+      } catch (err) {
+        setError('Failed to load appointments');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAppointments();
   }, []);
 
   if (!userProfile) {

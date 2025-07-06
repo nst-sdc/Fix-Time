@@ -65,6 +65,14 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => 
 
           {isLoggedIn && (
             <li className="nav-item">
+              <Link to="/my-appointments" className="nav-link" onClick={() => setMenuOpen(false)}>
+                My Appointments
+              </Link>
+            </li>
+          )}
+
+          {isLoggedIn && (
+            <li className="nav-item">
               <Link to="/calendar" className="nav-link" onClick={() => setMenuOpen(false)}>
                 Calendar
               </Link>
@@ -124,6 +132,11 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => 
                   <Link to="/dashboard" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
                     <FaUser className="dropdown-icon" />
                     <span>Dashboard</span>
+                  </Link>
+                  
+                  <Link to="/my-appointments" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
+                    <FaUser className="dropdown-icon" />
+                    <span>My Appointments</span>
                   </Link>
                   
                   <Link to="/profile" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
