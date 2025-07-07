@@ -160,30 +160,43 @@ Fix-Time/
 │   │   ├── App.js     # Main application component
 │   │   └── index.js   # Entry point
 │   └── package.json   # Frontend dependencies
-├── server/            # Express backend
+├── server/                             # Backend - Express & MongoDB
 │   ├── src/
-│   │   ├── controllers/  # Route controllers
+│   │   ├── controllers/
 │   │   │   ├── appointmentController.js
 │   │   │   ├── authController.js
 │   │   │   ├── reviewController.js
-│   │   │   └── serviceController.js
-│   │   ├── middleware/  # Express middleware
-│   │   │   └── auth.js
-│   │   ├── models/    # Mongoose models
+│   │   │   ├── serviceController.js
+│   │   │   ├── providerController.js     # NEW - For provider-specific logic
+│   │   │   └── receiverController.js     # NEW - For receiver-specific logic
+│   │   ├── middleware/
+│   │   │   ├── auth.js
+│   │   │   └── roleAuth.js               # NEW - Protect role-based routes
+│   │   ├── models/
 │   │   │   ├── Appointment.js
 │   │   │   ├── Review.js
 │   │   │   ├── Service.js
-│   │   │   └── User.js
-│   │   ├── routes/    # API routes
+│   │   │   ├── User.js                   # Current user model
+│   │   │   ├── Provider.js               # NEW - Will replace User
+│   │   │   └── Receiver.js               # NEW - Will replace User
+│   │   ├── routes/
 │   │   │   ├── appointments.js
 │   │   │   ├── auth.js
 │   │   │   ├── reviews.js
-│   │   │   └── services.js
-│   │   └── index.js   # Server entry point
-│   └── package.json   # Backend dependencies
-├── .env               # Environment variables (gitignored)
-├── README.md          # Project documentation
-└── package.json       # Root dependencies
+│   │   │   ├── services.js
+│   │   │   ├── providers.js              # NEW - Provider endpoints
+│   │   │   └── receivers.js              # NEW - Receiver endpoints
+│   │   ├── utils/
+│   │   │   └── roleUtils.js              # NEW - Helpers for roles
+│   │   ├── seedServices.js              # Seeder for dummy service data
+│   │   └── index.js                     # Main server entry
+│   ├── .env           # Environment variables (gitignored) Mongo URI, JWT secret, etc
+│   ├── package.json
+│   ├── package.json   # Backend dependencies
+│   ├── .gitignore
+│   └── README.md
+├── Contribution.md           
+└── README.md          # Project documentation
 ```
 
 ## 🤝 Contributing
