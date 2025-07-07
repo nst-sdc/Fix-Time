@@ -524,4 +524,64 @@ body.dark .auth-link {
 body.dark .auth-link:hover {
   color: #8b9eff;
 }
+
+/* User type selector styles */
+.user-type-selector {
+  margin-bottom: 20px;
+}
+
+.user-type-selector label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+  color: #333;
+}
+
+.user-type-options {
+  display: flex;
+  gap: 15px;
+}
+
+.user-type-option {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border: 2px solid #e1e1e1;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.user-type-option:hover {
+  border-color: #4361ee;
+}
+
+.user-type-option.selected {
+  border-color: #4361ee;
+  background-color: rgba(67, 97, 238, 0.05);
+}
+
+.user-type-option input {
+  margin-right: 8px;
+}
+
+/* Business information section styles */
+.form-section-title {
+  margin-top: 20px;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 1px solid #e1e1e1;
+}
+
+/* Improve responsiveness */
+@media (max-width: 600px) {
+  .user-type-options {
+    flex-direction: column;
+    gap: 10px;
+  }
+}
   

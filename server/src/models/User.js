@@ -12,6 +12,19 @@ const userSchema = new mongoose.Schema({
     type: String, 
     required: true,
     enum: ['male', 'female', 'other', 'prefer-not-to-say']
+  },
+  role: {
+    type: String,
+    required: true,
+    enum: ['customer', 'provider'],
+    default: 'customer'
+  },
+  businessInfo: {
+    businessName: { type: String, required: function() { return this.role === 'provider'; } },
+    businessDescription: { type: String, required: false },
+    services: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Service' }],
+    businessCategory: { type: String, required: false },
+    businessHours: { type: String, required: false }
   }
 }, { timestamps: true });
 
