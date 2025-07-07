@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './auth.css';
 import axios from 'axios';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
+import { FaUser, FaBuilding, FaCalendarAlt, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 
 const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
   const [isLogin, setIsLogin] = useState(initialIsLogin);
@@ -233,10 +234,13 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
 
           {!isLogin && (
             <>
-              <div className="form-group user-type-selector">
+              <div className="user-type-selector">
                 <label>Register as:</label>
                 <div className="user-type-options">
-                  <label className={`user-type-option ${userType === 'customer' ? 'selected' : ''}`}>
+                  <label 
+                    className={`user-type-option ${userType === 'customer' ? 'selected' : ''}`}
+                    onClick={() => setUserType('customer')}
+                  >
                     <input
                       type="radio"
                       name="userType"
@@ -244,9 +248,13 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
                       checked={userType === 'customer'}
                       onChange={() => setUserType('customer')}
                     />
+                    <FaUser style={{ marginRight: '8px' }} />
                     Customer
                   </label>
-                  <label className={`user-type-option ${userType === 'provider' ? 'selected' : ''}`}>
+                  <label 
+                    className={`user-type-option ${userType === 'provider' ? 'selected' : ''}`}
+                    onClick={() => setUserType('provider')}
+                  >
                     <input
                       type="radio"
                       name="userType"
@@ -254,6 +262,7 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
                       checked={userType === 'provider'}
                       onChange={() => setUserType('provider')}
                     />
+                    <FaBuilding style={{ marginRight: '8px' }} />
                     Service Provider
                   </label>
                 </div>
@@ -274,27 +283,33 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
 
           {!isLogin && (
             <div className="form-group">
-              <input
-                type="tel"
-                placeholder="Enter your Phone Number"
-                className="form-input"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                required
-              />
+              <div className="input-with-icon">
+                <FaPhone className="input-icon" />
+                <input
+                  type="tel"
+                  placeholder="Enter your Phone Number"
+                  className="form-input"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  required
+                />
+              </div>
             </div>
           )}
 
           {!isLogin && (
             <div className="form-group">
-              <textarea
-                placeholder="Enter your Address"
-                className="form-input"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                rows="3"
-                required
-              />
+              <div className="input-with-icon textarea-container">
+                <FaMapMarkerAlt className="input-icon" />
+                <textarea
+                  placeholder="Enter your Address"
+                  className="form-input"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  rows="3"
+                  required
+                />
+              </div>
             </div>
           )}
 
@@ -317,7 +332,10 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
 
           {!isLogin && (
             <div className="form-group">
-              <label className="form-label">Date of Birth (Optional - Must be at least 10 years old)</label>
+              <label className="form-label">
+                <FaCalendarAlt style={{ marginRight: '8px' }} />
+                Date of Birth (Optional - Must be at least 10 years old)
+              </label>
               <input
                 type="date"
                 placeholder="Date of Birth (Optional)"
