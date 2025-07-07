@@ -14,7 +14,9 @@ exports.register = async (req, res) => {
     phoneNumber, 
     address, 
     dateOfBirth, 
-    gender 
+    gender,
+    role,
+    businessInfo 
   } = req.body;
   
   try {
@@ -29,6 +31,19 @@ exports.register = async (req, res) => {
       return res.status(400).json({ error: 'All required fields must be provided' });
     }
 
+    // Validate role if provided
+    const userRole = role || 'customer';
+    if (!['customer', 'provider'].includes(userRole)) {
+      return res.status(400).json({ error: 'Invalid role specified' });
+    }
+
+    // Validate business info for providers
+    if (userRole === 'provider') {
+      if (!businessInfo || !businessInfo.businessName) {
+        return res.status(400).json({ error: 'Business name is required for service providers' });
+      }
+    }
+
     // Create new user with all profile data
     const userData = {
       email,
@@ -36,12 +51,23 @@ exports.register = async (req, res) => {
       fullName,
       phoneNumber,
       address,
-      gender
+      gender,
+      role: userRole
     };
 
     // Add dateOfBirth if provided
     if (dateOfBirth) {
       userData.dateOfBirth = new Date(dateOfBirth);
+    }
+
+    // Add business info for providers
+    if (userRole === 'provider' && businessInfo) {
+      userData.businessInfo = {
+        businessName: businessInfo.businessName,
+        businessDescription: businessInfo.businessDescription || '',
+        businessCategory: businessInfo.businessCategory || '',
+        businessHours: businessInfo.businessHours || ''
+      };
     }
 
     const user = new User(userData);
@@ -78,20 +104,28 @@ exports.login = async (req, res) => {
       expiresIn: '1d',
     });
 
+    const userData = {
+      id: user._id,
+      email: user.email,
+      fullName: user.fullName,
+      phoneNumber: user.phoneNumber,
+      address: user.address,
+      dateOfBirth: user.dateOfBirth,
+      gender: user.gender,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    };
+
+    // Include business info for providers
+    if (user.role === 'provider' && user.businessInfo) {
+      userData.businessInfo = user.businessInfo;
+    }
+
     res.json({ 
       message: 'Login successful', 
       token,
-      user: {
-        id: user._id,
-        email: user.email,
-        fullName: user.fullName,
-        phoneNumber: user.phoneNumber,
-        address: user.address,
-        dateOfBirth: user.dateOfBirth,
-        gender: user.gender,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt
-      }
+      user: userData
     });
   } catch (err) {
     console.error('Login error:', err);
@@ -113,19 +147,28 @@ exports.getProfile = async (req, res) => {
     }
     
     console.log('User found:', user.email);
+    
+    const userData = {
+      id: user._id,
+      email: user.email,
+      fullName: user.fullName,
+      phoneNumber: user.phoneNumber,
+      address: user.address,
+      dateOfBirth: user.dateOfBirth,
+      gender: user.gender,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    };
+
+    // Include business info for providers
+    if (user.role === 'provider' && user.businessInfo) {
+      userData.businessInfo = user.businessInfo;
+    }
+
     res.json({
       success: true,
-      user: {
-        id: user._id,
-        email: user.email,
-        name: user.fullName,
-        phoneNumber: user.phoneNumber,
-        address: user.address,
-        dateOfBirth: user.dateOfBirth,
-        gender: user.gender,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt
-      }
+      user: userData
     });
   } catch (err) {
     console.error('Profile fetch error:', err);
@@ -142,7 +185,8 @@ exports.updateProfile = async (req, res) => {
       phoneNumber, 
       address, 
       dateOfBirth, 
-      gender 
+      gender,
+      businessInfo
     } = req.body;
 
     const user = await User.findById(req.user.id);
@@ -172,22 +216,41 @@ exports.updateProfile = async (req, res) => {
     if (dateOfBirth) user.dateOfBirth = new Date(dateOfBirth);
     if (gender) user.gender = gender;
 
+    // Update business info for providers
+    if (user.role === 'provider' && businessInfo) {
+      user.businessInfo = {
+        ...user.businessInfo,
+        businessName: businessInfo.businessName || user.businessInfo.businessName,
+        businessDescription: businessInfo.businessDescription || user.businessInfo.businessDescription,
+        businessCategory: businessInfo.businessCategory || user.businessInfo.businessCategory,
+        businessHours: businessInfo.businessHours || user.businessInfo.businessHours
+      };
+    }
+
     await user.save();
+
+    const userData = {
+      id: user._id,
+      email: user.email,
+      fullName: user.fullName,
+      phoneNumber: user.phoneNumber,
+      address: user.address,
+      dateOfBirth: user.dateOfBirth,
+      gender: user.gender,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    };
+
+    // Include business info for providers
+    if (user.role === 'provider' && user.businessInfo) {
+      userData.businessInfo = user.businessInfo;
+    }
 
     res.json({ 
       success: true,
       message: 'Profile updated successfully',
-      user: {
-        id: user._id,
-        email: user.email,
-        fullName: user.fullName,
-        phoneNumber: user.phoneNumber,
-        address: user.address,
-        dateOfBirth: user.dateOfBirth,
-        gender: user.gender,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt
-      }
+      user: userData
     });
   } catch (err) {
     console.error('Profile update error:', err);

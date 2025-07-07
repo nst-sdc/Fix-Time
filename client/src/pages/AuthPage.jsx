@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import './auth.css';
 import axios from 'axios';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
+import { FaUser, FaBuilding, FaCalendarAlt, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 
 const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
   const [isLogin, setIsLogin] = useState(initialIsLogin);
@@ -19,6 +20,11 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
+  const [userType, setUserType] = useState('customer');
+  const [businessName, setBusinessName] = useState('');
+  const [businessDescription, setBusinessDescription] = useState('');
+  const [businessCategory, setBusinessCategory] = useState('');
+  const [businessHours, setBusinessHours] = useState('');
   const navigate = useNavigate();
 
   // Calculate min and max dates for age validation (10 years minimum age)
@@ -47,6 +53,11 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
     setAddress('');
     setDateOfBirth('');
     setGender('');
+    setUserType('customer');
+    setBusinessName('');
+    setBusinessDescription('');
+    setBusinessCategory('');
+    setBusinessHours('');
     setError('');
     setSuccess('');
     setShowPass(false);
@@ -111,6 +122,11 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
         return 'Password must be at least 6 characters long.';
       }
       
+      // Validate business information for providers
+      if (userType === 'provider' && !businessName.trim()) {
+        return 'Business name is required for service providers.';
+      }
+      
       // Validate age if date of birth is provided
       const ageError = validateAge(dateOfBirth);
       if (ageError) {
@@ -165,12 +181,23 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
           fullName: fullName.trim(),
           phoneNumber: phoneNumber.trim(),
           address: address.trim(),
-          gender
+          gender,
+          role: userType
         };
 
         // Add dateOfBirth if provided
         if (dateOfBirth) {
           registrationData.dateOfBirth = dateOfBirth;
+        }
+
+        // Add business info for providers
+        if (userType === 'provider') {
+          registrationData.businessInfo = {
+            businessName: businessName.trim(),
+            businessDescription: businessDescription.trim(),
+            businessCategory: businessCategory.trim(),
+            businessHours: businessHours.trim()
+          };
         }
 
         await axios.post('http://localhost:5001/auth/register', registrationData);
@@ -206,41 +233,83 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
           </div>
 
           {!isLogin && (
+            <>
+              <div className="user-type-selector">
+                <label>Register as:</label>
+                <div className="user-type-options">
+                  <label 
+                    className={`user-type-option ${userType === 'customer' ? 'selected' : ''}`}
+                    onClick={() => setUserType('customer')}
+                  >
+                    <input
+                      type="radio"
+                      name="userType"
+                      value="customer"
+                      checked={userType === 'customer'}
+                      onChange={() => setUserType('customer')}
+                    />
+                    <FaUser style={{ marginRight: '8px' }} />
+                    Customer
+                  </label>
+                  <label 
+                    className={`user-type-option ${userType === 'provider' ? 'selected' : ''}`}
+                    onClick={() => setUserType('provider')}
+                  >
+                    <input
+                      type="radio"
+                      name="userType"
+                      value="provider"
+                      checked={userType === 'provider'}
+                      onChange={() => setUserType('provider')}
+                    />
+                    <FaBuilding style={{ marginRight: '8px' }} />
+                    Service Provider
+                  </label>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <input
+                  type="text"
+                  placeholder="Enter your Full Name"
+                  className="form-input"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                  required
+                />
+              </div>
+            </>
+          )}
+
+          {!isLogin && (
             <div className="form-group">
-              <input
-                type="text"
-                placeholder="Enter your Full Name"
-                className="form-input"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                required
-              />
+              <div className="input-with-icon">
+                <FaPhone className="input-icon" />
+                <input
+                  type="tel"
+                  placeholder="Enter your Phone Number"
+                  className="form-input"
+                  value={phoneNumber}
+                  onChange={(e) => setPhoneNumber(e.target.value)}
+                  required
+                />
+              </div>
             </div>
           )}
 
           {!isLogin && (
             <div className="form-group">
-              <input
-                type="tel"
-                placeholder="Enter your Phone Number"
-                className="form-input"
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                required
-              />
-            </div>
-          )}
-
-          {!isLogin && (
-            <div className="form-group">
-              <textarea
-                placeholder="Enter your Address"
-                className="form-input"
-                value={address}
-                onChange={(e) => setAddress(e.target.value)}
-                rows="3"
-                required
-              />
+              <div className="input-with-icon textarea-container">
+                <FaMapMarkerAlt className="input-icon" />
+                <textarea
+                  placeholder="Enter your Address"
+                  className="form-input"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  rows="3"
+                  required
+                />
+              </div>
             </div>
           )}
 
@@ -263,7 +332,10 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
 
           {!isLogin && (
             <div className="form-group">
-              <label className="form-label">Date of Birth (Optional - Must be at least 10 years old)</label>
+              <label className="form-label">
+                <FaCalendarAlt style={{ marginRight: '8px' }} />
+                Date of Birth (Optional - Must be at least 10 years old)
+              </label>
               <input
                 type="date"
                 placeholder="Date of Birth (Optional)"
@@ -274,6 +346,64 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
                 max={dateLimits.max}
               />
             </div>
+          )}
+
+          {/* Business information fields for providers */}
+          {!isLogin && userType === 'provider' && (
+            <>
+              <div className="form-section-title">Business Information</div>
+              
+              <div className="form-group">
+                <input
+                  type="text"
+                  placeholder="Business Name"
+                  className="form-input"
+                  value={businessName}
+                  onChange={(e) => setBusinessName(e.target.value)}
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <textarea
+                  placeholder="Business Description (optional)"
+                  className="form-input"
+                  value={businessDescription}
+                  onChange={(e) => setBusinessDescription(e.target.value)}
+                  rows="3"
+                />
+              </div>
+              
+              <div className="form-group">
+                <select
+                  className="form-input"
+                  value={businessCategory}
+                  onChange={(e) => setBusinessCategory(e.target.value)}
+                >
+                  <option value="">Select Business Category (optional)</option>
+                  <option value="healthcare">Healthcare</option>
+                  <option value="beauty">Beauty & Wellness</option>
+                  <option value="automotive">Automotive</option>
+                  <option value="education">Education & Coaching</option>
+                  <option value="home-repair">Home Repair</option>
+                  <option value="restaurant">Restaurant & Hospitality</option>
+                  <option value="retail">Retail & Local Business</option>
+                  <option value="government">Government & Legal</option>
+                  <option value="events">Private Events</option>
+                  <option value="other">Other</option>
+                </select>
+              </div>
+              
+              <div className="form-group">
+                <input
+                  type="text"
+                  placeholder="Business Hours (e.g., Mon-Fri: 9AM-5PM) (optional)"
+                  className="form-input"
+                  value={businessHours}
+                  onChange={(e) => setBusinessHours(e.target.value)}
+                />
+              </div>
+            </>
           )}
 
           <div className="form-group" style={{ position: 'relative' }}>
