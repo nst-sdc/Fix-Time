@@ -68,8 +68,8 @@ touch .env
 Add the following to .env
 ```
 PORT=5001
-MONGODB_URI=mongodb://localhost:27017/fixtime
-JWT_SECRET=thisissecretkey
+MONGODB_URI=mongodb+srv://rudranshgupta:Rudra%40123@fix-time.uarfbdn.mongodb.net/?retryWrites=true&w=majority&appName=Fix-Time
+JWT_SECRET=Hv6dQ6+s0f1+f62oJ27clu1nL0iMkYRwL0oi/6jXGfE=
 ```
 
 Start the backend:
