@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const Provider = require('../models/Provider');
 
 const generateToken = (userId) => {
   return jwt.sign({ userId }, process.env.JWT_SECRET, { expiresIn: '24h' });
@@ -39,12 +40,14 @@ exports.register = async (req, res) => {
 
     // Validate business info for providers
     if (userRole === 'provider') {
-      if (!businessInfo || !businessInfo.businessName) {
-        return res.status(400).json({ error: 'Business name is required for service providers' });
+      if (!businessInfo || !businessInfo.businessName || !businessInfo.businessCategory || !businessInfo.location) {
+        return res.status(400).json({ 
+          error: 'Business name, category, and location are required for service providers' 
+        });
       }
     }
 
-    // Create new user with all profile data
+    // Create new user
     const userData = {
       email,
       password,
@@ -60,24 +63,32 @@ exports.register = async (req, res) => {
       userData.dateOfBirth = new Date(dateOfBirth);
     }
 
-    // Add business info for providers
-    if (userRole === 'provider' && businessInfo) {
-      userData.businessInfo = {
-        businessName: businessInfo.businessName,
-        businessDescription: businessInfo.businessDescription || '',
-        businessCategory: businessInfo.businessCategory || '',
-        businessHours: businessInfo.businessHours || ''
-      };
-    }
-
     const user = new User(userData);
     await user.save();
 
-    // Don't generate JWT for registration
-    // Just return success message
+    // If provider, create provider profile
+    if (userRole === 'provider' && businessInfo) {
+      const providerData = {
+        userId: user._id,
+        businessName: businessInfo.businessName,
+        businessDescription: businessInfo.businessDescription || '',
+        businessCategory: businessInfo.businessCategory,
+        businessHours: businessInfo.businessHours || '9:00 AM - 6:00 PM',
+        location: businessInfo.location,
+        contactEmail: email,
+        contactPhone: phoneNumber,
+        specializations: businessInfo.specializations || [],
+        experience: businessInfo.experience || 0
+      };
+
+      const provider = new Provider(providerData);
+      await provider.save();
+    }
+
     res.status(201).json({ 
       message: 'User registered successfully. Please log in.',
-      success: true
+      success: true,
+      role: userRole
     });
   } catch (err) {
     console.error('Registration error:', err);
@@ -87,7 +98,7 @@ exports.register = async (req, res) => {
 
 // Login user
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, role } = req.body;
   
   try {
     const user = await User.findOne({ email });
@@ -98,6 +109,13 @@ exports.login = async (req, res) => {
     const isMatch = await user.comparePassword(password);
     if (!isMatch) {
       return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Validate role if provided
+    if (role && user.role !== role) {
+      return res.status(401).json({ 
+        error: `Invalid login attempt. This account is registered as a ${user.role}, not a ${role}` 
+      });
     }
 
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
@@ -117,19 +135,142 @@ exports.login = async (req, res) => {
       updatedAt: user.updatedAt
     };
 
-    // Include business info for providers
-    if (user.role === 'provider' && user.businessInfo) {
-      userData.businessInfo = user.businessInfo;
+    // Include provider info for providers
+    if (user.role === 'provider') {
+      const provider = await Provider.findOne({ userId: user._id });
+      if (provider) {
+        userData.providerInfo = {
+          businessName: provider.businessName,
+          businessDescription: provider.businessDescription,
+          businessCategory: provider.businessCategory,
+          businessHours: provider.businessHours,
+          location: provider.location,
+          isVerified: provider.isVerified,
+          rating: provider.rating,
+          totalReviews: provider.totalReviews,
+          specializations: provider.specializations,
+          experience: provider.experience
+        };
+      }
     }
 
     res.json({ 
-      message: 'Login successful', 
+      message: `Login successful as ${user.role}`, 
       token,
-      user: userData
+      user: userData,
+      role: user.role
     });
   } catch (err) {
     console.error('Login error:', err);
     res.status(500).json({ error: 'Server error during login' });
+  }
+};
+
+// Role-based login with explicit role validation
+exports.loginWithRole = async (req, res) => {
+  const { email, password, role } = req.body;
+  
+  try {
+    // Validate required fields
+    if (!email || !password || !role) {
+      return res.status(400).json({ 
+        error: 'Email, password, and role are required' 
+      });
+    }
+
+    // Validate role
+    if (!['customer', 'provider'].includes(role)) {
+      return res.status(400).json({ 
+        error: 'Role must be either "customer" or "provider"' 
+      });
+    }
+
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Validate user role matches requested role
+    if (user.role !== role) {
+      return res.status(401).json({ 
+        error: `This account is registered as a ${user.role}. Please login as a ${user.role} or create a new account.`,
+        actualRole: user.role
+      });
+    }
+
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '1d',
+    });
+
+    const userData = {
+      id: user._id,
+      email: user.email,
+      fullName: user.fullName,
+      phoneNumber: user.phoneNumber,
+      address: user.address,
+      dateOfBirth: user.dateOfBirth,
+      gender: user.gender,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    };
+
+    // Include provider info for providers
+    if (user.role === 'provider') {
+      const provider = await Provider.findOne({ userId: user._id });
+      if (provider) {
+        userData.providerInfo = {
+          businessName: provider.businessName,
+          businessDescription: provider.businessDescription,
+          businessCategory: provider.businessCategory,
+          businessHours: provider.businessHours,
+          location: provider.location,
+          isVerified: provider.isVerified,
+          rating: provider.rating,
+          totalReviews: provider.totalReviews,
+          specializations: provider.specializations,
+          experience: provider.experience
+        };
+      }
+    }
+
+    res.json({ 
+      message: `Login successful as ${user.role}`, 
+      token,
+      user: userData,
+      role: user.role
+    });
+  } catch (err) {
+    console.error('Role-based login error:', err);
+    res.status(500).json({ error: 'Server error during login' });
+  }
+};
+
+// Get user roles by email (for login form assistance)
+exports.getUserRoles = async (req, res) => {
+  const { email } = req.params;
+  
+  try {
+    const user = await User.findOne({ email }).select('role');
+    if (!user) {
+      return res.status(404).json({ 
+        error: 'User not found with this email' 
+      });
+    }
+
+    res.json({
+      success: true,
+      email: user.email,
+      role: user.role
+    });
+  } catch (err) {
+    console.error('Get user roles error:', err);
+    res.status(500).json({ error: 'Server error fetching user roles' });
   }
 };
 
@@ -161,9 +302,23 @@ exports.getProfile = async (req, res) => {
       updatedAt: user.updatedAt
     };
 
-    // Include business info for providers
-    if (user.role === 'provider' && user.businessInfo) {
-      userData.businessInfo = user.businessInfo;
+    // Include provider info for providers
+    if (user.role === 'provider') {
+      const provider = await Provider.findOne({ userId: user._id });
+      if (provider) {
+        userData.providerInfo = {
+          businessName: provider.businessName,
+          businessDescription: provider.businessDescription,
+          businessCategory: provider.businessCategory,
+          businessHours: provider.businessHours,
+          location: provider.location,
+          isVerified: provider.isVerified,
+          rating: provider.rating,
+          totalReviews: provider.totalReviews,
+          specializations: provider.specializations,
+          experience: provider.experience
+        };
+      }
     }
 
     res.json({

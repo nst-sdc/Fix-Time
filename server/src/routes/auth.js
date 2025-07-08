@@ -9,6 +9,12 @@ router.post('/register', authController.register);
 // Login route
 router.post('/login', authController.login);
 
+// Role-based login route
+router.post('/login-with-role', authController.loginWithRole);
+
+// Get user role by email (for login assistance)
+router.get('/user-role/:email', authController.getUserRoles);
+
 // Get user profile - protected route
 router.get('/profile', auth, authController.getProfile);
 
