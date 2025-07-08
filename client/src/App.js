@@ -24,6 +24,7 @@ import HotelRestaurant from './pages/categories/HotelRestaurant';
 import AppointmentCalendar from './pages/AppointmentCalendar';
 import RescheduleAppointment from './pages/RescheduleAppointment';
 import MyAppointments from './pages/MyAppointments';
+import ServiceList from './components/ServiceList';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -31,7 +32,6 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState('light');
 
-  // Initialize AOS animation library
   useEffect(() => {
     AOS.init({
       duration: 800,
@@ -41,7 +41,6 @@ function App() {
     });
   }, []);
 
-  // Set up axios defaults for authentication
   useEffect(() => {
     const token = localStorage.getItem('token');
     if (token) {
@@ -49,7 +48,6 @@ function App() {
     }
   }, []);
 
-  // Load theme from localStorage on app start
   useEffect(() => {
     const savedTheme = localStorage.getItem('theme') || 'light';
     setTheme(savedTheme);
@@ -57,11 +55,9 @@ function App() {
   }, []);
 
   useEffect(() => {
-    // Check if user is logged in based on JWT token
     const token = localStorage.getItem('token');
     if (token) {
       setIsLoggedIn(true);
-      // Fetch user profile data
       const fetchUserProfile = async () => {
         try {
           const res = await axios.get('http://localhost:5001/auth/profile', {
@@ -72,7 +68,6 @@ function App() {
           setUserProfile(res.data);
         } catch (err) {
           console.error('Error fetching profile:', err);
-          // If token is invalid, logout
           if (err.response?.status === 401) {
             handleLogout();
           }
@@ -89,7 +84,6 @@ function App() {
   const handleLogin = (userData) => {
     setIsLoggedIn(true);
     setUserProfile(userData);
-    // Set Authorization header for future requests
     const token = localStorage.getItem('token');
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -100,7 +94,6 @@ function App() {
     localStorage.removeItem('token');
     setIsLoggedIn(false);
     setUserProfile(null);
-    // Remove Authorization header
     delete axios.defaults.headers.common['Authorization'];
   };
 
@@ -111,10 +104,7 @@ function App() {
     document.body.className = newTheme;
   };
 
-  if (loading) {
-    // You can add a loading spinner here
-    return <div className="loading-container">Loading...</div>;
-  }
+  if (loading) return <div className="loading-container">Loading...</div>;
 
   return (
     <Router>
@@ -144,19 +134,11 @@ function App() {
             <Route path="/appointments" element={isLoggedIn ? <AppointmentPage /> : <Navigate to="/login" />} />
             <Route path="/book" element={isLoggedIn ? <AppointmentPage /> : <Navigate to="/login" />} />
             <Route path="/reschedule" element={isLoggedIn ? <RescheduleAppointment /> : <Navigate to="/login" />} />
-            <Route path="/dashboard" element={isLoggedIn ? 
-              <Dashboard userProfile={userProfile} setUserProfile={setUserProfile} /> 
-              : <Navigate to="/login" />} 
-            />
-            <Route path="/profile" element={isLoggedIn ? 
-              <UserProfile isLoggedIn={isLoggedIn} setIsLoggedIn={handleLogin} setUserProfile={setUserProfile} /> 
-              : <Navigate to="/login" />} 
-            />
-            <Route path="/calendar" element={isLoggedIn ? 
-              <AppointmentCalendar /> 
-              : <Navigate to="/login" />} 
-            />
+            <Route path="/dashboard" element={isLoggedIn ? <Dashboard userProfile={userProfile} setUserProfile={setUserProfile} /> : <Navigate to="/login" />} />
+            <Route path="/profile" element={isLoggedIn ? <UserProfile isLoggedIn={isLoggedIn} setIsLoggedIn={handleLogin} setUserProfile={setUserProfile} /> : <Navigate to="/login" />} />
+            <Route path="/calendar" element={isLoggedIn ? <AppointmentCalendar /> : <Navigate to="/login" />} />
             <Route path="/my-appointments" element={isLoggedIn ? <MyAppointments /> : <Navigate to="/login" />} />
+            <Route path="/demo-services" element={<ServiceList />} />
           </Routes>
         </main>
         <Footer />
@@ -166,4 +148,3 @@ function App() {
 }
 
 export default App;
-
