@@ -21,10 +21,13 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
   const [success, setSuccess] = useState('');
   const [loading, setLoading] = useState(false);
   const [userType, setUserType] = useState('customer');
+  const [loginRole, setLoginRole] = useState('customer');
   const [businessName, setBusinessName] = useState('');
+  const [isCheckingRole, setIsCheckingRole] = useState(false);
   const [businessDescription, setBusinessDescription] = useState('');
   const [businessCategory, setBusinessCategory] = useState('');
   const [businessHours, setBusinessHours] = useState('');
+  const [businessLocation, setBusinessLocation] = useState('');
   const navigate = useNavigate();
 
   // Calculate min and max dates for age validation (10 years minimum age)
@@ -54,10 +57,12 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
     setDateOfBirth('');
     setGender('');
     setUserType('customer');
+    setLoginRole('customer');
     setBusinessName('');
     setBusinessDescription('');
     setBusinessCategory('');
     setBusinessHours('');
+    setBusinessLocation('');
     setError('');
     setSuccess('');
     setShowPass(false);
@@ -67,6 +72,24 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
   const toggleForm = () => {
     // Navigate to the respective route instead of just toggling the form
     navigate(isLogin ? '/register' : '/login');
+  };
+
+  // Check user role when email is entered (for login form)
+  const checkUserRole = async (email) => {
+    if (!email || !email.includes('@') || !isLogin) return;
+    
+    try {
+      setIsCheckingRole(true);
+      const response = await axios.get(`http://localhost:5001/auth/user-role/${email}`);
+      if (response.data.success) {
+        setLoginRole(response.data.role);
+      }
+    } catch (error) {
+      // User not found or other error - keep current role selection
+      console.log('Could not determine user role:', error.message);
+    } finally {
+      setIsCheckingRole(false);
+    }
   };
 
   const validateAge = (dateString) => {
@@ -123,8 +146,13 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
       }
       
       // Validate business information for providers
-      if (userType === 'provider' && !businessName.trim()) {
-        return 'Business name is required for service providers.';
+      if (userType === 'provider') {
+        if (!businessName.trim()) {
+          return 'Business name is required for service providers.';
+        }
+        if (!businessLocation.trim()) {
+          return 'Business location is required for service providers.';
+        }
       }
       
       // Validate age if date of birth is provided
@@ -152,9 +180,10 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
       
       if (isLogin) {
         // Handle login
-        const res = await axios.post('http://localhost:5001/auth/login', { 
+        const res = await axios.post('http://localhost:5001/auth/login-with-role', { 
           email, 
-          password: passwd 
+          password: passwd,
+          role: loginRole
         });
 
         if (res.data.token) {
@@ -196,7 +225,8 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
             businessName: businessName.trim(),
             businessDescription: businessDescription.trim(),
             businessCategory: businessCategory.trim(),
-            businessHours: businessHours.trim()
+            businessHours: businessHours.trim(),
+            location: businessLocation.trim()
           };
         }
 
@@ -227,10 +257,55 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
               placeholder="Enter your Email"
               className="form-input"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e) => {
+                setEmail(e.target.value);
+                // Check user role after a short delay
+                setTimeout(() => checkUserRole(e.target.value), 1000);
+              }}
               required
             />
+            {isCheckingRole && isLogin && (
+              <small style={{ color: '#666', fontSize: '12px' }}>
+                Checking user type...
+              </small>
+            )}
           </div>
+
+          {isLogin && (
+            <div className="user-type-selector">
+              <label>Login as: {isCheckingRole && <span style={{ color: '#666', fontSize: '12px' }}>(checking...)</span>}</label>
+              <div className="user-type-options">
+                <label 
+                  className={`user-type-option ${loginRole === 'customer' ? 'selected' : ''}`}
+                  onClick={() => setLoginRole('customer')}
+                >
+                  <input
+                    type="radio"
+                    name="loginRole"
+                    value="customer"
+                    checked={loginRole === 'customer'}
+                    onChange={() => setLoginRole('customer')}
+                  />
+                  <FaUser style={{ marginRight: '8px' }} />
+                  Customer
+                </label>
+                <label 
+                  className={`user-type-option ${loginRole === 'provider' ? 'selected' : ''}`}
+                  onClick={() => setLoginRole('provider')}
+                >
+                  <input
+                    type="radio"
+                    name="loginRole"
+                    value="provider"
+                    checked={loginRole === 'provider'}
+                    onChange={() => setLoginRole('provider')}
+                  />
+                  <FaBuilding style={{ marginRight: '8px' }} />
+                  Service Provider
+                </label>
+              </div>
+            </div>
+          )}
 
           {!isLogin && (
             <>
@@ -402,6 +477,20 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
                   value={businessHours}
                   onChange={(e) => setBusinessHours(e.target.value)}
                 />
+              </div>
+              
+              <div className="form-group">
+                <div className="input-with-icon">
+                  <FaMapMarkerAlt className="input-icon" />
+                  <input
+                    type="text"
+                    placeholder="Business Location (required)"
+                    className="form-input"
+                    value={businessLocation}
+                    onChange={(e) => setBusinessLocation(e.target.value)}
+                    required
+                  />
+                </div>
               </div>
             </>
           )}

@@ -18,16 +18,75 @@ const authRoutes = require('./routes/auth');
 const reviewRoutes = require('./routes/reviews');
 const appointmentRoutes = require('./routes/appointments');
 const serviceRoutes = require('./routes/services');
+const providerRoutes = require('./routes/providers');
 
 // Setup routes
 app.use('/auth', authRoutes);
 app.use('/reviews', reviewRoutes);
 app.use('/appointments', appointmentRoutes);
 app.use('/services', serviceRoutes);
+app.use('/providers', providerRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
   res.send('Backend is running!');
+});
+
+// Temporary debug endpoints for development
+app.get('/debug/users', async (req, res) => {
+  try {
+    const User = require('./models/User');
+    const users = await User.find({}, { password: 0 });
+    res.json({ count: users.length, users });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/debug/services', async (req, res) => {
+  try {
+    const Service = require('./models/Service');
+    const services = await Service.find({});
+    res.json({ count: services.length, services });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/debug/appointments', async (req, res) => {
+  try {
+    const Appointment = require('./models/Appointment');
+    const appointments = await Appointment.find({})
+      .populate('userId', 'fullName email')
+      .populate('serviceId', 'name category');
+    res.json({ count: appointments.length, appointments });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/debug/reviews', async (req, res) => {
+  try {
+    const Review = require('./models/Review');
+    const reviews = await Review.find({})
+      .populate('userId', 'fullName email')
+      .populate('serviceId', 'name category');
+    res.json({ count: reviews.length, reviews });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/debug/providers', async (req, res) => {
+  try {
+    const Provider = require('./models/Provider');
+    const providers = await Provider.find({})
+      .populate('userId', 'fullName email phoneNumber')
+      .select('-documents');
+    res.json({ count: providers.length, providers });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Add a general error handler
