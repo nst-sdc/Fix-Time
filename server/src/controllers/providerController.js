@@ -136,15 +136,68 @@ exports.getProviderDashboard = async (req, res) => {
       });
     }
 
-    // You can add more dashboard data here like appointments, reviews, etc.
+    // Get booking statistics
+    const Appointment = require('../models/Appointment');
+    const Notification = require('../models/Notification');
+
+    const [
+      totalBookings,
+      pendingBookings,
+      confirmedBookings,
+      completedBookings,
+      unreadNotifications
+    ] = await Promise.all([
+      Appointment.countDocuments({ providerId: provider._id }),
+      Appointment.countDocuments({ providerId: provider._id, status: 'pending' }),
+      Appointment.countDocuments({ providerId: provider._id, status: 'confirmed' }),
+      Appointment.countDocuments({ providerId: provider._id, status: 'completed' }),
+      Notification.countDocuments({ recipientId: req.user.id, isRead: false })
+    ]);
+
+    // Get recent bookings
+    const recentBookings = await Appointment.find({ providerId: provider._id })
+      .populate('serviceId', 'name category')
+      .sort({ bookingRequestedAt: -1 })
+      .limit(5);
+
+    // Get recent notifications
+    const recentNotifications = await Notification.find({ recipientId: req.user.id })
+      .populate('appointmentId', 'customerName serviceId date time')
+      .populate('serviceId', 'name')
+      .sort({ createdAt: -1 })
+      .limit(5);
+
     const dashboardData = {
       provider,
       stats: {
         totalServices: provider.services.length,
+        totalBookings,
+        pendingBookings,
+        confirmedBookings,
+        completedBookings,
+        unreadNotifications,
         rating: provider.rating,
         totalReviews: provider.totalReviews,
         isVerified: provider.isVerified
-      }
+      },
+      recentBookings: recentBookings.map(booking => ({
+        _id: booking._id,
+        serviceName: booking.serviceId ? booking.serviceId.name : 'Unknown Service',
+        customerName: booking.customerName,
+        date: booking.date,
+        time: booking.time,
+        status: booking.status,
+        bookingRequestedAt: booking.bookingRequestedAt
+      })),
+      recentNotifications: recentNotifications.map(notification => ({
+        _id: notification._id,
+        type: notification.type,
+        title: notification.title,
+        message: notification.message,
+        isRead: notification.isRead,
+        createdAt: notification.createdAt,
+        timeAgo: notification.timeAgo
+      }))
     };
 
     res.json({

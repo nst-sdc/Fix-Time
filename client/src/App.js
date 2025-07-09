@@ -25,6 +25,7 @@ import AppointmentCalendar from './pages/AppointmentCalendar';
 import RescheduleAppointment from './pages/RescheduleAppointment';
 import MyAppointments from './pages/MyAppointments';
 import ServiceList from './components/ServiceList';
+import MyServices from './pages/MyServices';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -138,6 +139,7 @@ function App() {
             <Route path="/profile" element={isLoggedIn ? <UserProfile isLoggedIn={isLoggedIn} setIsLoggedIn={handleLogin} setUserProfile={setUserProfile} /> : <Navigate to="/login" />} />
             <Route path="/calendar" element={isLoggedIn ? <AppointmentCalendar /> : <Navigate to="/login" />} />
             <Route path="/my-appointments" element={isLoggedIn ? <MyAppointments /> : <Navigate to="/login" />} />
+            <Route path="/my-services" element={isLoggedIn ? <MyServices /> : <Navigate to="/login" />} />
             <Route path="/demo-services" element={<ServiceList />} />
           </Routes>
         </main>

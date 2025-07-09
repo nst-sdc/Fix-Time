@@ -1,0 +1,445 @@
+/* Container and Card Styles */
+.my-services-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+  padding: 2rem 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+.my-services-card {
+  background: white;
+  border-radius: 20px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.my-services-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 2px solid #f1f5f9;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.header-content {
+  flex: 1;
+  min-width: 300px;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(90deg, #FF758C 0%, #FF7EB3 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin: 0 0 0.5rem 0;
+}
+
+.page-subtitle {
+  font-size: 1.1rem;
+  color: #64748b;
+  margin: 0;
+}
+
+.stats-overview {
+  display: flex;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #ffe3ee 100%);
+  border-radius: 12px;
+  border: 1px solid #ffe3ee;
+  min-width: 100px;
+}
+
+.stat-number {
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #FF758C;
+  line-height: 1;
+}
+
+.stat-label {
+  font-size: 0.9rem;
+  color: #64748b;
+  font-weight: 500;
+  margin-top: 0.25rem;
+}
+
+/* Controls Section */
+.controls-section {
+  margin-bottom: 2rem;
+}
+
+.search-section {
+  margin-bottom: 1rem;
+}
+
+.search-input-group {
+  position: relative;
+  max-width: 400px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 0.75rem 2.5rem 0.75rem 1rem;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 1rem;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #FF758C;
+  box-shadow: 0 0 0 3px rgba(255, 117, 140, 0.1);
+}
+
+.clear-search-btn {
+  position: absolute;
+  right: 0.75rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 1.2rem;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.25rem;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.clear-search-btn:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.filter-controls {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.filter-icon {
+  color: #FF758C;
+  font-size: 1.2rem;
+}
+
+.filter-select {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  background: #fff;
+  color: #333;
+  transition: border-color 0.2s;
+}
+
+.filter-select:focus {
+  outline: none;
+  border-color: #FF758C;
+}
+
+.sort-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.sort-icon {
+  color: #FF758C;
+  font-size: 1.2rem;
+}
+
+.sort-select {
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  font-size: 1rem;
+  background: #fff;
+  color: #333;
+  transition: border-color 0.2s;
+}
+
+.sort-select:focus {
+  outline: none;
+  border-color: #FF758C;
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+}
+
+.empty-icon {
+  font-size: 3rem;
+  color: #FF758C;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+  color: #666;
+  font-size: 1.05rem;
+  margin-bottom: 1.5rem;
+}
+
+.add-service-btn {
+  background: linear-gradient(90deg, #FF758C, #FF7EB3);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.7rem 1.5rem;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(255, 117, 140, 0.13);
+  transition: background 0.2s, transform 0.2s;
+}
+.add-service-btn:hover {
+  background: linear-gradient(90deg, #FF7EB3, #FF758C);
+  transform: translateY(-2px) scale(1.04);
+}
+
+/* Services Grid and Card */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+}
+
+.service-card-provider {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(255, 117, 140, 0.08);
+  padding: 2rem 1.5rem 1.2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 220px;
+  border: 1.5px solid #f3f3f7;
+  transition: box-shadow 0.2s, border-color 0.2s;
+  cursor: pointer;
+}
+.service-card-provider:hover {
+  box-shadow: 0 12px 36px rgba(255, 117, 140, 0.18);
+  border-color: #FF7EB3;
+}
+
+.service-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.7rem;
+}
+.service-card-header h2 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  margin: 0;
+  color: #333;
+}
+.service-category {
+  background: linear-gradient(90deg, #FF758C, #FF7EB3);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.3rem 0.9rem;
+  border-radius: 999px;
+  margin-left: 1rem;
+  white-space: nowrap;
+}
+.service-description {
+  color: #666;
+  font-size: 1.05rem;
+  margin-bottom: 1.2rem;
+}
+.service-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.service-bookings {
+  font-size: 1rem;
+  color: #FF758C;
+  font-weight: 600;
+}
+.service-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+.view-details-btn, .edit-btn, .delete-btn, .view-bookings-btn, .close-modal-btn {
+  background: #f8f9fa;
+  color: #FF758C;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-weight: 600;
+  font-size: 0.97rem;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s, transform 0.18s;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.view-details-btn:hover, .edit-btn:hover {
+  background: #FF7EB3;
+  color: #fff;
+  transform: translateY(-2px);
+}
+.delete-btn:hover {
+  background: #ffb3c6;
+  color: #fff;
+  transform: translateY(-2px);
+}
+.view-bookings-btn {
+  background: #fff0f6;
+  color: #FF758C;
+}
+.view-bookings-btn:hover {
+  background: #FF758C;
+  color: #fff;
+  transform: translateY(-2px);
+}
+.close-modal-btn {
+  background: #f3f4f6;
+  color: #374151;
+  margin-left: 1rem;
+}
+.close-modal-btn:hover {
+  background: #FF7EB3;
+  color: #fff;
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.18);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 18px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.18);
+  padding: 2.5rem 2rem 1.5rem 2rem;
+  min-width: 340px;
+  max-width: 95vw;
+  width: 420px;
+  position: relative;
+  animation: modalIn 0.2s cubic-bezier(0.4,0,0.2,1);
+}
+@keyframes modalIn {
+  from { transform: translateY(40px) scale(0.98); opacity: 0; }
+  to { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.modal-header {
+  margin-bottom: 1.2rem;
+}
+.modal-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #FF758C;
+  margin: 0;
+}
+.modal-body {
+  margin-bottom: 1.5rem;
+}
+.detail-section {
+  margin-bottom: 1.2rem;
+}
+.detail-section:last-child {
+  margin-bottom: 0;
+}
+.detail-section h3 {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #FF758C;
+  margin-bottom: 0.7rem;
+}
+.detail-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1rem;
+  color: #333;
+}
+.detail-label {
+  font-weight: 600;
+  color: #FF758C;
+}
+.detail-value {
+  color: #374151;
+  font-weight: 500;
+}
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.7rem;
+  margin-top: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .my-services-card {
+    padding: 1.2rem;
+  }
+  .my-services-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+  .service-card-provider {
+    padding: 1.2rem 0.7rem 1.1rem 0.7rem;
+  }
+  .modal-content {
+    padding: 1.2rem 0.7rem 1.1rem 0.7rem;
+    width: 98vw;
+    min-width: unset;
+  }
+} 
