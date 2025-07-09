@@ -48,4 +48,6 @@ const CategoryPage = ({ categoryName, children, onServiceAdded }) => {
   );
 };
 
+// NOTE: This component can be reused for the 'Others' category page as well.
+
 export default CategoryPage;

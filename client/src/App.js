@@ -26,6 +26,7 @@ import RescheduleAppointment from './pages/RescheduleAppointment';
 import MyAppointments from './pages/MyAppointments';
 import ServiceList from './components/ServiceList';
 import MyServices from './pages/MyServices';
+import OtherServices from './pages/categories/OtherServices';
 
 function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -66,7 +67,8 @@ function App() {
               Authorization: `Bearer ${token}`
             }
           });
-          setUserProfile(res.data);
+          setUserProfile(res.data.user);
+          console.log('[Profile Fetch] User profile after refresh:', res.data.user);
         } catch (err) {
           console.error('Error fetching profile:', err);
           if (err.response?.status === 401) {
@@ -84,7 +86,9 @@ function App() {
 
   const handleLogin = (userData) => {
     setIsLoggedIn(true);
-    setUserProfile(userData);
+    const user = userData.user ? userData.user : userData;
+    setUserProfile(user);
+    console.log('[Login] User profile:', user);
     const token = localStorage.getItem('token');
     if (token) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -132,6 +136,7 @@ function App() {
             <Route path="/categories/retail" element={<RetailLocalBusinesses />} />
             <Route path="/categories/private-events" element={<PrivateEvents />} />
             <Route path="/categories/hotel-restaurant" element={<HotelRestaurant />} />
+            <Route path="/categories/others" element={<OtherServices />} />
             <Route path="/appointments" element={isLoggedIn ? <AppointmentPage /> : <Navigate to="/login" />} />
             <Route path="/book" element={isLoggedIn ? <AppointmentPage /> : <Navigate to="/login" />} />
             <Route path="/reschedule" element={isLoggedIn ? <RescheduleAppointment /> : <Navigate to="/login" />} />
