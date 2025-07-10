@@ -1,0 +1,696 @@
+@import './HomePage.css';
+
+/* Provider Home Page Custom Styles */
+.provider-home-page .provider-main-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-top: 2.5rem;
+}
+
+.provider-card {
+  background: var(--card-bg, #fff);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+  padding: 2rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+  transition: box-shadow 0.2s;
+}
+.provider-card:hover {
+  box-shadow: 0 8px 32px rgba(90,61,255,0.10);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.7rem;
+}
+.card-icon {
+  font-size: 1.5rem;
+  color: #5a3dff;
+}
+
+.appointments-preview {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.appointment-preview {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  box-shadow: 0 1px 4px rgba(90,61,255,0.03);
+  transition: background 0.2s;
+}
+.appointment-preview:hover {
+  background: #ececff;
+}
+.preview-icon {
+  font-size: 1.3rem;
+  color: #5a3dff;
+}
+.preview-info .client-name {
+  font-weight: 600;
+  color: #1e293b;
+}
+.preview-info .service-type {
+  font-size: 0.95rem;
+  color: #64748b;
+}
+.preview-info .time-slot {
+  font-size: 0.93rem;
+  color: #5a3dff;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.stats-panel .stats-counters {
+  display: flex;
+  gap: 1.5rem;
+  justify-content: space-between;
+}
+.stat-box {
+  background: #f3f4f6;
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  text-align: center;
+  flex: 1;
+}
+.stat-label {
+  font-size: 0.95rem;
+  color: #64748b;
+}
+.stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #5a3dff;
+  margin-top: 0.2rem;
+}
+
+.availability-card .today-status {
+  font-size: 1.1rem;
+  margin-bottom: 0.7rem;
+}
+.status-free {
+  color: #10b981;
+  font-weight: 600;
+}
+.update-schedule-btn {
+  background: linear-gradient(90deg, #5a3dff 0%, #a56bff 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.6rem 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.7rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.update-schedule-btn:hover {
+  background: linear-gradient(90deg, #a56bff 0%, #5a3dff 100%);
+}
+.mini-calendar-widget {
+  background: #f8fafc;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  color: #64748b;
+  font-size: 0.98rem;
+}
+
+.queue-card .queue-status-row {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  margin-bottom: 0.7rem;
+}
+.queue-toggle-btn {
+  background: #f1f5f9;
+  color: #5a3dff;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 0.5rem 1.1rem;
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+.queue-toggle-btn.open {
+  background: #e0f7ef;
+  color: #059669;
+  border-color: #10b981;
+}
+.queue-toggle-btn.closed {
+  background: #fef2f2;
+  color: #dc2626;
+  border-color: #fca5a5;
+}
+.now-serving, .next-appointment {
+  font-size: 1rem;
+  color: #64748b;
+}
+.queue-progress-bar {
+  background: #f3f4f6;
+  border-radius: 6px;
+  height: 8px;
+  width: 100%;
+  margin-top: 0.5rem;
+  overflow: hidden;
+}
+.queue-progress-bar .progress {
+  background: linear-gradient(90deg, #5a3dff 0%, #10b981 100%);
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.5s;
+}
+
+.notifications-card .notif-pulse.pulse {
+  animation: notifPulse 1s infinite alternate;
+}
+@keyframes notifPulse {
+  0% { filter: drop-shadow(0 0 0 #5a3dff); }
+  100% { filter: drop-shadow(0 0 8px #5a3dff); }
+}
+.notifications-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.notification-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #f8fafc;
+  border-radius: 7px;
+  padding: 0.7rem 1rem;
+  margin-bottom: 0.5rem;
+  font-size: 0.98rem;
+}
+.notif-message {
+  color: #1e293b;
+}
+.notif-time {
+  color: #64748b;
+  font-size: 0.92rem;
+}
+
+.quick-links-card .quick-links-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 1rem;
+  margin-top: 0.7rem;
+}
+.quick-link-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #f3f4f6;
+  border-radius: 8px;
+  padding: 0.7rem 1.1rem;
+  color: #5a3dff;
+  font-weight: 600;
+  font-size: 1rem;
+  text-decoration: none;
+  transition: background 0.2s, color 0.2s;
+  border: none;
+  cursor: pointer;
+}
+.quick-link-btn:hover {
+  background: #ececff;
+  color: #a56bff;
+}
+
+.why-fix-time-cards {
+  display: flex;
+  gap: 2rem;
+  margin-top: 2.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.why-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(90,61,255,0.07);
+  padding: 2rem 1.5rem 1.5rem 1.5rem;
+  max-width: 340px;
+  min-width: 260px;
+  flex: 1 1 260px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
+  z-index: 1;
+}
+.why-card:hover {
+  box-shadow: 0 8px 32px rgba(90,61,255,0.13);
+  transform: translateY(-6px) scale(1.03);
+}
+.why-icon {
+  font-size: 2.2rem;
+  color: #5a3dff;
+  margin-bottom: 1rem;
+  transition: color 0.2s;
+}
+.why-card h4 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 0.7rem;
+  color: #1e293b;
+}
+.why-card p {
+  color: #64748b;
+  font-size: 1.05rem;
+  line-height: 1.6;
+}
+
+.final-cta {
+  margin-top: 3.5rem;
+  margin-bottom: 3.5rem;
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+}
+.final-cta h2 {
+  margin-bottom: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .provider-home-page .provider-main-grid {
+    grid-template-columns: 1fr;
+  }
+  .why-fix-time-cards {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  .why-card {
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+  }
+}
+
+/* Dark mode overrides */
+body.dark .provider-card {
+  background: #1e293b;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+}
+body.dark .appointment-preview,
+body.dark .stat-box,
+body.dark .mini-calendar-widget,
+body.dark .notification-item,
+body.dark .quick-link-btn {
+  background: #334155;
+  color: #e2e8f0;
+}
+body.dark .card-header .card-icon {
+  color: #a56bff;
+}
+body.dark .stat-value {
+  color: #a56bff;
+}
+body.dark .queue-toggle-btn.open {
+  background: #134e4a;
+  color: #10b981;
+  border-color: #059669;
+}
+body.dark .queue-toggle-btn.closed {
+  background: #7f1d1d;
+  color: #fca5a5;
+  border-color: #fca5a5;
+}
+body.dark .queue-progress-bar {
+  background: #334155;
+}
+body.dark .queue-progress-bar .progress {
+  background: linear-gradient(90deg, #a56bff 0%, #10b981 100%);
+}
+body.dark .notif-message {
+  color: #e2e8f0;
+}
+body.dark .notif-time {
+  color: #a3a3a3;
+}
+body.dark .why-card {
+  background: #1e293b;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+}
+body.dark .why-card h4 {
+  color: #a56bff;
+}
+body.dark .why-card p {
+  color: #a3a3a3;
+}
+body.dark .why-icon {
+  color: #a56bff;
+} 
+
+.provider-hero-section {
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+  padding: 3.5rem 0 2.5rem 0;
+}
+.provider-hero-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 3rem;
+  flex-wrap: wrap;
+}
+.hero-left {
+  flex: 1 1 350px;
+  min-width: 320px;
+}
+.hero-right {
+  flex: 0 0 340px;
+  min-width: 280px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+/* Mini Calendar Widget */
+.mini-calendar-widget {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(90,61,255,0.07);
+  padding: 1.2rem 1.5rem;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  margin-top: 0.5rem;
+  transition: box-shadow 0.2s;
+}
+.calendar-header {
+  font-weight: 700;
+  color: #5a3dff;
+  margin-bottom: 0.7rem;
+  text-align: center;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 0.3rem;
+  margin-bottom: 0.7rem;
+}
+.calendar-day-label {
+  font-size: 0.95rem;
+  color: #64748b;
+  text-align: center;
+  font-weight: 600;
+}
+.calendar-day {
+  background: #f3f4f6;
+  border-radius: 6px;
+  text-align: center;
+  padding: 0.3rem 0;
+  font-size: 1rem;
+  color: #1e293b;
+  transition: background 0.2s, color 0.2s;
+}
+.calendar-day.busy {
+  background: #fca5a5;
+  color: #fff;
+}
+.calendar-legend {
+  display: flex;
+  align-items: center;
+  gap: 1.2rem;
+  font-size: 0.95rem;
+  color: #64748b;
+  margin-top: 0.5rem;
+  justify-content: center;
+}
+.calendar-legend .dot {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 0.3rem;
+}
+.calendar-legend .dot.busy {
+  background: #fca5a5;
+}
+.calendar-legend .dot.free {
+  background: #10b981;
+}
+
+/* Why Choose Section */
+.why-choose-section {
+  background: #fff;
+  padding: 3rem 0 2.5rem 0;
+  text-align: center;
+}
+.why-choose-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #5a3dff;
+  margin-bottom: 2.2rem;
+}
+
+/* Review Cards */
+.provider-reviews-section {
+  background: #f8fafc;
+  padding: 3rem 0 3.5rem 0;
+  text-align: center;
+}
+.reviews-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #5a3dff;
+  margin-bottom: 2.2rem;
+}
+.provider-reviews-grid {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.review-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(90,61,255,0.07);
+  padding: 1.5rem 1.2rem;
+  max-width: 320px;
+  min-width: 220px;
+  flex: 1 1 220px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 1rem;
+  transition: box-shadow 0.2s, transform 0.2s;
+  position: relative;
+  z-index: 1;
+  text-align: left;
+}
+.review-card:hover {
+  box-shadow: 0 8px 32px rgba(90,61,255,0.13);
+  transform: translateY(-6px) scale(1.03);
+}
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 0.5rem;
+}
+.review-user-icon {
+  font-size: 1.2rem;
+  color: #5a3dff;
+}
+.review-user {
+  font-weight: 600;
+  color: #1e293b;
+}
+.review-date {
+  font-size: 0.95rem;
+  color: #64748b;
+  margin-left: auto;
+}
+.review-rating {
+  margin-bottom: 0.5rem;
+}
+.star-filled {
+  color: #fbbf24;
+  font-size: 1.1rem;
+}
+.star-empty {
+  color: #e5e7eb;
+  font-size: 1.1rem;
+}
+.review-comment {
+  color: #64748b;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+/* Animation for pop-up */
+.animated-pop[data-aos] {
+  opacity: 0;
+  transform: translateY(40px) scale(0.98);
+  transition: opacity 0.7s cubic-bezier(.4,0,.2,1), transform 0.7s cubic-bezier(.4,0,.2,1);
+}
+.animated-pop[data-aos].aos-animate {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1100px) {
+  .provider-hero-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 2rem;
+  }
+  .hero-right {
+    margin-top: 2rem;
+    justify-content: flex-start;
+  }
+}
+@media (max-width: 900px) {
+  .provider-main-grid {
+    grid-template-columns: 1fr;
+  }
+  .why-fix-time-cards {
+    flex-direction: column;
+    gap: 1.5rem;
+    align-items: center;
+  }
+  .why-card {
+    max-width: 100%;
+    min-width: 0;
+    width: 100%;
+  }
+  .provider-reviews-grid {
+    flex-direction: column;
+    gap: 1.2rem;
+    align-items: center;
+  }
+}
+
+body.dark .provider-hero-section {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+}
+body.dark .mini-calendar-widget,
+body.dark .review-card,
+body.dark .why-card {
+  background: #1e293b;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.18);
+}
+body.dark .calendar-day {
+  background: #334155;
+  color: #e2e8f0;
+}
+body.dark .calendar-day.busy {
+  background: #fca5a5;
+  color: #fff;
+}
+body.dark .calendar-header,
+body.dark .why-choose-title,
+body.dark .reviews-title {
+  color: #a56bff;
+}
+body.dark .review-user {
+  color: #a56bff;
+}
+body.dark .review-date {
+  color: #a3a3a3;
+}
+body.dark .review-comment {
+  color: #a3a3a3;
+}
+body.dark .star-empty {
+  color: #334155;
+}
+body.dark .star-filled {
+  color: #fbbf24;
+} 
+
+.hero-calendar-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
+  border-radius: 50%;
+  box-shadow: 0 4px 24px rgba(90,61,255,0.10);
+  width: 120px;
+  height: 120px;
+  margin: 0 auto;
+  margin-top: 1.5rem;
+  font-size: 4.5rem;
+  color: #5a3dff;
+  transition: background 0.2s, color 0.2s;
+}
+body.dark .hero-calendar-logo {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  color: #a56bff;
+}
+
+.get-in-touch-section {
+  background: #fff;
+  padding: 3rem 0 2.5rem 0;
+  text-align: center;
+}
+.get-in-touch-title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #5a3dff;
+  margin-bottom: 2.2rem;
+}
+body.dark .get-in-touch-section {
+  background: #1e293b;
+}
+body.dark .get-in-touch-title {
+  color: #a56bff;
+}
+
+.mini-calendar-section {
+  background: #f8fafc;
+  padding: 2.5rem 0 2.5rem 0;
+  text-align: center;
+}
+body.dark .mini-calendar-section {
+  background: #16213e;
+} 
+
+body.dark .why-choose-section {
+  background: #1e293b;
+}
+body.dark .provider-reviews-section {
+  background: #16213e;
+} 
+
+/* Light mode alternation */
+.why-choose-section {
+  background: #fff;
+}
+.get-in-touch-section {
+  background: #f8fafc;
+}
+.provider-reviews-section {
+  background: #fff;
+}
+
+/* Dark mode alternation */
+body.dark .why-choose-section {
+  background: #232946;
+}
+body.dark .get-in-touch-section {
+  background: #1e293b;
+}
+body.dark .provider-reviews-section {
+  background: #16213e;
+} 
