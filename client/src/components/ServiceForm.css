@@ -270,3 +270,75 @@ body.dark .service-form textarea {
     align-items: stretch;
   }
 }
+/* Auto Slot Generator */
+.slot-generator {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.slot-generator .form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.slot-generator .form-group.third {
+  flex: 1;
+  min-width: 120px;
+}
+
+.slot-buttons {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.reset-btn {
+  background-color: transparent;
+  border: 1px solid #ff758c;
+  color: #ff758c;
+  font-weight: 500;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.reset-btn:hover {
+  background-color: #fff0f4;
+}
+
+@media (max-width: 600px) {
+  .slot-generator .form-row {
+    flex-direction: column;
+  }
+
+  .slot-buttons {
+    flex-direction: column;
+  }
+}
+
+.service-form label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #555;
+  margin-bottom: 0.25rem;
+}
+
+body.dark .service-form label {
+  color: #ccc;
+}
+
+.time-slots-list li {
+  background-color: #fef0f2;
+  color: #ff5277;
+  font-weight: 500;
+  border: 1px solid #ffcad4;
+  transition: all 0.2s ease;
+}
+
+.remove-slot-btn:hover {
+  color: #d32f2f;
+  transform: scale(1.2);
+}
