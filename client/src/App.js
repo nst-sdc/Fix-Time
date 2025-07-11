@@ -11,6 +11,7 @@ import UserProfile from './pages/UserProfile';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import HomePage from './pages/HomePage';
+import ProviderHomePage from './pages/ProviderHomePage';
 import Services from './pages/Services';
 import HealthcareCate from './pages/categories/HealthcareCate';
 import BeautyCate from './pages/categories/BeautyCate';
@@ -122,7 +123,9 @@ function App() {
         />
         <main className="app-content">
           <Routes>
-            <Route path="/" element={<HomePage />} />
+            <Route path="/" element={
+              userProfile && userProfile.role === 'provider' ? <ProviderHomePage /> : <HomePage />
+            } />
             <Route path="/login" element={!isLoggedIn ? <AuthPage isLogin={true} setIsLoggedIn={handleLogin} /> : <Navigate to="/dashboard" />} />
             <Route path="/register" element={!isLoggedIn ? <AuthPage isLogin={false} setIsLoggedIn={handleLogin} /> : <Navigate to="/dashboard" />} />
             <Route path="/services" element={<Services />} />
