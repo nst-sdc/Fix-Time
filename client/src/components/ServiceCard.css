@@ -1,103 +1,109 @@
-.service-link {
-  text-decoration: none;
-  color: inherit;
-}
-
-.service-card {
-  background-color: white;
-  border-radius: 12px;
-  padding: 1.5rem;
+/* Overlay background for modal */
+.service-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(30, 30, 30, 0.5);
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  transition: all 0.3s ease;
-  border: 1px solid transparent;
-}
-
-body.dark .service-card {
-  background-color: #1a1a1a;
-  border-color: #333;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-}
-
-.service-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-  border-color: #f0f0f0;
-}
-
-body.dark .service-card:hover {
-  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-  border-color: #444;
-}
-
-.service-icon {
-  background: linear-gradient(135deg, #FF9A8B 0%, #FF6B8B 100%);
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
   justify-content: center;
-  color: white;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Modal content box */
+.service-modal {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 18px;
+  width: 90%;
+  max-width: 540px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+  position: relative;
+  animation: slideUp 0.4s ease;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.service-modal h2 {
+  margin-top: 0;
+  font-size: 1.8rem;
+  color: #ff6584;
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+
+/* Close button */
+.close-modal-btn {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  background: none;
+  border: none;
   font-size: 1.5rem;
-  flex-shrink: 0;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s ease;
 }
 
-.service-details {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+.close-modal-btn:hover {
+  color: #ff5e7d;
 }
 
-.service-name {
-  font-weight: 600;
-  font-size: 1.1rem;
-  color: #333;
-  margin: 0;
+/* Modal image */
+.service-modal-img {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-bottom: 1rem;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
 }
 
-body.dark .service-name {
+/* Paragraph spacing */
+.service-modal p {
+  margin: 0.5rem 0;
+  font-size: 0.95rem;
+  color: #444;
+  line-height: 1.5;
+}
+/* Know more button*/
+.know-more-btn {
+  background-color: transparent;
+  border: 1px solid #ff7eb3;
+  color: #ff7eb3;
+  padding: 0.4rem 0.9rem;
+  font-size: 0.85rem;
+  border-radius: 8px;
+  cursor: pointer;
+  margin-top: 0.6rem;
+  transition: all 0.25s ease;
+}
+
+.know-more-btn:hover {
+  background-color: #ff7eb3;
   color: #fff;
 }
 
-.book-now-btn {
-  background: linear-gradient(90deg, #FF758C, #FF7EB3);
-  color: white;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 0.5rem;
-  align-self: flex-start;
+/* Animate in */
+@keyframes slideUp {
+  from {
+    transform: translateY(40px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
-.book-now-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 10px rgba(255, 117, 140, 0.3);
+@keyframes fadeIn {
+  from {
+    background: rgba(30, 30, 30, 0);
+  }
+  to {
+    background: rgba(30, 30, 30, 0.5);
+  }
 }
-
-@media (max-width: 768px) {
-  .service-card {
-    padding: 1.2rem;
-  }
-  
-  .service-icon {
-    width: 40px;
-    height: 40px;
-    font-size: 1.2rem;
-  }
-  
-  .service-name {
-    font-size: 1rem;
-  }
-  
-  .book-now-btn {
-    padding: 0.4rem 0.8rem;
-    font-size: 0.9rem;
-  }
-} 
