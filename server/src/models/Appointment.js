@@ -11,6 +11,11 @@ const appointmentSchema = new mongoose.Schema({
     ref: 'Service',
     required: true
   },
+  providerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Provider',
+    required: true
+  },
   date: {
     type: Date,
     required: true
@@ -21,10 +26,14 @@ const appointmentSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['scheduled', 'completed', 'cancelled', 'no-show'],
-    default: 'scheduled'
+    enum: ['pending', 'confirmed', 'rejected', 'completed', 'cancelled', 'no-show'],
+    default: 'pending'
   },
   notes: {
+    type: String,
+    default: ''
+  },
+  providerNotes: {
     type: String,
     default: ''
   },
@@ -40,10 +49,23 @@ const appointmentSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  customerAddress: {
+    type: String,
+    required: true
+  },
+  bookingRequestedAt: {
+    type: Date,
+    default: Date.now
+  },
   hasReviewed: {
     type: Boolean,
     default: false
   }
 }, { timestamps: true });
+
+// Indexes for better query performance
+appointmentSchema.index({ providerId: 1, status: 1 });
+appointmentSchema.index({ userId: 1, status: 1 });
+appointmentSchema.index({ bookingRequestedAt: -1 });
 
 module.exports = mongoose.model('Appointment', appointmentSchema); 

@@ -43,8 +43,9 @@ const HomePage = () => {
                 Get Started
                 <FaArrowRight className="btn-icon" />
               </Link>
-              <button onClick={scrollToServices} className="btn btn-secondary explore-btn">
+              <button onClick={scrollToServices} className="btn btn-primary explore-btn-pink">
                 Explore Services
+                <FaArrowRight className="btn-icon" />
               </button>
             </div>
             <div className="hero-stats">

@@ -26,6 +26,11 @@ const serviceSchema = new mongoose.Schema({
     min: 5, 
     comment: 'Duration in minutes' 
   },
+  providerId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Provider',
+    required: true
+  },
   provider: {
     type: String,
     default: ''
@@ -50,6 +55,11 @@ const serviceSchema = new mongoose.Schema({
     type: Boolean, 
     default: true 
   },
+  isActive: {
+    type: Boolean,
+    default: true,
+    comment: 'Service availability for booking'
+  },
   avgRating: { 
     type: Number, 
     default: 0,
@@ -61,5 +71,10 @@ const serviceSchema = new mongoose.Schema({
     default: 0 
   }
 }, { timestamps: true });
+
+// Indexes for better query performance
+serviceSchema.index({ providerId: 1, isActive: 1 });
+serviceSchema.index({ category: 1, available: 1 });
+serviceSchema.index({ name: 1 });
 
 module.exports = mongoose.model('Service', serviceSchema); 

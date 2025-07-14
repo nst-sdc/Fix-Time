@@ -14,7 +14,7 @@
   --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.1);
-  --transition: all 0.3s ease;
+  --transition: all 0.1s ease;
 }
 
 /* Dark Mode Variables */
@@ -104,13 +104,23 @@ body.dark .btn-secondary:hover {
   font-size: 1.1rem;
 }
 
+/* Custom pink gradient for Explore Services button */
+.explore-btn-pink {
+  background: linear-gradient(90deg, #FF758C, #FF7EB3) !important;
+  box-shadow: 0 8px 15px rgba(255, 117, 140, 0.2) !important;
+}
+
+.explore-btn-pink:hover {
+  box-shadow: 0 10px 25px rgba(255, 117, 140, 0.3) !important;
+}
+
 /* Hero Section */
 .hero-section {
   position: relative;
   padding: 120px 0 160px;
   background-color: #ffffff;
   overflow: hidden;
-  transition: var(--transition);
+  transition: all 0.1s ease;
 }
 
 body.dark .hero-section {
@@ -867,20 +877,6 @@ body.dark .cta-content {
   }
 }
 
-.explore-btn {
-  background: linear-gradient(90deg, #FF758C, #FF7EB3) !important;
-  color: white !important;
-  font-weight: 600 !important;
-  box-shadow: 0 6px 18px rgba(255, 117, 140, 0.25) !important;
-  transition: transform 0.2s ease, box-shadow 0.2s ease !important;
-  border: none !important;
-}
-
-.explore-btn:hover {
-  transform: translateY(-3px) !important;
-  box-shadow: 0 8px 25px rgba(255, 117, 140, 0.35) !important;
-}
-
 /* Add ID for Services section to target with scroll */
 #explore-services-section {
   padding-top: 2rem;
@@ -983,11 +979,6 @@ body.dark .section-title {
 
 body.dark .text-accent {
   -webkit-text-fill-color: transparent !important;
-}
-
-body.dark .explore-btn {
-  background: linear-gradient(90deg, #FF758C, #FF7EB3) !important;
-  color: white !important;
 }
 
 /* Ensure "Explore Our Services" heading is visible in dark mode */

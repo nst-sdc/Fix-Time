@@ -62,6 +62,18 @@ body.dark {
   background-color: var(--background-color);
 }
 
+/* Fast dark mode transitions - disable transitions for instant theme switching */
+body.dark *,
+body.light * {
+  transition: none !important;
+}
+
+/* Keep hover transitions for interactive elements */
+body.dark *:hover,
+body.light *:hover {
+  transition: all 0.2s ease !important;
+}
+
 body.dark .App {
   background-color: var(--background-color);
   color: var(--text-color);
@@ -213,7 +225,7 @@ body {
   color: var(--text-color);
   background-color: var(--background-color);
   line-height: 1.5;
-  transition: all 0.3s ease;
+  transition: all 0.1s ease;
 }
 
 .App {
@@ -222,13 +234,13 @@ body {
   min-height: 100vh;
   background-color: var(--background-color);
   color: var(--text-color);
-  transition: all 0.3s ease;
+  transition: all 0.1s ease;
 }
 
 .app-content {
   flex: 1;
   background-color: var(--background-color);
-  transition: all 0.3s ease;
+  transition: all 0.1s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {

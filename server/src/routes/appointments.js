@@ -12,7 +12,12 @@ router.post('/', appointmentController.createAppointment);
 // Get all appointments for logged-in user
 router.get('/', appointmentController.getUserAppointments);
 
-// Update appointment status
+// Provider-specific routes
+router.get('/provider', appointmentController.getProviderAppointments);
+router.patch('/:id/provider-status', appointmentController.updateProviderAppointmentStatus);
+router.get('/:id/customer-details', appointmentController.getCustomerDetails);
+
+// Update appointment status (for customers)
 router.patch('/:id/status', appointmentController.updateAppointmentStatus);
 
 // Delete an appointment

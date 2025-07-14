@@ -19,6 +19,7 @@ const reviewRoutes = require('./routes/reviews');
 const appointmentRoutes = require('./routes/appointments');
 const serviceRoutes = require('./routes/services');
 const providerRoutes = require('./routes/providers');
+const notificationRoutes = require('./routes/notifications');
 
 // Setup routes
 app.use('/auth', authRoutes);
@@ -26,6 +27,7 @@ app.use('/reviews', reviewRoutes);
 app.use('/appointments', appointmentRoutes);
 app.use('/services', serviceRoutes);
 app.use('/providers', providerRoutes);
+app.use('/notifications', notificationRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
