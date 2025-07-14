@@ -1,7 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './Dashboard.css';
-import { FaUser, FaCalendarAlt, FaClock, FaHistory, FaAngleDown, FaAngleUp, FaEnvelope, FaCalendarDay } from 'react-icons/fa';
+import {
+  FaUser, FaCalendarAlt, FaClock, FaHistory,
+  FaAngleDown, FaAngleUp, FaEnvelope, FaCalendarDay
+} from 'react-icons/fa';
 import AppointmentDetails from '../components/AppointmentDetails';
 import axios from 'axios';
 
@@ -23,31 +26,53 @@ const Dashboard = ({ userProfile, setUserProfile }) => {
           setLoading(false);
           return;
         }
+
         const response = await axios.get('http://localhost:5001/appointments', {
           headers: { Authorization: `Bearer ${token}` }
         });
+
         if (response.data.success) {
-          const validAppointments = response.data.appointments.filter(appt => appt.serviceName !== 'Unknown Service');
           const now = new Date();
-          const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-          setUpcomingAppointments(validAppointments.filter(appt => {
+          const appointments = response.data.appointments.map(appt => {
+            // Combine date and time to get full appointment datetime
+            const [time, meridian] = appt.time.split(' ');
+            let [hours, minutes] = time.split(':').map(Number);
+            if (meridian === 'PM' && hours !== 12) hours += 12;
+            if (meridian === 'AM' && hours === 12) hours = 0;
+
+            const apptDateTime = new Date(appt.date);
+            apptDateTime.setHours(hours);
+            apptDateTime.setMinutes(minutes);
+            apptDateTime.setSeconds(0);
+
+            if (apptDateTime < now && appt.status === 'confirmed') {
+              return { ...appt, status: 'completed' };
+            }
+
+            return appt;
+          });
+
+          setUpcomingAppointments(appointments.filter(appt => {
             const apptDate = new Date(appt.date);
-            return apptDate >= today && ['scheduled', 'confirmed', 'in-progress'].includes(appt.status);
+            return new Date(appt.date) >= new Date().setHours(0,0,0,0)
+              && ['scheduled', 'confirmed', 'in-progress'].includes(appt.status);
           }));
-          setPastAppointments(validAppointments.filter(appt => {
+
+          setPastAppointments(appointments.filter(appt => {
             const apptDate = new Date(appt.date);
-            // Past if before today, or if status is completed/cancelled/no-show (even if in the future)
-            return apptDate < today || ['completed', 'cancelled', 'no-show'].includes(appt.status);
+            return new Date(appt.date) < new Date().setHours(0,0,0,0)
+              || ['completed', 'cancelled', 'no-show'].includes(appt.status);
           }));
         } else {
-          setError('Failed to fetch appointments');
+          setError('Failed to fetch appointments.');
         }
       } catch (err) {
-        setError('Failed to load appointments');
+        setError('Error loading appointments.');
       } finally {
         setLoading(false);
       }
     };
+
     fetchAppointments();
   }, []);
 
@@ -63,96 +88,79 @@ const Dashboard = ({ userProfile, setUserProfile }) => {
       </div>
 
       <div className="dashboard-content">
+
+        {/* User Profile Panel */}
         <div className="dashboard-panel user-profile-panel">
           <div className="panel-header">
             <FaUser className="panel-icon" />
             <h2>User Profile</h2>
           </div>
-          
           <div className="profile-details">
-            <div className="profile-avatar-large">
-              <FaUser />
-            </div>
-            
+            <div className="profile-avatar-large"><FaUser /></div>
             <div className="profile-info-container">
               <div className="profile-info-item">
                 <span className="info-label"><FaEnvelope /> Email:</span>
                 <span className="info-value">{userProfile.email}</span>
               </div>
-              
               <div className="profile-info-item">
                 <span className="info-label"><FaCalendarDay /> Member Since:</span>
                 <span className="info-value">
-                  {userProfile.createdAt 
-                    ? new Date(userProfile.createdAt).toLocaleDateString('en-US', {
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric'
-                      }) 
-                    : 'N/A'}
+                  {userProfile.createdAt ? new Date(userProfile.createdAt).toLocaleDateString() : 'N/A'}
                 </span>
               </div>
             </div>
           </div>
         </div>
-        
+
+        {/* Upcoming Appointments */}
         <div className="dashboard-panel upcoming-appointments">
           <div className="panel-header">
             <FaCalendarAlt className="panel-icon" />
             <h2>Upcoming Appointments</h2>
-            <Link to="/calendar" className="view-calendar-link">
-              View Calendar
-            </Link>
+            <Link to="/calendar" className="view-calendar-link">View Calendar</Link>
           </div>
-          
           {loading ? (
             <div className="loading-state">Loading appointments...</div>
           ) : upcomingAppointments.length > 0 ? (
             <div className="appointments-list">
-              {upcomingAppointments.map(appointment => (
-                <AppointmentDetails 
-                  key={appointment._id} 
-                  appointment={appointment} 
-                />
+              {upcomingAppointments.map(appt => (
+                <AppointmentDetails key={appt._id} appointment={appt} />
               ))}
             </div>
           ) : (
-          <div className="empty-state">
-            <FaClock className="empty-icon" />
-            <p>You don't have any upcoming appointments.</p>
+            <div className="empty-state">
+              <FaClock className="empty-icon" />
+              <p>No upcoming appointments.</p>
               <Link to="/services" className="book-btn">Book Now</Link>
-          </div>
+            </div>
           )}
         </div>
-        
+
+        {/* Past Appointments */}
         <div className="dashboard-panel appointment-history">
           <div className="panel-header" onClick={() => setExpandHistory(!expandHistory)}>
             <div className="header-content">
-            <FaHistory className="panel-icon" />
-            <h2>Appointment History</h2>
+              <FaHistory className="panel-icon" />
+              <h2>Appointment History</h2>
             </div>
             <div className="expand-icon">
               {expandHistory ? <FaAngleUp /> : <FaAngleDown />}
             </div>
           </div>
-          
           {expandHistory && (
             <>
               {loading ? (
                 <div className="loading-state">Loading history...</div>
               ) : pastAppointments.length > 0 ? (
                 <div className="appointments-list">
-                  {pastAppointments.map(appointment => (
-                    <AppointmentDetails 
-                      key={appointment._id} 
-                      appointment={appointment} 
-                    />
+                  {pastAppointments.map(appt => (
+                    <AppointmentDetails key={appt._id} appointment={appt} />
                   ))}
                 </div>
               ) : (
-          <div className="empty-state">
-            <p>You don't have any past appointments.</p>
-          </div>
+                <div className="empty-state">
+                  <p>No past appointments.</p>
+                </div>
               )}
             </>
           )}
@@ -162,4 +170,4 @@ const Dashboard = ({ userProfile, setUserProfile }) => {
   );
 };
 
-export default Dashboard; 
+export default Dashboard;

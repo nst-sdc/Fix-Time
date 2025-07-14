@@ -1,239 +1,498 @@
 import React, { useState } from 'react';
 import './MyServices.css';
-import { FaEye, FaEdit, FaTrash, FaList, FaFilter, FaSort } from 'react-icons/fa';
+import { FaBell, FaCalendarAlt, FaUser, FaStar, FaEdit, FaTrash, FaPlus, FaChartPie, FaChartBar, FaEnvelope, FaFlag, FaUsers, FaClock, FaToggleOn, FaToggleOff } from 'react-icons/fa';
 
-// Mock data for demonstration
+// --- Mock Data ---
+const mockBookings = [
+  { id: 1, name: 'Alice Smith', date: '2024-07-15', time: '10:00', service: 'Haircut', status: 'Confirmed' },
+  { id: 2, name: 'Bob Lee', date: '2024-07-15', time: '12:00', service: 'Yoga', status: 'Pending' },
+  { id: 3, name: 'Charlie Kim', date: '2024-07-14', time: '09:00', service: 'Car Wash', status: 'No-show' },
+  { id: 4, name: 'Dana White', date: '2024-07-13', time: '15:00', service: 'Haircut', status: 'Cancelled' },
+];
 const mockServices = [
-  {
-    id: 1,
-    name: 'Haircut & Styling',
-    category: 'Salon',
-    bookings: 12,
-    description: 'Professional haircut and styling for all hair types.',
-  },
-  {
-    id: 2,
-    name: 'Yoga Class',
-    category: 'Fitness',
-    bookings: 8,
-    description: 'Group yoga sessions for all levels.',
-  },
-  {
-    id: 3,
-    name: 'Car Wash',
-    category: 'Automobile',
-    bookings: 5,
-    description: 'Exterior and interior car cleaning service.',
-  },
+  { id: 1, name: 'Haircut', duration: 30, cost: 25, status: true, category: 'Salon', buffer: 10 },
+  { id: 2, name: 'Yoga', duration: 60, cost: 15, status: true, category: 'Fitness', buffer: 5 },
+  { id: 3, name: 'Car Wash', duration: 45, cost: 20, status: false, category: 'Automobile', buffer: 15 },
+];
+const mockNotifications = [
+  { id: 1, type: 'booking', text: 'New booking from Alice Smith', unread: true },
+  { id: 2, type: 'cancel', text: 'Booking cancelled by Dana White', unread: true },
+  { id: 3, type: 'feedback', text: 'New feedback from Bob Lee', unread: false },
+  { id: 4, type: 'system', text: 'System maintenance on July 20', unread: true },
+];
+const mockAnalytics = {
+  weeklyBookings: 18,
+  monthlyBookings: 72,
+  revenue: 1200,
+  mostBooked: 'Haircut',
+  repeatCustomers: 8,
+  pie: [
+    { label: 'Haircut', value: 40, color: '#6C8AE4' },
+    { label: 'Yoga', value: 25, color: '#A3B8D8' },
+    { label: 'Car Wash', value: 35, color: '#BFD7ED' },
+  ],
+  bar: [
+    { label: 'Week 1', value: 15 },
+    { label: 'Week 2', value: 18 },
+    { label: 'Week 3', value: 20 },
+    { label: 'Week 4', value: 19 },
+  ],
+};
+const mockCustomers = [
+  { id: 1, name: 'Alice Smith', contact: 'alice@email.com', history: 5 },
+  { id: 2, name: 'Bob Lee', contact: 'bob@email.com', history: 3 },
+  { id: 3, name: 'Charlie Kim', contact: 'charlie@email.com', history: 2 },
+];
+const mockReviews = [
+  { id: 1, service: 'Haircut', name: 'Alice Smith', rating: 5, text: 'Great service!', date: '2024-07-10' },
+  { id: 2, service: 'Yoga', name: 'Bob Lee', rating: 4, text: 'Very relaxing.', date: '2024-07-09' },
+  { id: 3, service: 'Car Wash', name: 'Charlie Kim', rating: 3, text: 'Good, but a bit slow.', date: '2024-07-08' },
+];
+const mockProfile = {
+  name: 'Naman’s Salon',
+  logo: '',
+  description: 'Professional salon and wellness services.',
+  address: '123 Main St, City',
+  tags: ['Salon', 'Wellness', 'Haircut'],
+  contact: '+1 234 567 890',
+};
+const mockCoupons = [
+  { id: 1, name: 'SUMMER10', amount: 10, type: '%', expiry: '2024-08-01', used: 5 },
+  { id: 2, name: 'WELCOME5', amount: 5, type: '$', expiry: '2024-12-31', used: 12 },
+];
+const mockTeam = [
+  { id: 1, name: 'Priya', role: 'Stylist', services: ['Haircut'], performance: 4.8 },
+  { id: 2, name: 'Rahul', role: 'Yoga Trainer', services: ['Yoga'], performance: 4.6 },
 ];
 
-const categories = ['All', ...Array.from(new Set(mockServices.map(s => s.category)))];
-
-const MyServices = () => {
-  const [services, setServices] = useState(mockServices);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterCategory, setFilterCategory] = useState('All');
-  const [sortBy, setSortBy] = useState('name');
-  const [selectedService, setSelectedService] = useState(null);
-  const [showDetails, setShowDetails] = useState(false);
-
-  // Stats
-  const totalServices = services.length;
-  const totalBookings = services.reduce((sum, s) => sum + s.bookings, 0);
-
-  // Filter, search, sort
-  const filteredServices = services
-    .filter(s => filterCategory === 'All' || s.category === filterCategory)
-    .filter(s =>
-      s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.description.toLowerCase().includes(searchTerm.toLowerCase())
-    )
-    .sort((a, b) => {
-      if (sortBy === 'name') return a.name.localeCompare(b.name);
-      if (sortBy === 'bookings') return b.bookings - a.bookings;
-      return 0;
-    });
-
-  // Modal handlers
-  const openDetails = (service) => {
-    setSelectedService(service);
-    setShowDetails(true);
-  };
-  const closeDetails = () => {
-    setShowDetails(false);
-    setSelectedService(null);
-  };
-
-  // Delete with confirmation
-  const handleDelete = (id) => {
-    if (window.confirm('Are you sure you want to delete this service?')) {
-      setServices(prev => prev.filter(s => s.id !== id));
-      closeDetails();
-    }
-  };
-
+// --- Section 1: Booking Dashboard ---
+function BookingDashboard() {
+  const [filter, setFilter] = useState('Upcoming');
+  const filters = ['Upcoming', 'Today', 'Past', 'Cancelled'];
+  const filtered = mockBookings.filter(b =>
+    filter === 'Upcoming' ? b.status === 'Confirmed' :
+    filter === 'Today' ? b.date === '2024-07-15' :
+    filter === 'Past' ? b.status === 'No-show' :
+    filter === 'Cancelled' ? b.status === 'Cancelled' : true
+  );
+  // Simple calendar: just show days with bookings
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    return d;
+  });
   return (
-    <div className="my-services-container">
-      <div className="my-services-card">
-        <div className="my-services-header">
-          <div className="header-content">
-            <h1 className="page-title">My Services</h1>
-            <p className="page-subtitle">Manage and track all your offered services</p>
-          </div>
-          <div className="stats-overview">
-            <div className="stat-item">
-              <span className="stat-number">{totalServices}</span>
-              <span className="stat-label">Total</span>
-            </div>
-            <div className="stat-item">
-              <span className="stat-number">{totalBookings}</span>
-              <span className="stat-label">Bookings</span>
-            </div>
-          </div>
-          <button className="add-service-btn">+ Add New Service</button>
-        </div>
-
-        <div className="controls-section">
-          <div className="search-section">
-            <div className="search-input-group">
-              <input
-                type="text"
-                placeholder="Search services..."
-                value={searchTerm}
-                onChange={e => setSearchTerm(e.target.value)}
-                className="search-input"
-              />
-              <button
-                className="clear-search-btn"
-                onClick={() => setSearchTerm('')}
-                style={{ display: searchTerm ? 'block' : 'none' }}
-              >
-                ×
-              </button>
-            </div>
-          </div>
-          <div className="filter-controls">
-            <div className="filter-group">
-              <FaFilter className="filter-icon" />
-              <select
-                value={filterCategory}
-                onChange={e => setFilterCategory(e.target.value)}
-                className="filter-select"
-              >
-                {categories.map(cat => (
-                  <option key={cat} value={cat}>{cat}</option>
-                ))}
-              </select>
-            </div>
-            <div className="sort-group">
-              <FaSort className="sort-icon" />
-              <select
-                value={sortBy}
-                onChange={e => setSortBy(e.target.value)}
-                className="sort-select"
-              >
-                <option value="name">Sort by Name</option>
-                <option value="bookings">Sort by Bookings</option>
-              </select>
-            </div>
-          </div>
-        </div>
-
-        {filteredServices.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">
-              <FaList />
-            </div>
-            <h3>No services found</h3>
-            <p>
-              {services.length === 0
-                ? "You don't have any services yet. Add your first service to get started!"
-                : `No services match your search or filter.`}
-            </p>
-            <button className="add-service-btn">+ Add New Service</button>
-          </div>
-        ) : (
-          <div className="services-grid">
-            {filteredServices.map(service => (
-              <div
-                className="service-card-provider"
-                key={service.id}
-                onClick={() => openDetails(service)}
-              >
-                <div className="service-card-header">
-                  <h2>{service.name}</h2>
-                  <span className="service-category">{service.category}</span>
-                </div>
-                <p className="service-description">{service.description}</p>
-                <div className="service-card-footer">
-                  <span className="service-bookings">Bookings: {service.bookings}</span>
-                  <div className="service-actions">
-                    <button className="view-details-btn">
-                      <FaEye /> View Details
-                    </button>
-                    <button className="edit-btn" onClick={e => { e.stopPropagation(); /* handle edit */ }}>
-                      <FaEdit /> Edit
-                    </button>
-                    <button className="delete-btn" onClick={e => { e.stopPropagation(); handleDelete(service.id); }}>
-                      <FaTrash /> Delete
-                    </button>
-                    <button className="view-bookings-btn" onClick={e => { e.stopPropagation(); /* handle view bookings */ }}>
-                      <FaList /> View Bookings
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+    <section className="section booking-dashboard">
+      <h2>Booking Dashboard</h2>
+      <div className="booking-filters">
+        {filters.map(f => (
+          <button key={f} className={filter === f ? 'active' : ''} onClick={() => setFilter(f)}>{f}</button>
+        ))}
       </div>
-
-      {/* Service Details Modal */}
-      {showDetails && selectedService && (
-        <div className="modal-overlay" onClick={closeDetails}>
-          <div className="modal-content" onClick={e => e.stopPropagation()}>
-            <div className="modal-header">
-              <h2>{selectedService.name}</h2>
-            </div>
-            <div className="modal-body">
-              <div className="detail-section">
-                <h3>Service Details</h3>
-                <div className="detail-grid">
-                  <div className="detail-row">
-                    <span className="detail-label">Category:</span>
-                    <span className="detail-value">{selectedService.category}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Bookings:</span>
-                    <span className="detail-value">{selectedService.bookings}</span>
-                  </div>
-                  <div className="detail-row">
-                    <span className="detail-label">Description:</span>
-                    <span className="detail-value">{selectedService.description}</span>
-                  </div>
-                </div>
+      {filtered.length === 0 ? (
+        <div className="empty-state">
+          <h3>No Bookings</h3>
+          <p>You have no bookings in this category.</p>
+        </div>
+      ) : (
+        <div className="booking-cards">
+          {filtered.map(b => (
+            <div className={`booking-card status-${b.status.toLowerCase()}`} key={b.id}>
+              <div className="booking-card-header">
+                <span className="booking-name">{b.name}</span>
+                <span className={`booking-status ${b.status.toLowerCase()}`}>{b.status}</span>
+              </div>
+              <div className="booking-card-body">
+                <span>{b.service}</span>
+                <span>{b.date} {b.time}</span>
+              </div>
+              <div className="booking-card-actions">
+                <button>View</button>
+                <button>Message</button>
               </div>
             </div>
-            <div className="modal-footer">
-              <button className="edit-btn" onClick={() => {/* handle edit */}}>
-                <FaEdit /> Edit
-              </button>
-              <button className="delete-btn" onClick={() => handleDelete(selectedService.id)}>
-                <FaTrash /> Delete
-              </button>
-              <button className="view-bookings-btn" onClick={() => {/* handle view bookings */}}>
-                <FaList /> View Bookings
-              </button>
-              <button className="close-modal-btn" onClick={closeDetails}>
-                Close
-              </button>
+          ))}
+        </div>
+      )}
+      <div className="calendar-mini">
+        <FaCalendarAlt className="calendar-icon" />
+        <div className="calendar-days">
+          {days.map((d, i) => (
+            <div key={i} className={`calendar-day${mockBookings.some(b => b.date === d.toISOString().slice(0,10)) ? ' booked' : ''}`}>
+              {d.getDate()}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// --- Section 2: Service Management Panel ---
+function ServiceManagement() {
+  const [services, setServices] = useState(mockServices);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ name: '', duration: '', cost: '', category: '', buffer: '' });
+  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleAdd = e => {
+    e.preventDefault();
+    setServices([...services, { ...form, id: Date.now(), status: true }]);
+    setForm({ name: '', duration: '', cost: '', category: '', buffer: '' });
+    setShowForm(false);
+  };
+  const handleToggle = id => setServices(services.map(s => s.id === id ? { ...s, status: !s.status } : s));
+  const handleDelete = id => setServices(services.filter(s => s.id !== id));
+  return (
+    <section className="section service-management">
+      <h2>Service Management</h2>
+      <div className="service-list">
+        {services.map(s => (
+          <div className={`service-item${s.status ? '' : ' inactive'}`} key={s.id}>
+            <div className="service-info">
+              <span className="service-name">{s.name}</span>
+              <span className="service-meta">{s.duration} min | ${s.cost} | {s.category}</span>
+              <span className="service-buffer">Buffer: {s.buffer} min</span>
+            </div>
+            <div className="service-actions">
+              <button onClick={() => handleToggle(s.id)}>{s.status ? <FaToggleOn /> : <FaToggleOff />}</button>
+              <button onClick={() => {}}><FaEdit /></button>
+              <button onClick={() => handleDelete(s.id)}><FaTrash /></button>
+            </div>
+          </div>
+        ))}
+      </div>
+      <button className="add-btn" onClick={() => setShowForm(!showForm)}><FaPlus /> Add New Service</button>
+      {showForm && (
+        <form className="service-form" onSubmit={handleAdd}>
+          <input name="name" placeholder="Service Name" value={form.name} onChange={handleChange} required />
+          <input name="duration" placeholder="Duration (min)" value={form.duration} onChange={handleChange} required />
+          <input name="cost" placeholder="Cost ($)" value={form.cost} onChange={handleChange} required />
+          <input name="category" placeholder="Category" value={form.category} onChange={handleChange} required />
+          <input name="buffer" placeholder="Buffer Time (min)" value={form.buffer} onChange={handleChange} required />
+          <button type="submit">Add Service</button>
+        </form>
+      )}
+    </section>
+  );
+}
+
+// --- Section 3: Availability & Schedule Settings ---
+function AvailabilitySettings() {
+  const [availability, setAvailability] = useState({
+    Mon: { enabled: true, slots: ['09:00-12:00', '14:00-18:00'] },
+    Tue: { enabled: true, slots: ['09:00-12:00', '14:00-18:00'] },
+    Wed: { enabled: true, slots: ['09:00-12:00', '14:00-18:00'] },
+    Thu: { enabled: true, slots: ['09:00-12:00', '14:00-18:00'] },
+    Fri: { enabled: true, slots: ['09:00-12:00', '14:00-18:00'] },
+    Sat: { enabled: false, slots: [] },
+    Sun: { enabled: false, slots: [] },
+  });
+  const [holidays, setHolidays] = useState(['2024-07-20']);
+  const [breaks, setBreaks] = useState(['12:00-13:00']);
+  const days = Object.keys(availability);
+  const toggleDay = d => setAvailability({ ...availability, [d]: { ...availability[d], enabled: !availability[d].enabled } });
+  return (
+    <section className="section availability-settings">
+      <h2>Availability & Schedule</h2>
+      <div className="availability-days">
+        {days.map(d => (
+          <div key={d} className={`day-row${availability[d].enabled ? '' : ' off'}`}>
+            <span>{d}</span>
+            <button onClick={() => toggleDay(d)}>{availability[d].enabled ? <FaToggleOn /> : <FaToggleOff />}</button>
+            <span className="slots">{availability[d].slots.join(', ')}</span>
+          </div>
+        ))}
+      </div>
+      <div className="availability-extras">
+        <div>
+          <strong>Holidays:</strong> {holidays.join(', ')}
+        </div>
+        <div>
+          <strong>Breaks:</strong> {breaks.join(', ')}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// --- Section 4: Notifications Panel ---
+function NotificationsPanel() {
+  const [open, setOpen] = useState(false);
+  const unread = mockNotifications.filter(n => n.unread).length;
+  return (
+    <div className="notifications-panel">
+      <button
+        className={`bell-btn${open ? ' active' : ''}`}
+        onClick={() => setOpen(true)}
+        title="Notifications"
+        aria-label="Show notifications"
+      >
+        <FaBell />
+        {unread > 0 && <span className="notif-count">{unread}</span>}
+      </button>
+      {open && (
+        <div className="notif-modal-overlay" onClick={() => setOpen(false)}>
+          <div className="notif-modal-grid" onClick={e => e.stopPropagation()}>
+            <button className="notif-close-btn" onClick={() => setOpen(false)} aria-label="Close notifications">&times;</button>
+            <h3>Notifications</h3>
+            <div className="notif-grid">
+              {mockNotifications.length === 0 ? (
+                <div className="notif-empty">No notifications</div>
+              ) : (
+                mockNotifications.map(n => (
+                  <div key={n.id} className={`notif-item${n.unread ? ' unread' : ''}`}>{n.text}</div>
+                ))
+              )}
             </div>
           </div>
         </div>
       )}
     </div>
   );
-};
+}
 
-export default MyServices; 
+// --- Section 5: Analytics & Insights ---
+function AnalyticsInsights() {
+  return (
+    <section className="section analytics-insights">
+      <h2>Analytics & Insights</h2>
+      <div className="analytics-cards">
+        <div className="analytics-item">
+          <span>Total Bookings (Month)</span>
+          <strong>{mockAnalytics.monthlyBookings}</strong>
+        </div>
+        <div className="analytics-item">
+          <span>Total Revenue</span>
+          <strong>${mockAnalytics.revenue}</strong>
+        </div>
+        <div className="analytics-item">
+          <span>Most Booked</span>
+          <strong>{mockAnalytics.mostBooked}</strong>
+        </div>
+        <div className="analytics-item">
+          <span>Repeat Customers</span>
+          <strong>{mockAnalytics.repeatCustomers}</strong>
+        </div>
+      </div>
+      <div className="charts-row">
+        <div className="pie-chart">
+          <svg width="120" height="120" viewBox="0 0 32 32">
+            {(() => {
+              let acc = 0;
+              return mockAnalytics.pie.map((slice, i) => {
+                const val = slice.value / 100 * 100;
+                const dash = `${val} ${100 - val}`;
+                const el = <circle key={i} r="16" cx="16" cy="16" fill="transparent" stroke={slice.color} strokeWidth="8" strokeDasharray={dash} strokeDashoffset={-acc} />;
+                acc -= val;
+                return el;
+              });
+            })()}
+          </svg>
+          <div className="pie-legend">
+            {mockAnalytics.pie.map((slice, i) => (
+              <span key={i} style={{ color: slice.color }}>{slice.label}</span>
+            ))}
+          </div>
+        </div>
+        <div className="bar-chart">
+          <svg width="120" height="80">
+            {mockAnalytics.bar.map((bar, i) => (
+              <rect key={i} x={i*25+10} y={80-bar.value*3} width="18" height={bar.value*3} fill="#6C8AE4" rx="4" />
+            ))}
+          </svg>
+          <div className="bar-legend">
+            {mockAnalytics.bar.map((bar, i) => (
+              <span key={i}>{bar.label}</span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// --- Section 6: Customer Management ---
+function CustomerManagement() {
+  return (
+    <section className="section customer-management">
+      <h2>Customer Management</h2>
+      <div className="customer-list">
+        {mockCustomers.map(c => (
+          <div className="customer-item" key={c.id}>
+            <div className="customer-info">
+              <span className="customer-name">{c.name}</span>
+              <span className="customer-contact">{c.contact}</span>
+              <span className="customer-history">Past bookings: {c.history}</span>
+            </div>
+            <div className="customer-actions">
+              <button><FaEnvelope /></button>
+              <button><FaEdit /></button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// --- Section 7: Ratings & Feedback ---
+function RatingsFeedback() {
+  return (
+    <section className="section ratings-feedback">
+      <h2>Ratings & Feedback</h2>
+      <div className="reviews-list">
+        {mockReviews.map(r => (
+          <div className="review-item" key={r.id}>
+            <div className="review-header">
+              <span className="review-name">{r.name}</span>
+              <span className="review-service">({r.service})</span>
+              <span className="review-date">{r.date}</span>
+            </div>
+            <div className="review-rating">
+              {[...Array(5)].map((_, i) => <FaStar key={i} className={i < r.rating ? 'star filled' : 'star'} />)}
+            </div>
+            <div className="review-text">{r.text}</div>
+            <div className="review-actions">
+              <button><FaEdit /> Respond</button>
+              <button><FaFlag /> Report</button>
+            </div>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+// --- Section 8: Profile Customization ---
+function ProfileCustomization() {
+  const [profile, setProfile] = useState(mockProfile);
+  const handleChange = e => setProfile({ ...profile, [e.target.name]: e.target.value });
+  return (
+    <section className="section profile-customization">
+      <h2>Profile Customization</h2>
+      <form className="profile-form">
+        <div className="profile-row">
+          <label>Business Name</label>
+          <input name="name" value={profile.name} onChange={handleChange} />
+        </div>
+        <div className="profile-row">
+          <label>Logo</label>
+          <input type="file" accept="image/*" />
+        </div>
+        <div className="profile-row">
+          <label>Description</label>
+          <textarea name="description" value={profile.description} onChange={handleChange} />
+        </div>
+        <div className="profile-row">
+          <label>Location</label>
+          <input name="address" value={profile.address} onChange={handleChange} />
+        </div>
+        <div className="profile-row">
+          <label>Tags</label>
+          <input name="tags" value={profile.tags.join(', ')} onChange={e => setProfile({ ...profile, tags: e.target.value.split(',').map(t => t.trim()) })} />
+        </div>
+        <div className="profile-row">
+          <label>Contact Info</label>
+          <input name="contact" value={profile.contact} onChange={handleChange} />
+        </div>
+      </form>
+    </section>
+  );
+}
+
+// --- Section 9: Promotions & Coupons ---
+function PromotionsCoupons() {
+  const [coupons, setCoupons] = useState(mockCoupons);
+  const [form, setForm] = useState({ name: '', amount: '', type: '%', expiry: '' });
+  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleAdd = e => {
+    e.preventDefault();
+    setCoupons([...coupons, { ...form, id: Date.now(), used: 0 }]);
+    setForm({ name: '', amount: '', type: '%', expiry: '' });
+  };
+  return (
+    <section className="section promotions-coupons">
+      <h2>Promotions & Coupons</h2>
+      <div className="coupons-list">
+        {coupons.map(c => (
+          <div className="coupon-item" key={c.id}>
+            <span className="coupon-name">{c.name}</span>
+            <span className="coupon-amount">{c.amount}{c.type}</span>
+            <span className="coupon-expiry">Exp: {c.expiry}</span>
+            <span className="coupon-used">Used: {c.used}</span>
+            <button onClick={() => {}}><FaEdit /></button>
+            <button onClick={() => setCoupons(coupons.filter(x => x.id !== c.id))}><FaTrash /></button>
+          </div>
+        ))}
+      </div>
+      <form className="coupon-form" onSubmit={handleAdd}>
+        <input name="name" placeholder="Coupon Name" value={form.name} onChange={handleChange} required />
+        <input name="amount" placeholder="Amount" value={form.amount} onChange={handleChange} required />
+        <select name="type" value={form.type} onChange={handleChange}>
+          <option value="%">%</option>
+          <option value="$">$</option>
+        </select>
+        <input name="expiry" placeholder="Expiry (YYYY-MM-DD)" value={form.expiry} onChange={handleChange} required />
+        <button type="submit"><FaPlus /> Add Coupon</button>
+      </form>
+    </section>
+  );
+}
+
+// --- Section 10: Team Access ---
+function TeamAccess() {
+  const [team, setTeam] = useState(mockTeam);
+  const [form, setForm] = useState({ name: '', role: '', services: '', performance: '' });
+  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
+  const handleAdd = e => {
+    e.preventDefault();
+    setTeam([...team, { ...form, id: Date.now(), services: form.services.split(',').map(s => s.trim()) }]);
+    setForm({ name: '', role: '', services: '', performance: '' });
+  };
+  return (
+    <section className="section team-access">
+      <h2>Team Access</h2>
+      <div className="team-list">
+        {team.map(m => (
+          <div className="team-item" key={m.id}>
+            <div className="team-info">
+              <span className="team-name">{m.name}</span>
+              <span className="team-role">{m.role}</span>
+              <span className="team-services">{m.services.join(', ')}</span>
+              <span className="team-performance">Performance: {m.performance}</span>
+            </div>
+            <button onClick={() => {}}><FaEdit /></button>
+            <button onClick={() => setTeam(team.filter(x => x.id !== m.id))}><FaTrash /></button>
+          </div>
+        ))}
+      </div>
+      <form className="team-form" onSubmit={handleAdd}>
+        <input name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
+        <input name="role" placeholder="Role" value={form.role} onChange={handleChange} required />
+        <input name="services" placeholder="Services (comma separated)" value={form.services} onChange={handleChange} required />
+        <input name="performance" placeholder="Performance" value={form.performance} onChange={handleChange} required />
+        <button type="submit"><FaPlus /> Add Member</button>
+      </form>
+    </section>
+  );
+}
+
+// --- Main Page Layout ---
+export default function MyServices() {
+  return (
+    <div className="myservices-main">
+      <NotificationsPanel />
+      <div className="dashboard-grid">
+        <BookingDashboard />
+        <ServiceManagement />
+        <AvailabilitySettings />
+        <AnalyticsInsights />
+        <CustomerManagement />
+        <RatingsFeedback />
+        <ProfileCustomization />
+        <PromotionsCoupons />
+        <TeamAccess />
+      </div>
+    </div>
+  );
+} 
