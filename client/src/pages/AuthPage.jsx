@@ -30,8 +30,6 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
   const [businessLocation, setBusinessLocation] = useState('');
   const navigate = useNavigate();
 
-  const API_BASE_URL = process.env.REACT_APP_API_URL;
-
   // Calculate min and max dates for age validation (10 years minimum age)
   const calculateDateLimits = () => {
     const today = new Date();
@@ -82,7 +80,7 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
     
     try {
       setIsCheckingRole(true);
-      const response = await axios.get(`${API_BASE_URL}/auth/user-role/${email}`);
+      const response = await axios.get(`http://localhost:5001/auth/user-role/${email}`);
       if (response.data.success) {
         setLoginRole(response.data.role);
       }
@@ -182,7 +180,7 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
       
       if (isLogin) {
         // Handle login
-        const res = await axios.post(`${API_BASE_URL}/auth/login-with-role`, { 
+        const res = await axios.post('http://localhost:5001/auth/login-with-role', { 
           email, 
           password: passwd,
           role: loginRole
@@ -232,7 +230,7 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
           };
         }
 
-        await axios.post(`${API_BASE_URL}/auth/register`, registrationData);
+        await axios.post('http://localhost:5001/auth/register', registrationData);
         
         setSuccess('Registration successful! Please log in with your credentials.');
         

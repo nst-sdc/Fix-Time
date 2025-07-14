@@ -59,9 +59,7 @@ const ServiceReviews = ({ serviceId }) => {
           return;
         }
         
-        // Real API call for production
-        const API_BASE_URL = process.env.REACT_APP_API_URL;
-        const response = await axios.get(`${API_BASE_URL}/reviews/service/${serviceId}`);
+        const response = await axios.get(`http://localhost:5001/reviews/service/${serviceId}`);
         setReviews(response.data.data);
         setLoading(false);
       } catch (err) {

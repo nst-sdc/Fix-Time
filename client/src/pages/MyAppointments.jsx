@@ -50,8 +50,7 @@ const MyAppointments = () => {
         return;
       }
 
-      const API_BASE_URL = process.env.REACT_APP_API_URL;
-      const response = await axios.get(`${API_BASE_URL}/appointments`, {
+      const response = await axios.get('http://localhost:5001/appointments', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -293,9 +292,8 @@ const MyAppointments = () => {
         token: token ? 'present' : 'missing'
       });
 
-      const API_BASE_URL = process.env.REACT_APP_API_URL;
       const response = await axios.put(
-        `${API_BASE_URL}/appointments/${selectedAppointment._id}/reschedule`,
+        `http://localhost:5001/appointments/${selectedAppointment._id}/reschedule`,
         {
           date: rescheduleDate,
           time: rescheduleTime
@@ -406,9 +404,8 @@ const MyAppointments = () => {
         const token = localStorage.getItem('token');
         
         // Call API to update appointment status
-        const API_BASE_URL = process.env.REACT_APP_API_URL;
         const response = await axios.patch(
-          `${API_BASE_URL}/appointments/${id}/status`,
+          `http://localhost:5001/appointments/${id}/status`,
           { status: 'cancelled' },
           {
             headers: {

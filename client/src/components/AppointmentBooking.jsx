@@ -88,8 +88,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
         navigate('/login');
         return;
       }
-      const API_BASE_URL = process.env.REACT_APP_API_URL;
-      const userResponse = await axios.get(`${API_BASE_URL}/auth/profile`, {
+      const userResponse = await axios.get('http://localhost:5001/auth/profile', {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!userResponse.data || !userResponse.data.success || !userResponse.data.user) {
@@ -101,8 +100,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
 
       if (!finalServiceId && preSelectedService) {
         try {
-          const API_BASE_URL = process.env.REACT_APP_API_URL;
-          const servicesResponse = await axios.get(`${API_BASE_URL}/services`, {
+          const servicesResponse = await axios.get('http://localhost:5001/services', {
             params: { name: preSelectedService }
           });
           if (servicesResponse.data?.services?.length > 0) {
@@ -113,8 +111,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
         }
       }
       if (!finalServiceId) {
-        const API_BASE_URL = process.env.REACT_APP_API_URL;
-        const servicesResponse = await axios.get(`${API_BASE_URL}/services`);
+        const servicesResponse = await axios.get('http://localhost:5001/services');
         if (servicesResponse.data?.services?.length > 0) {
           finalServiceId = servicesResponse.data.services[0]._id;
         }
@@ -131,9 +128,8 @@ const AppointmentBooking = ({ serviceId = null }) => {
         customerEmail: formData.email || user.email,
         customerPhone: phoneToUse
       };
-      const API_BASE_URL = process.env.REACT_APP_API_URL;
       const response = await axios.post(
-        `${API_BASE_URL}/appointments`,
+        'http://localhost:5001/appointments',
         appointmentData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

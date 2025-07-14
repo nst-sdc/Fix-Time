@@ -63,8 +63,7 @@ function App() {
       setIsLoggedIn(true);
       const fetchUserProfile = async () => {
         try {
-          const API_BASE_URL = process.env.REACT_APP_API_URL;
-          const res = await axios.get(`${API_BASE_URL}/auth/profile`, {
+          const res = await axios.get('http://localhost:5001/auth/profile', {
             headers: {
               Authorization: `Bearer ${token}`
             }
