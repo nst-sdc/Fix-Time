@@ -55,7 +55,8 @@ const ServiceCategory = () => {
 
   const fetchDynamicServices = async () => {
     try {
-      const res = await axios.get(`http://localhost:5001/services/category/${categorySlug}`);
+      const API_BASE_URL = process.env.REACT_APP_API_URL;
+      const res = await axios.get(`${API_BASE_URL}/services/category/${categorySlug}`);
       setDynamicServices(res.data);
     } catch (err) {
       console.error("Failed to fetch services:", err);

@@ -53,7 +53,8 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
         return;
       }
 
-      const response = await axios.get('http://localhost:5001/auth/profile', {
+      const API_BASE_URL = process.env.REACT_APP_API_URL;
+      const response = await axios.get(`${API_BASE_URL}/auth/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -132,7 +133,8 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
       }
 
       const token = localStorage.getItem('token');
-      const response = await axios.put('http://localhost:5001/auth/profile', formData, {
+      const API_BASE_URL = process.env.REACT_APP_API_URL;
+      const response = await axios.put(`${API_BASE_URL}/auth/profile`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

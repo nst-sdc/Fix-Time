@@ -37,6 +37,8 @@ const AppointmentCalendar = () => {
     'default': '#6c757d'      // gray
   };
 
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
+
   // Fetch appointments data
   const fetchAppointments = async () => {
     setLoading(true);
@@ -53,7 +55,7 @@ const AppointmentCalendar = () => {
       }
       
       // Fetch appointments from API
-      const response = await axios.get('http://localhost:5001/appointments', {
+      const response = await axios.get(`${API_BASE_URL}/appointments`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -222,7 +224,7 @@ const AppointmentCalendar = () => {
         
         // Call API to update appointment status
         const response = await axios.patch(
-          `http://localhost:5001/appointments/${id}/status`,
+          `${API_BASE_URL}/appointments/${id}/status`,
           { status: 'cancelled' },
           {
             headers: {

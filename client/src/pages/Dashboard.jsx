@@ -8,6 +8,8 @@ import {
 import AppointmentDetails from '../components/AppointmentDetails';
 import axios from 'axios';
 
+const API_BASE_URL = process.env.REACT_APP_API_URL;
+
 const Dashboard = ({ userProfile, setUserProfile }) => {
   const [upcomingAppointments, setUpcomingAppointments] = useState([]);
   const [pastAppointments, setPastAppointments] = useState([]);
@@ -27,7 +29,7 @@ const Dashboard = ({ userProfile, setUserProfile }) => {
           return;
         }
 
-        const response = await axios.get('http://localhost:5001/appointments', {
+        const response = await axios.get(`${API_BASE_URL}/appointments`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 

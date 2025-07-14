@@ -15,6 +15,8 @@ const RescheduleAppointment = () => {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
 
+  const API_BASE_URL = process.env.REACT_APP_API_URL;
+
   // Generate date options (current date + 14 days)
   const generateDateOptions = () => {
     const options = [];
@@ -119,7 +121,7 @@ const RescheduleAppointment = () => {
         }
         
         // Fetch appointments from API
-        const response = await axios.get('http://localhost:5001/appointments', {
+        const response = await axios.get(`${API_BASE_URL}/appointments`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -235,7 +237,7 @@ const RescheduleAppointment = () => {
       
       // Call API to reschedule appointment
       const response = await axios.put(
-        `http://localhost:5001/appointments/${appointment._id}/reschedule`,
+        `${API_BASE_URL}/appointments/${appointment._id}/reschedule`,
         {
           date: newDate.toISOString(),
           time: selectedTime
