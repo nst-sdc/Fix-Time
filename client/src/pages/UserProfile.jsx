@@ -57,14 +57,14 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
         headers: { Authorization: `Bearer ${token}` }
       });
 
-      setUser(response.data);
+      setUser(response.data.user);
       setFormData({
-        fullName: response.data.fullName || '',
-        email: response.data.email || '',
-        phoneNumber: response.data.phoneNumber || '',
-        address: response.data.address || '',
-        dateOfBirth: response.data.dateOfBirth ? new Date(response.data.dateOfBirth).toISOString().split('T')[0] : '',
-        gender: response.data.gender || ''
+        fullName: response.data.user.fullName || '',
+        email: response.data.user.email || '',
+        phoneNumber: response.data.user.phoneNumber || '',
+        address: response.data.user.address || '',
+        dateOfBirth: response.data.user.dateOfBirth ? new Date(response.data.user.dateOfBirth).toISOString().split('T')[0] : '',
+        gender: response.data.user.gender || ''
       });
     } catch (err) {
       console.error('Error fetching profile:', err);
