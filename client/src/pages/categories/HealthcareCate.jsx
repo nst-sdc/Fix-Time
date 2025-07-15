@@ -65,13 +65,13 @@ const HealthcareCate = () => {
       categoryName="Healthcare & Wellness"
       onServiceAdded={handleServiceAdded}
     >
-      <div className="category-page">
-        <h1 className="category-title">🏥 Healthcare & Wellness</h1>
+    <div className="category-page">
+      <h1 className="category-title">🏥 Healthcare & Wellness</h1>
         
         {error && (
           <div className="error-message">
             {error}
-          </div>
+              </div>
         )}
         
         {loading ? (
@@ -79,12 +79,12 @@ const HealthcareCate = () => {
         ) : services.length === 0 ? (
           <div className="no-services-message">
             No services available in this category yet.
-          </div>
+            </div>
         ) : (
           <div className="services-list">
             {services.map((service) => (
               <ServiceCard key={service._id} service={service} />
-            ))}
+        ))}
           </div>
         )}
       </div>

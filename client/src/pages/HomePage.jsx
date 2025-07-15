@@ -4,6 +4,7 @@ import './HomePage.css';
 import { FaClock, FaCalendarAlt, FaUserCheck, FaMobileAlt, FaQuoteRight, FaArrowRight } from 'react-icons/fa';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import Spline from '@splinetool/react-spline';
 
 const HomePage = () => {
   useEffect(() => {
@@ -62,20 +63,14 @@ const HomePage = () => {
           </div>
           <div className="hero-image" data-aos="fade-left">
             <div className="hero-illustration">
-              <img src="https://cdn.jsdelivr.net/gh/priyabratasingh/static-assets/fixtime-hero.svg" 
-                alt="Appointment Scheduling" 
-                onError={(e) => {
-                  e.target.src = "https://cdn-icons-png.flaticon.com/512/2693/2693507.png"; 
-                  e.target.style.maxWidth = "80%";
-                }}
-              />
+              <Spline scene="https://prod.spline.design/nOAbeVybOQvffhuC/scene.splinecode" />
             </div>
             <div className="blob-shape"></div>
           </div>
         </div>
         <div className="hero-wave">
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320">
-            <path fill="#f8fafc" fillOpacity="1" d="M0,192L48,197.3C96,203,192,213,288,229.3C384,245,480,267,576,250.7C672,235,768,181,864,181.3C960,181,1056,235,1152,234.7C1248,235,1344,181,1392,154.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+          <svg viewBox="0 0 1440 120" xmlns="http://www.w3.org/2000/svg">
+            <path className="wave-path" d="M0,64L60,69.3C120,75,240,85,360,90.7C480,96,600,96,720,90.7C840,85,960,75,1080,69.3C1200,64,1320,64,1380,64L1440,64L1440,120L1380,120C1320,120,1200,120,1080,120C960,120,840,120,720,120C600,120,480,120,360,120C240,120,120,120,60,120L0,120Z"></path>
           </svg>
         </div>
       </section>

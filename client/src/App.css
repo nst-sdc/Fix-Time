@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
 * {
   box-sizing: border-box;
@@ -8,67 +8,74 @@
 
 :root {
   /* Light theme variables */
-  --primary-color: #372a72;
-  --secondary-color: #ff6b8b;
-  --accent-color: #a56bff;
-  --text-color: #333;
-  --text-light: #666;
-  --text-lighter: #777;
+  --primary-color: #4f46e5;
+  --secondary-color: #f97316;
+  --accent-color: #8b5cf6;
+  --text-color: #1f2937;
+  --text-light: #4b5563;
+  --text-lighter: #6b7280;
   --background-color: #ffffff;
   --card-bg: #ffffff;
   --card-border: #f0f0f0;
-  --input-bg: #f9f9f9;
-  --input-border: #e0e0e0;
-  --section-bg: #f8f9fa;
-  --section-bg-alt: #f0f4f8;
-  --light-gray: #f8f9fa;
-  --medium-gray: #dee2e6;
-  --dark-gray: #6c757d;
+  --input-bg: #f9fafb;
+  --input-border: #e5e7eb;
+  --section-bg: #f8fafc;
+  --section-bg-alt: #f1f5f9;
+  --light-gray: #f9fafb;
+  --medium-gray: #e5e7eb;
+  --dark-gray: #6b7280;
   --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.1);
-  --gradient-primary: linear-gradient(90deg, #5e60ce 0%, #6c63ff 100%);
-  --gradient-secondary: linear-gradient(90deg, #ff6b8b 0%, #a56bff 100%);
-  --gradient-pink: linear-gradient(90deg, #FF758C, #FF7EB3);
+  --gradient-primary: linear-gradient(90deg, #4f46e5 0%, #8b5cf6 100%);
+  --gradient-secondary: linear-gradient(90deg, #f97316 0%, #ec4899 100%);
+  --gradient-accent: linear-gradient(90deg, #8b5cf6, #ec4899);
 }
 
 /* Dark Mode Variables */
 body.dark {
-  --primary-color: #6c63ff;
-  --secondary-color: #ff6b8b;
-  --accent-color: #a56bff;
-  --text-color: #e0e0e0;
-  --text-light: #b0b0b0;
-  --text-lighter: #aaa;
-  --background-color: #121212;
-  --card-bg: #1a1a1a;
-  --card-border: #333;
-  --input-bg: #2a2a2a;
-  --input-border: #444;
-  --section-bg: #1a1a1a;
-  --section-bg-alt: #0a0a0a;
-  --light-gray: #222;
-  --medium-gray: #444;
-  --dark-gray: #888;
-  --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.2);
-  --shadow-md: 0 8px 15px rgba(0, 0, 0, 0.3);
-  --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.4);
-  /* Gradients can stay the same for both themes */
+  --primary-color: #6366f1;
+  --secondary-color: #f97316;
+  --accent-color: #a855f7;
+  --text-color: #f9fafb;
+  --text-light: #e5e7eb;
+  --text-lighter: #d1d5db;
+  --background-color: #000000;
+  --card-bg: #1e1e1e;
+  --card-border: #2e2e2e;
+  --input-bg: #1e1e1e;
+  --input-border: #2e2e2e;
+  --section-bg: #0a0a0a;
+  --section-bg-alt: #000000;
+  --light-gray: #2e2e2e;
+  --medium-gray: #3e3e3e;
+  --dark-gray: #8e8e8e;
+  --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 15px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.5);
+  /* Gradients for dark mode */
+  --gradient-primary: linear-gradient(90deg, #6366f1 0%, #a855f7 100%);
+  --gradient-secondary: linear-gradient(90deg, #f97316 0%, #ec4899 100%);
+  --gradient-accent: linear-gradient(90deg, #a855f7, #ec4899);
 }
 
 /* Dark Mode Overrides - Base Elements */
 body.dark {
   color: var(--text-color);
   background-color: var(--background-color);
+  background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='wavePattern' patternUnits='userSpaceOnUse' width='500' height='500' patternTransform='scale(0.5) rotate(0)'%3E%3Cpath d='M0,250 C100,150 150,100 250,100 C350,100 400,150 500,250 C400,350 350,400 250,400 C150,400 100,350 0,250 Z' fill='none' stroke='rgba(255,255,255,0.05)' stroke-width='1'/%3E%3Cpath d='M0,250 C100,200 150,175 250,175 C350,175 400,200 500,250 C400,300 350,325 250,325 C150,325 100,300 0,250 Z' fill='none' stroke='rgba(255,255,255,0.05)' stroke-width='1'/%3E%3Cpath d='M0,250 C100,225 150,215 250,215 C350,215 400,225 500,250 C400,275 350,285 250,285 C150,285 100,275 0,250 Z' fill='none' stroke='rgba(255,255,255,0.05)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23wavePattern)'/%3E%3C/svg%3E");
+  background-attachment: fixed;
 }
 
-/* Fast dark mode transitions - disable transitions for instant theme switching */
+/* Transition control */
 body.dark *,
 body.light * {
-  transition: none !important;
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-duration: 0.2s;
+  transition-timing-function: ease;
 }
 
-/* Keep hover transitions for interactive elements */
+/* Enable hover transitions */
 body.dark *:hover,
 body.light *:hover {
   transition: all 0.2s ease !important;
@@ -109,7 +116,7 @@ body.dark input:focus,
 body.dark textarea:focus,
 body.dark select:focus {
   border-color: var(--accent-color);
-  box-shadow: 0 0 0 3px rgba(165, 107, 255, 0.2);
+  box-shadow: 0 0 0 3px rgba(168, 85, 247, 0.25);
 }
 
 body.dark input::placeholder,
@@ -125,6 +132,7 @@ body.dark .testimonial-card,
 body.dark .service-category-card {
   background-color: var(--card-bg);
   border-color: var(--card-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
 }
 
 body.dark .services-container {
@@ -133,7 +141,7 @@ body.dark .services-container {
 
 body.dark .service-grid,
 body.dark .services-list {
-  background-color: rgba(30, 30, 30, 0.6);
+  background-color: rgba(30, 41, 59, 0.6);
 }
 
 /* Section Backgrounds Dark Mode */
@@ -151,7 +159,7 @@ body.dark .cta-section {
 /* Text Elements Dark Mode */
 body.dark .category-title {
   -webkit-text-fill-color: initial;
-  background: var(--gradient-pink);
+  background: var(--gradient-accent);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -159,7 +167,7 @@ body.dark .category-title {
 
 body.dark .services-heading {
   -webkit-text-fill-color: initial;
-  background: var(--gradient-pink);
+  background: var(--gradient-accent);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -182,7 +190,7 @@ body.dark .service-category-card p {
 body.dark .book-now-btn,
 body.dark .confirm-button,
 body.dark .show-category-btn {
-  background: var(--gradient-pink);
+  background: var(--gradient-accent);
   color: white;
 }
 
@@ -192,14 +200,13 @@ body.dark *[style*="box-shadow"] {
 }
 
 body.dark .navbar {
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 2px 15px rgba(0, 0, 0, 0.3);
 }
 
 /* Footer Protection - Ensure footer remains completely untouched by theme changes */
 body.dark .footer,
 body.light .footer {
-  /* Preserve original footer styling */
-  background: linear-gradient(0deg, rgba(37, 22, 80, 1) 0%, rgba(55, 42, 114, 1) 100%) !important;
+  background: linear-gradient(0deg, #0f172a 0%, #1e293b 100%) !important;
   color: #fff !important;
 }
 
@@ -212,20 +219,21 @@ body.light .footer * {
 body.dark .footer-accent,
 body.light .footer-accent {
   /* Preserve footer gradient text */
-  background: linear-gradient(90deg, #ff9a8b 0%, #ff6b8b 100%) !important;
+  background: var(--gradient-secondary) !important;
   -webkit-background-clip: text !important;
   background-clip: text !important;
   color: transparent !important;
 }
 
+/* Base styles */
 body {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: var(--text-color);
   background-color: var(--background-color);
-  line-height: 1.5;
-  transition: all 0.1s ease;
+  line-height: 1.6;
+  transition: background-color 0.3s ease;
 }
 
 .App {
@@ -234,19 +242,21 @@ body {
   min-height: 100vh;
   background-color: var(--background-color);
   color: var(--text-color);
-  transition: all 0.1s ease;
+  transition: background-color 0.3s ease;
 }
 
 .app-content {
   flex: 1;
   background-color: var(--background-color);
-  transition: all 0.1s ease;
+  transition: background-color 0.3s ease;
 }
 
 h1, h2, h3, h4, h5, h6 {
   margin-top: 0;
   line-height: 1.2;
   color: var(--text-color);
+  font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  letter-spacing: -0.025em;
 }
 
 a {
