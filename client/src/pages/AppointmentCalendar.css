@@ -803,6 +803,13 @@ body.dark .cancel-btn:hover {
   background-color: var(--error-bg-dark, rgba(239, 68, 68, 0.15));
 }
 
+.reschedule-btn:disabled,
+.cancel-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
 .calendar-notification {
   position: fixed;
   bottom: 2rem;

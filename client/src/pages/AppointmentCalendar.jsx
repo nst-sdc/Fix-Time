@@ -8,6 +8,7 @@ import { FaFilter, FaCalendarDay, FaTimes, FaEdit, FaTrash, FaMapMarkerAlt, FaBu
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { isPastAppointment } from '../utils/serviceUtils';
 
 const AppointmentCalendar = () => {
   const [appointments, setAppointments] = useState([]);
@@ -527,12 +528,16 @@ const AppointmentCalendar = () => {
                     <button 
                       className="reschedule-btn"
                       onClick={() => rescheduleAppointment(selectedAppointment._id)}
+                      disabled={isPastAppointment(selectedAppointment.date, selectedAppointment.time)}
+                      title={isPastAppointment(selectedAppointment.date, selectedAppointment.time) ? 'Cannot reschedule past appointments' : ''}
                     >
                       <FaEdit /> Reschedule
                     </button>
                     <button 
                       className="cancel-btn"
                       onClick={() => cancelAppointment(selectedAppointment._id)}
+                      disabled={isPastAppointment(selectedAppointment.date, selectedAppointment.time)}
+                      title={isPastAppointment(selectedAppointment.date, selectedAppointment.time) ? 'Cannot cancel past appointments' : ''}
                     >
                       <FaTrash /> Cancel
                     </button>
