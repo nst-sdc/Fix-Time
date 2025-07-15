@@ -7,20 +7,20 @@
 }
 
 :root {
-  /* Light theme variables */
+  /* Light theme variables - Updated for better aesthetics */
   --primary-color: #4f46e5;
-  --secondary-color: #f97316;
+  --secondary-color: #f43f5e;
   --accent-color: #8b5cf6;
   --text-color: #1f2937;
   --text-light: #4b5563;
   --text-lighter: #6b7280;
-  --background-color: #ffffff;
+  --background-color: #f9fafb;
   --card-bg: #ffffff;
-  --card-border: #f0f0f0;
+  --card-border: #e5e7eb;
   --input-bg: #f9fafb;
   --input-border: #e5e7eb;
-  --section-bg: #f8fafc;
-  --section-bg-alt: #f1f5f9;
+  --section-bg: #ffffff;
+  --section-bg-alt: #f8fafc;
   --light-gray: #f9fafb;
   --medium-gray: #e5e7eb;
   --dark-gray: #6b7280;
@@ -28,25 +28,25 @@
   --shadow-md: 0 10px 15px rgba(0, 0, 0, 0.05);
   --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.1);
   --gradient-primary: linear-gradient(90deg, #4f46e5 0%, #8b5cf6 100%);
-  --gradient-secondary: linear-gradient(90deg, #f97316 0%, #ec4899 100%);
+  --gradient-secondary: linear-gradient(90deg, #f43f5e 0%, #ec4899 100%);
   --gradient-accent: linear-gradient(90deg, #8b5cf6, #ec4899);
 }
 
 /* Dark Mode Variables */
 body.dark {
   --primary-color: #6366f1;
-  --secondary-color: #f97316;
+  --secondary-color: #f43f5e;
   --accent-color: #a855f7;
   --text-color: #f9fafb;
   --text-light: #e5e7eb;
   --text-lighter: #d1d5db;
-  --background-color: #000000;
-  --card-bg: #1e1e1e;
-  --card-border: #2e2e2e;
+  --background-color: #030712;
+  --card-bg: #111827;
+  --card-border: #1f2937;
   --input-bg: #1e1e1e;
   --input-border: #2e2e2e;
-  --section-bg: #0a0a0a;
-  --section-bg-alt: #000000;
+  --section-bg: #0f172a;
+  --section-bg-alt: #030712;
   --light-gray: #2e2e2e;
   --medium-gray: #3e3e3e;
   --dark-gray: #8e8e8e;
@@ -55,7 +55,7 @@ body.dark {
   --shadow-lg: 0 15px 30px rgba(0, 0, 0, 0.5);
   /* Gradients for dark mode */
   --gradient-primary: linear-gradient(90deg, #6366f1 0%, #a855f7 100%);
-  --gradient-secondary: linear-gradient(90deg, #f97316 0%, #ec4899 100%);
+  --gradient-secondary: linear-gradient(90deg, #f43f5e 0%, #ec4899 100%);
   --gradient-accent: linear-gradient(90deg, #a855f7, #ec4899);
 }
 
@@ -64,6 +64,14 @@ body.dark {
   color: var(--text-color);
   background-color: var(--background-color);
   background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='wavePattern' patternUnits='userSpaceOnUse' width='500' height='500' patternTransform='scale(0.5) rotate(0)'%3E%3Cpath d='M0,250 C100,150 150,100 250,100 C350,100 400,150 500,250 C400,350 350,400 250,400 C150,400 100,350 0,250 Z' fill='none' stroke='rgba(255,255,255,0.05)' stroke-width='1'/%3E%3Cpath d='M0,250 C100,200 150,175 250,175 C350,175 400,200 500,250 C400,300 350,325 250,325 C150,325 100,300 0,250 Z' fill='none' stroke='rgba(255,255,255,0.05)' stroke-width='1'/%3E%3Cpath d='M0,250 C100,225 150,215 250,215 C350,215 400,225 500,250 C400,275 350,285 250,285 C150,285 100,275 0,250 Z' fill='none' stroke='rgba(255,255,255,0.05)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23wavePattern)'/%3E%3C/svg%3E");
+  background-attachment: fixed;
+}
+
+/* Light mode background with subtle pattern */
+body.light {
+  color: var(--text-color);
+  background-color: var(--background-color);
+  background-image: url("data:image/svg+xml,%3Csvg width='100%25' height='100%25' xmlns='http://www.w3.org/2000/svg'%3E%3Cdefs%3E%3Cpattern id='lightWavePattern' patternUnits='userSpaceOnUse' width='500' height='500' patternTransform='scale(0.5) rotate(0)'%3E%3Cpath d='M0,250 C100,150 150,100 250,100 C350,100 400,150 500,250 C400,350 350,400 250,400 C150,400 100,350 0,250 Z' fill='none' stroke='rgba(79,70,229,0.03)' stroke-width='1'/%3E%3Cpath d='M0,250 C100,200 150,175 250,175 C350,175 400,200 500,250 C400,300 350,325 250,325 C150,325 100,300 0,250 Z' fill='none' stroke='rgba(79,70,229,0.02)' stroke-width='1'/%3E%3Cpath d='M0,250 C100,225 150,215 250,215 C350,215 400,225 500,250 C400,275 350,285 250,285 C150,285 100,275 0,250 Z' fill='none' stroke='rgba(79,70,229,0.01)' stroke-width='1'/%3E%3C/pattern%3E%3C/defs%3E%3Crect width='100%25' height='100%25' fill='url(%23lightWavePattern)'/%3E%3C/svg%3E");
   background-attachment: fixed;
 }
 
@@ -328,4 +336,64 @@ img {
     animation: none !important;
     transition: none !important;
   }
+}
+
+/* Light mode text element styling */
+body.light .text-accent {
+  background: var(--gradient-primary);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* Light mode button styling */
+body.light .btn-primary {
+  background: var(--gradient-primary);
+  color: white;
+  border: none;
+  box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3);
+}
+
+body.light .btn-primary:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+}
+
+body.light .explore-btn-pink {
+  background: var(--gradient-primary) !important;
+  box-shadow: 0 5px 20px rgba(99, 102, 241, 0.3) !important;
+}
+
+body.light .explore-btn-pink:hover {
+  box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4) !important;
+}
+
+body.light .btn-secondary {
+  background-color: rgba(99, 102, 241, 0.1);
+  color: var(--primary-color);
+  border: 1px solid rgba(99, 102, 241, 0.2);
+}
+
+body.light .btn-secondary:hover {
+  background-color: rgba(99, 102, 241, 0.15);
+  transform: translateY(-3px);
+}
+
+/* Ensure cards in light mode have proper hover effects */
+body.light .service-card:hover,
+body.light .feature-card:hover,
+body.light .testimonial-card:hover,
+body.light .service-category-card:hover {
+  box-shadow: 0 15px 30px rgba(99, 102, 241, 0.15);
+  border-color: rgba(99, 102, 241, 0.3);
+}
+
+/* Light mode section backgrounds with subtle patterns */
+body.light .services-section,
+body.light .features-section,
+body.light .testimonials-section,
+body.light .how-section,
+body.light .cta-section {
+  position: relative;
+  overflow: hidden;
 }
