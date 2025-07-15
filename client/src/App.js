@@ -29,6 +29,9 @@ import ServiceList from './components/ServiceList';
 import MyServices from './pages/MyServices';
 import OtherServices from './pages/categories/OtherServices';
 
+// Export API base URL for use in other components
+export const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+
 // Create theme context
 export const ThemeContext = createContext();
 

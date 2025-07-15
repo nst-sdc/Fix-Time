@@ -451,7 +451,7 @@ body.dark .navbar {
     font-size: 1.8rem;
     cursor: pointer;
   }
-
+  
   .dropdown-menu {
     position: static;
     width: 100%;
@@ -462,24 +462,24 @@ body.dark .navbar {
   .profile-button {
     width: 100%;
     justify-content: center;
-  }
+}
 
-  .theme-toggle-btn {
+.theme-toggle-btn {
     margin-bottom: 10px;
-  }
+}
 }
 
 /* Mobile optimization */
 @media screen and (max-width: 480px) {
   .navbar-logo {
     font-size: 1.5rem;
-  }
-  
+}
+
   .login-btn, .register-btn {
     padding: 6px 16px;
     font-size: 0.9rem;
   }
-  
+
   .dropdown-menu {
     width: 100%;
   }
