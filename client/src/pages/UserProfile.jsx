@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FiEdit2, FiSave, FiX, FiUser, FiPhone, FiMapPin, FiCalendar, FiMail } from 'react-icons/fi';
 import './UserProfile.css';
+import { API_BASE_URL } from '../App';
 
 const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
   const [user, setUser] = useState(null);
@@ -53,7 +54,7 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
         return;
       }
 
-      const response = await axios.get('http://localhost:5001/auth/profile', {
+      const response = await axios.get(`${API_BASE_URL}/auth/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -132,7 +133,7 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
       }
 
       const token = localStorage.getItem('token');
-      const response = await axios.put('http://localhost:5001/auth/profile', formData, {
+      const response = await axios.put(`${API_BASE_URL}/auth/profile`, formData, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

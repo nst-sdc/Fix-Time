@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import axios from 'axios';
 import "./AppointmentBooking.css";
 import ReviewForm from './ReviewForm';
+import { API_BASE_URL } from '../App';
 
 const timeSlots = [
   "8:00 AM", "9:00 AM", "10:00 AM",
@@ -88,7 +89,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
         navigate('/login');
         return;
       }
-      const userResponse = await axios.get('http://localhost:5001/auth/profile', {
+      const userResponse = await axios.get(`${API_BASE_URL}/auth/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!userResponse.data || !userResponse.data.success || !userResponse.data.user) {
@@ -100,7 +101,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
 
       if (!finalServiceId && preSelectedService) {
         try {
-          const servicesResponse = await axios.get('http://localhost:5001/services', {
+          const servicesResponse = await axios.get(`${API_BASE_URL}/services`, {
             params: { name: preSelectedService }
           });
           if (servicesResponse.data?.services?.length > 0) {
@@ -111,7 +112,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
         }
       }
       if (!finalServiceId) {
-        const servicesResponse = await axios.get('http://localhost:5001/services');
+        const servicesResponse = await axios.get(`${API_BASE_URL}/services`);
         if (servicesResponse.data?.services?.length > 0) {
           finalServiceId = servicesResponse.data.services[0]._id;
         }
@@ -129,7 +130,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
         customerPhone: phoneToUse
       };
       const response = await axios.post(
-        'http://localhost:5001/appointments',
+        `${API_BASE_URL}/appointments`,
         appointmentData,
         { headers: { Authorization: `Bearer ${token}` } }
       );

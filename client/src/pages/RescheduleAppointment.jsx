@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { FaCalendarAlt, FaClock, FaArrowLeft, FaCheck } from 'react-icons/fa';
 import './RescheduleAppointment.css';
+import { API_BASE_URL } from '../App';
 
 const RescheduleAppointment = () => {
   const location = useLocation();
@@ -119,7 +120,7 @@ const RescheduleAppointment = () => {
         }
         
         // Fetch appointments from API
-        const response = await axios.get('http://localhost:5001/appointments', {
+        const response = await axios.get(`${API_BASE_URL}/appointments`, {
           headers: {
             Authorization: `Bearer ${token}`
           }
@@ -235,7 +236,7 @@ const RescheduleAppointment = () => {
       
       // Call API to reschedule appointment
       const response = await axios.put(
-        `http://localhost:5001/appointments/${appointment._id}/reschedule`,
+        `${API_BASE_URL}/appointments/${appointment._id}/reschedule`,
         {
           date: newDate.toISOString(),
           time: selectedTime

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './auth.css';
 import axios from 'axios';
+import { API_BASE_URL } from '../App';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { FaUser, FaBuilding, FaCalendarAlt, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
 
@@ -80,7 +81,7 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
     
     try {
       setIsCheckingRole(true);
-      const response = await axios.get(`http://localhost:5001/auth/user-role/${email}`);
+      const response = await axios.get(`${API_BASE_URL}/auth/user-role/${email}`);
       if (response.data.success) {
         setLoginRole(response.data.role);
       }
@@ -180,7 +181,7 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
       
       if (isLogin) {
         // Handle login
-        const res = await axios.post('http://localhost:5001/auth/login-with-role', { 
+        const res = await axios.post(`${API_BASE_URL}/auth/login-with-role`, { 
           email, 
           password: passwd,
           role: loginRole
@@ -230,7 +231,7 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
           };
         }
 
-        await axios.post('http://localhost:5001/auth/register', registrationData);
+        await axios.post(`${API_BASE_URL}/auth/register`, registrationData);
         
         setSuccess('Registration successful! Please log in with your credentials.');
         
