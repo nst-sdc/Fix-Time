@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { FaStar, FaUser } from 'react-icons/fa';
 import axios from 'axios';
 import './ServiceReviews.css';
-import { API_BASE_URL } from '../App';
 
 const ServiceReviews = ({ serviceId }) => {
   const [reviews, setReviews] = useState([]);
@@ -60,7 +59,7 @@ const ServiceReviews = ({ serviceId }) => {
           return;
         }
         
-        const response = await axios.get(`${API_BASE_URL}/reviews/service/${serviceId}`);
+        const response = await axios.get(`http://localhost:5001/reviews/service/${serviceId}`);
         setReviews(response.data.data);
         setLoading(false);
       } catch (err) {

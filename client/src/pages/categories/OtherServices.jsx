@@ -3,7 +3,8 @@ import axios from 'axios';
 import './CategoryPage.css';
 import ServiceCard from '../../components/ServiceCard';
 import CategoryPage from './CategoryPage';
-import { API_BASE_URL } from '../../App';
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
 
 // List of pre-existing categories (should match those in SERVICES)
 const PRE_EXISTING_CATEGORIES = [

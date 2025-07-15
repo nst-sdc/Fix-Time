@@ -18,7 +18,6 @@ import {
   FaExclamationTriangle
 } from 'react-icons/fa';
 import './MyAppointments.css';
-import { API_BASE_URL } from '../App';
 
 const MyAppointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -51,7 +50,7 @@ const MyAppointments = () => {
         return;
       }
 
-      const response = await axios.get(`${API_BASE_URL}/appointments`, {
+      const response = await axios.get('http://localhost:5001/appointments', {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -294,7 +293,7 @@ const MyAppointments = () => {
       });
 
       const response = await axios.put(
-        `${API_BASE_URL}/appointments/${selectedAppointment._id}/reschedule`,
+        `http://localhost:5001/appointments/${selectedAppointment._id}/reschedule`,
         {
           date: rescheduleDate,
           time: rescheduleTime
@@ -406,7 +405,7 @@ const MyAppointments = () => {
         
         // Call API to update appointment status
         const response = await axios.patch(
-          `${API_BASE_URL}/appointments/${id}/status`,
+          `http://localhost:5001/appointments/${id}/status`,
           { status: 'cancelled' },
           {
             headers: {

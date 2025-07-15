@@ -8,7 +8,6 @@ import { FaFilter, FaCalendarDay, FaTimes, FaEdit, FaTrash, FaMapMarkerAlt, FaBu
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { API_BASE_URL } from '../App';
 
 const AppointmentCalendar = () => {
   const [appointments, setAppointments] = useState([]);
@@ -54,7 +53,7 @@ const AppointmentCalendar = () => {
       }
       
       // Fetch appointments from API
-      const response = await axios.get(`${API_BASE_URL}/appointments`, {
+      const response = await axios.get('http://localhost:5001/appointments', {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -223,7 +222,7 @@ const AppointmentCalendar = () => {
         
         // Call API to update appointment status
         const response = await axios.patch(
-          `${API_BASE_URL}/appointments/${id}/status`,
+          `http://localhost:5001/appointments/${id}/status`,
           { status: 'cancelled' },
           {
             headers: {

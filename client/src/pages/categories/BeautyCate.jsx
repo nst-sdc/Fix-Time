@@ -4,7 +4,6 @@ import './CategoryPage.css';
 import { FaCut, FaMale, FaPaintBrush, FaHands, FaSmile, FaRing, FaSpa, FaHotjar } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
 import CategoryPage from './CategoryPage';
-import { API_BASE_URL } from '../../App';
 
 // Default icon mapping for this category
 const iconMapping = {
@@ -19,6 +18,8 @@ const iconMapping = {
   // Default icon for any other service
   "default": <FaSpa />
 };
+
+const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
 
 const BeautyCate = () => {
   const [services, setServices] = useState([]);

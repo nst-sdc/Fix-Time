@@ -3,7 +3,6 @@ import { useParams, Link } from "react-router-dom";
 import axios from "axios";
 import "./Services.css";
 import ServiceForm from "../components/ServiceForm";
-import { API_BASE_URL } from '../App';
 
 // Local static categories
 const SERVICES = [
@@ -56,7 +55,7 @@ const ServiceCategory = () => {
 
   const fetchDynamicServices = async () => {
     try {
-      const res = await axios.get(`${API_BASE_URL}/services/category/${categorySlug}`);
+      const res = await axios.get(`http://localhost:5001/services/category/${categorySlug}`);
       setDynamicServices(res.data);
     } catch (err) {
       console.error("Failed to fetch services:", err);
