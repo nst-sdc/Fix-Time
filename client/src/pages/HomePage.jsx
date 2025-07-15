@@ -1,12 +1,16 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import { Link } from 'react-router-dom';
 import './HomePage.css';
 import { FaClock, FaCalendarAlt, FaUserCheck, FaMobileAlt, FaQuoteRight, FaArrowRight } from 'react-icons/fa';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
-import Spline from '@splinetool/react-spline';
+import { ThemeContext } from '../App';
 
 const HomePage = () => {
+  // Get theme from context
+  const { theme } = useContext(ThemeContext);
+  const isDarkMode = theme === 'dark';
+  
   useEffect(() => {
     AOS.init({
       duration: 800,
@@ -63,7 +67,11 @@ const HomePage = () => {
           </div>
           <div className="hero-image" data-aos="fade-left">
             <div className="hero-illustration">
-              <Spline scene="https://prod.spline.design/nOAbeVybOQvffhuC/scene.splinecode" />
+              <img 
+                src={isDarkMode ? "/calender6.png" : "/calender5.png"} 
+                alt="Appointment Calendar" 
+                className="calendar-image"
+              />
             </div>
             <div className="blob-shape"></div>
           </div>
