@@ -3,7 +3,9 @@ import axios from 'axios';
 import './CategoryPage.css';
 import { FaCar, FaWind, FaUserCog, FaOilCan, FaShower } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
+import ServiceForm from '../../components/ServiceForm';
 import CategoryPage from './CategoryPage';
+import { API_BASE_URL } from '../../App';
 
 // Default icon mapping for this category
 const iconMapping = {
@@ -15,8 +17,6 @@ const iconMapping = {
   // Default icon for any other service
   "default": <FaCar />
 };
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
 
 const AutomobileService = () => {
   const [services, setServices] = useState([]);
@@ -62,13 +62,13 @@ const AutomobileService = () => {
       categoryName="Automobile Services"
       onServiceAdded={handleServiceAdded}
     >
-      <div className="category-page">
-        <h1 className="category-title">🚗 Automobile Services</h1>
+    <div className="category-page">
+      <h1 className="category-title">🚗 Automobile Services</h1>
         
         {error && (
           <div className="error-message">
             {error}
-          </div>
+              </div>
         )}
         
         {loading ? (
@@ -76,12 +76,12 @@ const AutomobileService = () => {
         ) : services.length === 0 ? (
           <div className="no-services-message">
             No services available in this category yet.
-          </div>
+            </div>
         ) : (
           <div className="services-list">
             {services.map((service) => (
               <ServiceCard key={service._id} service={service} />
-            ))}
+        ))}
           </div>
         )}
       </div>
