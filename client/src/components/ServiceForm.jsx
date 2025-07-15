@@ -1,8 +1,8 @@
-import React, { useState } from "react";
-import axios from "axios";
-import "./ServiceForm.css";
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { API_BASE_URL } from '../App';
+import './ServiceForm.css';
 
 const ServiceForm = ({ category, onClose, onSuccess }) => {
   const [form, setForm] = useState({

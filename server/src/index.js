@@ -8,10 +8,15 @@ const app = express();
 
 // Configure CORS with more specific options
 app.use(cors({
-  origin: 'http://localhost:3000', // Frontend URL
+  origin: process.env.NODE_ENV === 'production' 
+    ? [process.env.FRONTEND_URL, /\.vercel\.app$/] 
+    : 'http://localhost:3000',
   credentials: true
 }));
 app.use(express.json());
+
+// Handle requests to /api/* for Vercel deployment
+const apiPath = process.env.NODE_ENV === 'production' ? '/api' : '';
 
 // Import routes
 const authRoutes = require('./routes/auth');
@@ -22,20 +27,20 @@ const providerRoutes = require('./routes/providers');
 const notificationRoutes = require('./routes/notifications');
 
 // Setup routes
-app.use('/auth', authRoutes);
-app.use('/reviews', reviewRoutes);
-app.use('/appointments', appointmentRoutes);
-app.use('/services', serviceRoutes);
-app.use('/providers', providerRoutes);
-app.use('/notifications', notificationRoutes);
+app.use(`${apiPath}/auth`, authRoutes);
+app.use(`${apiPath}/reviews`, reviewRoutes);
+app.use(`${apiPath}/appointments`, appointmentRoutes);
+app.use(`${apiPath}/services`, serviceRoutes);
+app.use(`${apiPath}/providers`, providerRoutes);
+app.use(`${apiPath}/notifications`, notificationRoutes);
 
 // Root endpoint
-app.get('/', (req, res) => {
+app.get(`${apiPath}/`, (req, res) => {
   res.send('Backend is running!');
 });
 
 // Temporary debug endpoints for development
-app.get('/debug/users', async (req, res) => {
+app.get(`${apiPath}/debug/users`, async (req, res) => {
   try {
     const User = require('./models/User');
     const users = await User.find({}, { password: 0 });
@@ -45,7 +50,7 @@ app.get('/debug/users', async (req, res) => {
   }
 });
 
-app.get('/debug/services', async (req, res) => {
+app.get(`${apiPath}/debug/services`, async (req, res) => {
   try {
     const Service = require('./models/Service');
     const services = await Service.find({});
@@ -55,7 +60,7 @@ app.get('/debug/services', async (req, res) => {
   }
 });
 
-app.get('/debug/appointments', async (req, res) => {
+app.get(`${apiPath}/debug/appointments`, async (req, res) => {
   try {
     const Appointment = require('./models/Appointment');
     const appointments = await Appointment.find({})
@@ -67,7 +72,7 @@ app.get('/debug/appointments', async (req, res) => {
   }
 });
 
-app.get('/debug/reviews', async (req, res) => {
+app.get(`${apiPath}/debug/reviews`, async (req, res) => {
   try {
     const Review = require('./models/Review');
     const reviews = await Review.find({})
@@ -79,7 +84,7 @@ app.get('/debug/reviews', async (req, res) => {
   }
 });
 
-app.get('/debug/providers', async (req, res) => {
+app.get(`${apiPath}/debug/providers`, async (req, res) => {
   try {
     const Provider = require('./models/Provider');
     const providers = await Provider.find({})
@@ -99,6 +104,30 @@ app.use((err, req, res, next) => {
     message: 'Server error',
     error: process.env.NODE_ENV === 'production' ? 'Internal Server Error' : err.message
   });
+});
+
+// MongoDB Connection
+const connectDB = async () => {
+  try {
+    const mongoURI = process.env.MONGODB_URI || 'mongodb://localhost:27017/fixtime';
+    await mongoose.connect(mongoURI);
+    console.log('MongoDB connected successfully');
+    
+    // Seed services if needed
+    await ensureSeededServices();
+  } catch (error) {
+    console.error('MongoDB connection error:', error.message);
+    process.exit(1);
+  }
+};
+
+// Call connectDB
+connectDB();
+
+// Set up server to listen for requests
+const PORT = process.env.PORT || 5001;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
 
 // --- Idempotent seeding logic ---
@@ -714,18 +743,3 @@ async function ensureSeededServices() {
   }
   console.log('Seeded services ensured.');
 }
-
-// Connect to MongoDB with better error handling
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/fixtime')
-  .then(async () => {
-    console.log('MongoDB connected successfully');
-    await ensureSeededServices();
-    const PORT = process.env.PORT || 5001;
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  })
-  .catch(err => {
-    console.error('MongoDB connection error:', err);
-    process.exit(1); // Exit with error
-  });
