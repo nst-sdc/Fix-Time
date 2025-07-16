@@ -18,6 +18,15 @@ import {
   FaExclamationTriangle
 } from 'react-icons/fa';
 import './MyAppointments.css';
+import { isPastAppointment } from '../utils/serviceUtils';
+
+// Add a helper to get the display status
+function getDisplayStatus(appointment) {
+  if ((appointment.status === 'scheduled' || appointment.status === 'confirmed') && isPastAppointment(appointment.date, appointment.time)) {
+    return 'completed';
+  }
+  return appointment.status;
+}
 
 const MyAppointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -648,7 +657,7 @@ const MyAppointments = () => {
                     <FaEye />
                     View Details
                   </button>
-                  {(appointment.status === 'scheduled' || appointment.status === 'confirmed') && (
+                  {(appointment.status === 'scheduled' || appointment.status === 'confirmed') && !isPastAppointment(appointment.date, appointment.time) && (
                     <>
                     <button 
                       className="reschedule-btn"
@@ -723,7 +732,7 @@ const MyAppointments = () => {
                           {getStatusIcon(selectedAppointment.status)}
                           {getStatusText(selectedAppointment.status)}
                         </span>
-                        <p className="status-description">{getStatusDescription(selectedAppointment.status)}</p>
+                        <p className="status-description">{getStatusDescription(getDisplayStatus(selectedAppointment))}</p>
                       </div>
                     </span>
                   </div>
@@ -771,7 +780,7 @@ const MyAppointments = () => {
             </div>
 
             <div className="modal-footer">
-              {(selectedAppointment.status === 'scheduled' || selectedAppointment.status === 'confirmed') && (
+              {(selectedAppointment.status === 'scheduled' || selectedAppointment.status === 'confirmed') && !isPastAppointment(selectedAppointment.date, selectedAppointment.time) && (
                 <>
                 <button 
                   className="reschedule-btn"

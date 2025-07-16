@@ -479,6 +479,14 @@ exports.updateAppointmentStatus = async (req, res) => {
       });
     }
 
+    // Prevent status update if appointment is in the past
+    if (isPastAppointment(appointment.date, appointment.time)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot update status of a past appointment.'
+      });
+    }
+
     // Update status
     appointment.status = status;
     if (!appointment.providerId) {
@@ -582,6 +590,14 @@ exports.rescheduleAppointment = async (req, res) => {
       });
     }
 
+    // Prevent rescheduling if appointment is in the past
+    if (isPastAppointment(appointment.date, appointment.time)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot reschedule a past appointment.'
+      });
+    }
+
     // Update appointment
     appointment.date = date;
     appointment.time = time;
@@ -612,3 +628,16 @@ exports.rescheduleAppointment = async (req, res) => {
     });
   }
 }; 
+
+// Utility: Check if appointment is in the past
+function isPastAppointment(date, time) {
+  const now = new Date();
+  const apptDate = new Date(date);
+  if (!time) return apptDate < now;
+  const [rawTime, period] = time.split(' ');
+  let [hours, minutes] = rawTime.split(':').map(Number);
+  if (period === 'PM' && hours !== 12) hours += 12;
+  if (period === 'AM' && hours === 12) hours = 0;
+  apptDate.setHours(hours, minutes, 0, 0);
+  return apptDate < now;
+} 
