@@ -26,7 +26,8 @@ const AppointmentBooking = ({ serviceId = null }) => {
     name: "",
     email: "",
     phone: "",
-    reason: preSelectedService || ""
+    reason: preSelectedService || "",
+    customerAddress: ""
   });
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [bookedAppointmentId, setBookedAppointmentId] = useState(null);
@@ -56,6 +57,22 @@ const AppointmentBooking = ({ serviceId = null }) => {
     }
   }, [preSelectedService]);
 
+  // Autofill address from user profile if available
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (token) {
+      axios.get('http://localhost:5001/auth/profile', {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+        .then(res => {
+          if (res.data?.user?.address) {
+            setFormData(prev => ({ ...prev, customerAddress: res.data.user.address }));
+          }
+        })
+        .catch(() => {});
+    }
+  }, []);
+
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
@@ -73,6 +90,10 @@ const AppointmentBooking = ({ serviceId = null }) => {
     const phoneToUse = formData.phone.trim();
     if (!validatePhone(phoneToUse)) {
       alert("Please enter a valid phone number (at least 10 digits)");
+      return;
+    }
+    if (!formData.customerAddress.trim()) {
+      alert("Please enter your address");
       return;
     }
     const [dayName, monthStr, dayNum] = selectedDate.replace(',', '').split(' ');
@@ -126,7 +147,8 @@ const AppointmentBooking = ({ serviceId = null }) => {
         notes: formData.reason,
         customerName: formData.name || user.name,
         customerEmail: formData.email || user.email,
-        customerPhone: phoneToUse
+        customerPhone: phoneToUse,
+        customerAddress: formData.customerAddress.trim()
       };
       const response = await axios.post(
         'http://localhost:5001/appointments',
@@ -267,6 +289,19 @@ const AppointmentBooking = ({ serviceId = null }) => {
             placeholder="Phone Number"
             onChange={handleChange}
             value={formData.phone}
+            required
+          />
+        </div>
+
+        <div className="form-group">
+          <label htmlFor="customerAddress">Address:</label>
+          <textarea
+            id="customerAddress"
+            name="customerAddress"
+            placeholder="Enter your Address"
+            rows={3}
+            onChange={handleChange}
+            value={formData.customerAddress}
             required
           />
         </div>

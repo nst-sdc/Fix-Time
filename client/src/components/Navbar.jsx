@@ -63,10 +63,20 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => 
             </li>
           )}
 
-          {isLoggedIn && (
+          {/* Show My Appointments only for clients */}
+          {isLoggedIn && userProfile?.role !== 'provider' && (
             <li className="nav-item">
               <Link to="/my-appointments" className="nav-link" onClick={() => setMenuOpen(false)}>
                 My Appointments
+              </Link>
+            </li>
+          )}
+
+          {/* Show My Services only for providers */}
+          {isLoggedIn && userProfile?.role === 'provider' && (
+            <li className="nav-item">
+              <Link to="/my-services" className="nav-link" onClick={() => setMenuOpen(false)}>
+                My Services
               </Link>
             </li>
           )}
@@ -75,14 +85,6 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => 
             <li className="nav-item">
               <Link to="/calendar" className="nav-link" onClick={() => setMenuOpen(false)}>
                 Calendar
-              </Link>
-            </li>
-          )}
-
-          {isLoggedIn && (
-            <li className="nav-item">
-              <Link to="/my-services" className="nav-link" onClick={() => setMenuOpen(false)}>
-                My Services
               </Link>
             </li>
           )}
@@ -133,22 +135,30 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => 
                       <span className="dropdown-email">{userProfile?.email || 'user@example.com'}</span>
                     </div>
                   </div>
-                  
                   <Link to="/dashboard" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
                     <BsSpeedometer2 className="dropdown-icon" />
                     <span>Dashboard</span>
                   </Link>
                   
-                  <Link to="/my-appointments" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
-                    <BsCalendarCheck className="dropdown-icon" />
-                    <span>My Appointments</span>
-                  </Link>
-                  
-                  <Link to="/profile" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
-                    <FaUserEdit className="dropdown-icon" />
-                    <span>Profile</span>
-                  </Link>
-                  
+                   {/* Show My Appointments only for clients */}
+                   {userProfile?.role !== 'provider' && (
+                     <Link to="/my-appointments" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
+                       <FaUser className="dropdown-icon" />
+                       <span>My Appointments</span>
+                     </Link>
+                   )}
+                   {/* Show My Services only for providers */}
+                   {userProfile?.role === 'provider' && (
+                     <Link to="/my-services" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
+                       <FaUser className="dropdown-icon" />
+                       <span>My Services</span>
+                     </Link>
+                   )}
+                   
+                    <Link to="/profile" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
+                      <FaUserEdit className="dropdown-icon" />
+                      <span>Profile</span>
+                    </Link>
                   <div className="dropdown-item logout-item" onClick={handleLogout}>
                     <FaSignOutAlt className="dropdown-icon" />
                     <span>Logout</span>

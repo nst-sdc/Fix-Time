@@ -218,6 +218,28 @@
   font-weight: 500;
 }
 
+.loading-spinner.revolving {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  font-size: 1.2rem;
+  color: #64748b;
+  font-weight: 500;
+  padding: 3rem;
+}
+
+.spinner-icon {
+  animation: spin 1s linear infinite;
+  font-size: 2rem;
+  color: #5a3dff;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 /* Dark Mode Styles */
 body.dark .profile-container {
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
