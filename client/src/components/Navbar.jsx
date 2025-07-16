@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import './Navbar.css';
 import { IoMenuOutline, IoCloseOutline } from 'react-icons/io5';
 import { FaUser, FaSignOutAlt, FaChevronDown, FaUserEdit } from 'react-icons/fa';
-import { BsSun, BsMoon } from 'react-icons/bs';
+import { BsSun, BsMoon, BsCalendarCheck, BsSpeedometer2 } from 'react-icons/bs';
 
 const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -116,7 +116,7 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => 
               <div className="profile-button" onClick={toggleDropdown}>
                 <div className="profile-info">
                   <div className="avatar-circle">
-                    <FaUser className="profile-avatar-icon" />
+                    <img src="/ui%20images/userimage.png" alt="User" className="user-avatar-image" />
                   </div>
                   <span className="profile-name">
                     {userProfile?.email?.split('@')[0] || 'User'}
@@ -128,9 +128,6 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => 
               {dropdownOpen && (
                 <div className="dropdown-menu">
                   <div className="dropdown-header">
-                    <div className="dropdown-avatar-container">
-                      <FaUser className="dropdown-avatar-icon" />
-                    </div>
                     <div className="dropdown-user-details">
                       <span className="dropdown-username">{userProfile?.email?.split('@')[0] || 'User'}</span>
                       <span className="dropdown-email">{userProfile?.email || 'user@example.com'}</span>
@@ -138,12 +135,12 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => 
                   </div>
                   
                   <Link to="/dashboard" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
-                    <FaUser className="dropdown-icon" />
+                    <BsSpeedometer2 className="dropdown-icon" />
                     <span>Dashboard</span>
                   </Link>
                   
                   <Link to="/my-appointments" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
-                    <FaUser className="dropdown-icon" />
+                    <BsCalendarCheck className="dropdown-icon" />
                     <span>My Appointments</span>
                   </Link>
                   
