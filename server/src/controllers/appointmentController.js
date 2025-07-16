@@ -66,6 +66,7 @@ exports.createAppointment = async (req, res) => {
 
     // Check if service exists and get provider info
     console.log("Looking up service with ID:", serviceId);
+    let providerToAssign;
     try {
       const service = await Service.findById(serviceId).populate('providerId');
       if (!service) {
@@ -75,16 +76,20 @@ exports.createAppointment = async (req, res) => {
           message: 'Service not found'
         });
       }
-      
-      if (!service.providerId) {
-        console.log("Service has no provider assigned");
-        return res.status(400).json({
-          success: false,
-          message: 'Service is not available for booking'
-        });
+      providerToAssign = service.providerId;
+      if (!providerToAssign) {
+        // Try to find the default provider by email
+        providerToAssign = await Provider.findOne({ contactEmail: 'nam@gmail.com' });
+        if (!providerToAssign) {
+          console.log("Default provider with email nam@gmail.com not found");
+          return res.status(400).json({
+            success: false,
+            message: 'No provider assigned to this service and default provider not found'
+          });
+        }
+        console.log("Assigning default provider (nam@gmail.com) to appointment");
       }
-      
-      console.log("Found service:", service.name, "Provider:", service.providerId._id);
+      console.log("Found service:", service.name, "Provider:", providerToAssign._id);
     } catch (serviceErr) {
       console.error("Error finding service:", serviceErr);
       return res.status(400).json({
@@ -97,7 +102,7 @@ exports.createAppointment = async (req, res) => {
     const appointment = new Appointment({
       userId,
       serviceId,
-      providerId: service.providerId._id,
+      providerId: providerToAssign._id,
       date,
       time,
       notes: notes || '',
@@ -311,7 +316,7 @@ exports.updateProviderAppointmentStatus = async (req, res) => {
     const { status, providerNotes } = req.body;
     const userId = req.user.id;
 
-    if (!status || !['pending', 'confirmed', 'rejected', 'completed', 'cancelled', 'no-show'].includes(status)) {
+    if (!status || !['pending', 'confirmed', 'rejected', 'completed', 'cancelled', 'no-show', 'scheduled'].includes(status)) {
       return res.status(400).json({
         success: false,
         message: 'Please provide a valid status'
@@ -343,6 +348,12 @@ exports.updateProviderAppointmentStatus = async (req, res) => {
     appointment.status = status;
     if (providerNotes) {
       appointment.providerNotes = providerNotes;
+    }
+    if (!appointment.providerId) {
+      const defaultProvider = await Provider.findOne({ contactEmail: 'nam@gmail.com' });
+      if (defaultProvider) {
+        appointment.providerId = defaultProvider._id;
+      }
     }
     await appointment.save();
 
@@ -449,7 +460,7 @@ exports.updateAppointmentStatus = async (req, res) => {
     const { status } = req.body;
     const userId = req.user.id;
 
-    if (!status || !['pending', 'confirmed', 'rejected', 'completed', 'cancelled', 'no-show'].includes(status)) {
+    if (!status || !['pending', 'confirmed', 'rejected', 'completed', 'cancelled', 'no-show', 'scheduled'].includes(status)) {
       return res.status(400).json({
         success: false,
         message: 'Please provide a valid status'
@@ -470,6 +481,12 @@ exports.updateAppointmentStatus = async (req, res) => {
 
     // Update status
     appointment.status = status;
+    if (!appointment.providerId) {
+      const defaultProvider = await Provider.findOne({ contactEmail: 'nam@gmail.com' });
+      if (defaultProvider) {
+        appointment.providerId = defaultProvider._id;
+      }
+    }
     await appointment.save();
 
     // Create notification for provider if appointment is cancelled
@@ -568,6 +585,12 @@ exports.rescheduleAppointment = async (req, res) => {
     // Update appointment
     appointment.date = date;
     appointment.time = time;
+    if (!appointment.providerId) {
+      const defaultProvider = await Provider.findOne({ contactEmail: 'nam@gmail.com' });
+      if (defaultProvider) {
+        appointment.providerId = defaultProvider._id;
+      }
+    }
     await appointment.save();
 
     // Populate service details

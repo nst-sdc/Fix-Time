@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FiEdit2, FiSave, FiX, FiUser, FiPhone, FiMapPin, FiCalendar, FiMail } from 'react-icons/fi';
 import './UserProfile.css';
+import { FaSpinner } from 'react-icons/fa';
 
 const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
   const [user, setUser] = useState(null);
@@ -21,6 +22,16 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
     address: '',
     dateOfBirth: '',
     gender: ''
+  });
+
+  const [businessInfo, setBusinessInfo] = useState({
+    businessName: '',
+    businessDescription: '',
+    businessCategory: '',
+    businessHours: '',
+    location: '',
+    specializations: '',
+    experience: ''
   });
 
   // Calculate min and max dates for age validation (10 years minimum age)
@@ -66,6 +77,17 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
         dateOfBirth: response.data.user.dateOfBirth ? new Date(response.data.user.dateOfBirth).toISOString().split('T')[0] : '',
         gender: response.data.user.gender || ''
       });
+      if (response.data.user.role === 'provider' && response.data.user.providerInfo) {
+        setBusinessInfo({
+          businessName: response.data.user.providerInfo.businessName || '',
+          businessDescription: response.data.user.providerInfo.businessDescription || '',
+          businessCategory: response.data.user.providerInfo.businessCategory || '',
+          businessHours: response.data.user.providerInfo.businessHours || '',
+          location: response.data.user.providerInfo.location || '',
+          specializations: (response.data.user.providerInfo.specializations || []).join(', '),
+          experience: response.data.user.providerInfo.experience || ''
+        });
+      }
     } catch (err) {
       console.error('Error fetching profile:', err);
       setError('Failed to load profile data');
@@ -82,6 +104,14 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleBusinessInputChange = (e) => {
+    const { name, value } = e.target;
+    setBusinessInfo(prev => ({
       ...prev,
       [name]: value
     }));
@@ -132,7 +162,19 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
       }
 
       const token = localStorage.getItem('token');
-      const response = await axios.put('http://localhost:5001/auth/profile', formData, {
+      let payload = { ...formData };
+      if (user.role === 'provider') {
+        payload.businessInfo = {
+          businessName: businessInfo.businessName,
+          businessDescription: businessInfo.businessDescription,
+          businessCategory: businessInfo.businessCategory,
+          businessHours: businessInfo.businessHours,
+          location: businessInfo.location,
+          specializations: businessInfo.specializations.split(',').map(s => s.trim()).filter(Boolean),
+          experience: businessInfo.experience
+        };
+      }
+      const response = await axios.put('http://localhost:5001/auth/profile', payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -147,6 +189,18 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
       // Update the global user profile for Dashboard
       if (setUserProfile) {
         setUserProfile(response.data.user);
+      }
+
+      if (user.role === 'provider' && response.data.user.providerInfo) {
+        setBusinessInfo({
+          businessName: response.data.user.providerInfo.businessName || '',
+          businessDescription: response.data.user.providerInfo.businessDescription || '',
+          businessCategory: response.data.user.providerInfo.businessCategory || '',
+          businessHours: response.data.user.providerInfo.businessHours || '',
+          location: response.data.user.providerInfo.location || '',
+          specializations: (response.data.user.providerInfo.specializations || []).join(', '),
+          experience: response.data.user.providerInfo.experience || ''
+        });
       }
 
       setTimeout(() => setSuccess(''), 3000);
@@ -190,7 +244,10 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
     return (
       <div className="profile-container">
         <div className="profile-card">
-          <div className="loading-spinner">Loading profile...</div>
+          <div className="calendar-loading">
+            <div className="spinner"></div>
+            <p>Loading your profile...</p>
+          </div>
         </div>
       </div>
     );
@@ -353,6 +410,121 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
               </div>
             </div>
           </div>
+
+          {/* Provider Business Info Section */}
+          {user.role === 'provider' && (
+            <div className="profile-section">
+              <h2 className="section-title">Business Information</h2>
+              <div className="info-grid">
+                <div className="info-item">
+                  <div className="info-label">Business Name</div>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="businessName"
+                      value={businessInfo.businessName}
+                      onChange={handleBusinessInputChange}
+                      className="profile-input"
+                      placeholder="Enter business name"
+                    />
+                  ) : (
+                    <div className="info-value">{businessInfo.businessName || 'Not provided'}</div>
+                  )}
+                </div>
+                <div className="info-item">
+                  <div className="info-label">Description</div>
+                  {isEditing ? (
+                    <textarea
+                      name="businessDescription"
+                      value={businessInfo.businessDescription}
+                      onChange={handleBusinessInputChange}
+                      className="profile-input"
+                      placeholder="Enter business description"
+                      rows="2"
+                    />
+                  ) : (
+                    <div className="info-value">{businessInfo.businessDescription || 'Not provided'}</div>
+                  )}
+                </div>
+                <div className="info-item">
+                  <div className="info-label">Category</div>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="businessCategory"
+                      value={businessInfo.businessCategory}
+                      onChange={handleBusinessInputChange}
+                      className="profile-input"
+                      placeholder="Enter business category"
+                    />
+                  ) : (
+                    <div className="info-value">{businessInfo.businessCategory || 'Not provided'}</div>
+                  )}
+                </div>
+                <div className="info-item">
+                  <div className="info-label">Business Hours</div>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="businessHours"
+                      value={businessInfo.businessHours}
+                      onChange={handleBusinessInputChange}
+                      className="profile-input"
+                      placeholder="e.g. 9:00 AM - 6:00 PM"
+                    />
+                  ) : (
+                    <div className="info-value">{businessInfo.businessHours || 'Not provided'}</div>
+                  )}
+                </div>
+                <div className="info-item">
+                  <div className="info-label">Location</div>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="location"
+                      value={businessInfo.location}
+                      onChange={handleBusinessInputChange}
+                      className="profile-input"
+                      placeholder="Enter business location"
+                    />
+                  ) : (
+                    <div className="info-value">{businessInfo.location || 'Not provided'}</div>
+                  )}
+                </div>
+                <div className="info-item">
+                  <div className="info-label">Specializations</div>
+                  {isEditing ? (
+                    <input
+                      type="text"
+                      name="specializations"
+                      value={businessInfo.specializations}
+                      onChange={handleBusinessInputChange}
+                      className="profile-input"
+                      placeholder="Comma separated (e.g. Haircut, Spa)"
+                    />
+                  ) : (
+                    <div className="info-value">{businessInfo.specializations || 'Not provided'}</div>
+                  )}
+                </div>
+                <div className="info-item">
+                  <div className="info-label">Experience (years)</div>
+                  {isEditing ? (
+                    <input
+                      type="number"
+                      name="experience"
+                      value={businessInfo.experience}
+                      onChange={handleBusinessInputChange}
+                      className="profile-input"
+                      placeholder="Years of experience"
+                      min="0"
+                    />
+                  ) : (
+                    <div className="info-value">{businessInfo.experience || 'Not provided'}</div>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
 
           <div className="profile-section">
             <h2 className="section-title">Account Information</h2>

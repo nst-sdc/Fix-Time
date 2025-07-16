@@ -442,10 +442,9 @@ const MyAppointments = () => {
 
   if (loading) {
     return (
-      <div className="appointments-container">
-        <div className="appointments-card">
-          <div className="loading-spinner">Loading your appointments...</div>
-        </div>
+      <div className="calendar-loading">
+        <div className="spinner"></div>
+        <p>Loading your appointments...</p>
       </div>
     );
   }
@@ -605,7 +604,15 @@ const MyAppointments = () => {
                     <h3 className="service-name">{appointment.serviceName}</h3>
                     <span className="service-category">{appointment.serviceCategory}</span>
                   </div>
-                  <div className="status-badge" style={{ backgroundColor: getStatusColor(appointment.status) }}>
+                  <div className={`status-badge booking-status ${
+                    appointment.status === 'scheduled'
+                      ? 'scheduled-blue'
+                      : appointment.status === 'cancelled'
+                      ? 'cancelled-red'
+                      : appointment.status
+                      ? appointment.status.toLowerCase()
+                      : ''
+                  }`}>
                     {getStatusIcon(appointment.status)}
                     <span>{getStatusText(appointment.status)}</span>
                   </div>
@@ -702,7 +709,17 @@ const MyAppointments = () => {
                     <span className="detail-label">Status:</span>
                     <span className="detail-value">
                       <div className="status-detail-container">
-                        <span className="status-indicator" style={{ backgroundColor: getStatusColor(selectedAppointment.status) }}>
+                        <span
+                          className={`status-indicator booking-status ${
+                            selectedAppointment.status === 'scheduled'
+                              ? 'scheduled-blue'
+                              : selectedAppointment.status === 'cancelled'
+                              ? 'cancelled-red'
+                              : selectedAppointment.status
+                              ? selectedAppointment.status.toLowerCase()
+                              : ''
+                          }`}
+                        >
                           {getStatusIcon(selectedAppointment.status)}
                           {getStatusText(selectedAppointment.status)}
                         </span>
