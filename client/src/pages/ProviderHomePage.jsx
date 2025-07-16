@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import './HomePage.css';
 import './ProviderHomePage.css';
 import { FaCalendarAlt, FaUser, FaClock, FaMoneyBillWave, FaEnvelope, FaChartBar, FaToggleOn, FaToggleOff, FaBell, FaUserEdit, FaListAlt, FaComments, FaQuestionCircle, FaUserCheck } from 'react-icons/fa';
@@ -7,6 +7,8 @@ import AppointmentDetails from '../components/AppointmentDetails';
 import ServiceReviews from '../components/ServiceReviews';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
+import axios from 'axios';
+import { navigateToTop } from '../utils/useScrollToTop';
 
 // Dummy data for now
 const dummyAppointments = [
@@ -26,20 +28,149 @@ const dummyReviews = [
 ];
 
 const ProviderHomePage = () => {
+  const navigate = useNavigate();
   const [queueOpen, setQueueOpen] = useState(true);
   const [nowServing, setNowServing] = useState('John Doe');
   const [nextAppointment, setNextAppointment] = useState('11:30 AM');
   const [stats, setStats] = useState({
-    totalToday: 7,
-    noShows: 1,
-    avgWait: 6,
+    totalToday: 0,
+    noShows: 0,
+    avgWait: 0,
   });
+  const [loadingStats, setLoadingStats] = useState(true);
+  const [errorStats, setErrorStats] = useState('');
   const [notifPulse, setNotifPulse] = useState(true);
+  const [upcoming, setUpcoming] = useState([]);
+  const [loadingUpcoming, setLoadingUpcoming] = useState(true);
+  const [errorUpcoming, setErrorUpcoming] = useState('');
+  const [availabilityData, setAvailabilityData] = useState([]);
+  const [loadingAvailability, setLoadingAvailability] = useState(true);
+
+  // Function to navigate with scroll to top
+  const handleNavigateToTop = (path) => {
+    navigateToTop(navigate, path);
+  };
 
   useEffect(() => {
     AOS.init({ duration: 1200, easing: 'ease-out', once: true });
     const interval = setInterval(() => setNotifPulse(p => !p), 2000);
     return () => clearInterval(interval);
+  }, []);
+
+  useEffect(() => {
+    const fetchUpcoming = async () => {
+      setLoadingUpcoming(true);
+      setErrorUpcoming('');
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get('http://localhost:5001/appointments/provider', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.data.appointments) {
+          // Only future appointments, sorted by date/time
+          const now = new Date();
+          const upcomingSorted = res.data.appointments
+            .filter(a => {
+              // Combine date and time
+              let apptDate = new Date(a.date);
+              let [h, m] = (a.time || '').split(/:| /).map(Number);
+              if (/pm/i.test(a.time) && h !== 12) h += 12;
+              if (/am/i.test(a.time) && h === 12) h = 0;
+              apptDate.setHours(h || 0);
+              apptDate.setMinutes(m || 0);
+              return apptDate > now && ['scheduled','confirmed','pending'].includes(a.status);
+            })
+            .sort((a, b) => new Date(a.date) - new Date(b.date))
+            .slice(0, 3);
+          setUpcoming(upcomingSorted);
+        } else {
+          setUpcoming([]);
+        }
+      } catch (err) {
+        setErrorUpcoming('Could not load upcoming appointments.');
+      } finally {
+        setLoadingUpcoming(false);
+      }
+    };
+    fetchUpcoming();
+  }, []);
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      setLoadingStats(true);
+      setErrorStats('');
+      try {
+        const token = localStorage.getItem('token');
+        // Fetch appointments for today
+        const appointmentsRes = await axios.get('http://localhost:5001/appointments/provider', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        // Fetch provider's services for average duration
+        const servicesRes = await axios.get('http://localhost:5001/services/provider', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (appointmentsRes.data.appointments && servicesRes.data.services) {
+          const today = new Date().toISOString().slice(0, 10);
+          const todayAppointments = appointmentsRes.data.appointments.filter(a => 
+            a.date && a.date.slice(0, 10) === today
+          );
+          const noShows = todayAppointments.filter(a => a.status === 'no-show').length;
+          
+          // Calculate average duration from provider's services
+          const services = servicesRes.data.services;
+          const avgDuration = services.length > 0 
+            ? Math.round(services.reduce((sum, s) => sum + (s.duration || 0), 0) / services.length)
+            : 0;
+          
+          setStats({
+            totalToday: todayAppointments.length,
+            noShows: noShows,
+            avgWait: avgDuration,
+          });
+        }
+      } catch (err) {
+        setErrorStats('Could not load activity stats.');
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+    fetchStats();
+  }, []);
+
+  useEffect(() => {
+    const fetchAvailability = async () => {
+      setLoadingAvailability(true);
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get('http://localhost:5001/appointments/provider', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        
+        if (res.data.appointments) {
+          // Calculate bookings for next 30 days
+          const next30Days = Array.from({ length: 30 }, (_, i) => {
+            const d = new Date();
+            d.setDate(d.getDate() + i);
+            return d.toISOString().slice(0, 10);
+          });
+          
+          const dayBookings = next30Days.map(date => {
+            const bookings = res.data.appointments.filter(a => 
+              a.date && a.date.slice(0, 10) === date
+            ).length;
+            return { date, bookings };
+          });
+          
+          setAvailabilityData(dayBookings);
+        }
+      } catch (err) {
+        console.error('Failed to load availability data:', err);
+      } finally {
+        setLoadingAvailability(false);
+      }
+    };
+    fetchAvailability();
   }, []);
 
   // Animated counter
@@ -60,24 +191,61 @@ const ProviderHomePage = () => {
     return <span>{count}</span>;
   };
 
-  // Mini calendar widget (dummy)
-  const MiniCalendar = () => (
-    <div className="mini-calendar-widget animated-pop" data-aos="fade-left">
-      <div className="calendar-header">June 2024</div>
-      <div className="calendar-grid">
-        {[...Array(7)].map((_, i) => (
-          <div className="calendar-day-label" key={i}>{['S','M','T','W','T','F','S'][i]}</div>
-        ))}
-        {[...Array(30)].map((_, i) => (
-          <div className={`calendar-day${i === 2 || i === 9 || i === 14 ? ' busy' : ''}`} key={i}>{i+1}</div>
-        ))}
+  // Mini calendar widget with real data
+  const MiniCalendar = () => {
+    const today = new Date();
+    const currentMonth = today.getMonth();
+    const currentYear = today.getFullYear();
+    
+    // Get the first day of the current month
+    const firstDayOfMonth = new Date(currentYear, currentMonth, 1);
+    const lastDayOfMonth = new Date(currentYear, currentMonth + 1, 0);
+    
+    // Calculate how many days to show (from today to end of month + some days from next month)
+    const daysFromToday = 30;
+    const daysToShow = Math.min(daysFromToday, lastDayOfMonth.getDate() - today.getDate() + 1);
+    
+    const getDayClass = (dayOffset) => {
+      const targetDate = new Date(today);
+      targetDate.setDate(today.getDate() + dayOffset);
+      const dateString = targetDate.toISOString().slice(0, 10);
+      
+      const dayData = availabilityData.find(d => d.date === dateString);
+      if (!dayData) return 'calendar-day';
+      
+      if (dayData.bookings > 5) return 'calendar-day busy';
+      if (dayData.bookings > 0) return 'calendar-day green';
+      return 'calendar-day';
+    };
+
+    const getDayNumber = (dayOffset) => {
+      const targetDate = new Date(today);
+      targetDate.setDate(today.getDate() + dayOffset);
+      return targetDate.getDate();
+    };
+
+    return (
+      <div className="mini-calendar-widget animated-pop" data-aos="fade-left">
+        <div className="calendar-header">
+          {today.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+        </div>
+        <div className="calendar-grid">
+          {[...Array(7)].map((_, i) => (
+            <div className="calendar-day-label" key={i}>{['S','M','T','W','T','F','S'][i]}</div>
+          ))}
+          {[...Array(daysToShow)].map((_, i) => (
+            <div className={getDayClass(i)} key={i} title={`${getDayNumber(i)} ${today.toLocaleDateString('en-US', { month: 'short' })}`}>
+              {getDayNumber(i)}
+            </div>
+          ))}
+        </div>
+        <div className="calendar-legend">
+          <span className="dot busy"></span> Busy (&gt;5)
+          <span className="dot green"></span> Booked (1-5)
+        </div>
       </div>
-      <div className="calendar-legend">
-        <span className="dot busy"></span> Busy
-        <span className="dot free"></span> Free
-      </div>
-    </div>
-  );
+    );
+  };
 
   // Dummy review cards
   const ReviewCard = ({ review }) => (
@@ -96,6 +264,20 @@ const ProviderHomePage = () => {
     </div>
   );
 
+  // Helper to format time to 12-hour with AM/PM
+  const formatTime12h = (timeStr) => {
+    if (!timeStr) return '';
+    // If already in 12-hour format with AM/PM, return as is
+    if (/am|pm|AM|PM/.test(timeStr)) return timeStr;
+    // If in HH:MM format, convert
+    const [h, m] = timeStr.split(":").map(Number);
+    if (isNaN(h) || isNaN(m)) return timeStr;
+    let hour = h % 12;
+    if (hour === 0) hour = 12;
+    const ampm = h < 12 ? "AM" : "PM";
+    return `${hour}:${m.toString().padStart(2, "0")} ${ampm}`;
+  };
+
   return (
     <div className="home-page provider-home-page">
       {/* HERO SECTION */}
@@ -110,8 +292,8 @@ const ProviderHomePage = () => {
               Welcome! Manage your appointments, availability, and client experience with Fix-Time’s smart queue-free platform.
             </p>
             <div className="hero-buttons">
-              <Link to="/dashboard" className="btn btn-primary">Go to Dashboard</Link>
-              <Link to="/profile" className="btn btn-secondary">Edit Profile</Link>
+              <button onClick={() => handleNavigateToTop('/dashboard')} className="btn btn-primary">Go to Dashboard</button>
+              <button onClick={() => handleNavigateToTop('/profile')} className="btn btn-secondary">Edit Profile</button>
             </div>
             <div className="hero-stats">
               <div className="stat-item">
@@ -181,19 +363,27 @@ const ProviderHomePage = () => {
             <div className="card-header">
               <FaCalendarAlt className="card-icon" />
               <h3>Upcoming Appointments</h3>
-              <Link to="/calendar" className="view-all-link">View All</Link>
+              <button onClick={() => handleNavigateToTop('/calendar')} className="view-all-link">View All</button>
             </div>
             <div className="appointments-preview">
-              {dummyAppointments.slice(0, 3).map(appt => (
-                <div className="appointment-preview" key={appt._id}>
-                  <FaUser className="preview-icon" />
-                  <div className="preview-info">
-                    <div className="client-name">{appt.clientName}</div>
-                    <div className="service-type">{appt.serviceName}</div>
-                    <div className="time-slot"><FaClock /> {appt.time}</div>
+              {loadingUpcoming ? (
+                <div className="loading-state">Loading...</div>
+              ) : errorUpcoming ? (
+                <div className="error-message">{errorUpcoming}</div>
+              ) : upcoming.length === 0 ? (
+                <div className="empty-state">No upcoming appointments.</div>
+              ) : (
+                upcoming.map(appt => (
+                  <div className="appointment-preview" key={appt._id}>
+                    <FaUser className="preview-icon" />
+                    <div className="preview-info">
+                      <div className="client-name">{appt.customerName || appt.clientName}</div>
+                      <div className="service-type">{appt.serviceName}</div>
+                      <div className="time-slot"><FaClock /> {formatTime12h(appt.time)}</div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))
+              )}
             </div>
           </div>
 
@@ -204,18 +394,26 @@ const ProviderHomePage = () => {
               <h3>Daily Activity Snapshot</h3>
             </div>
             <div className="stats-counters">
-              <div className="stat-box">
-                <span className="stat-label">Total Today</span>
-                <span className="stat-value"><AnimatedCounter value={stats.totalToday} /></span>
-              </div>
-              <div className="stat-box">
-                <span className="stat-label">No-Shows</span>
-                <span className="stat-value"><AnimatedCounter value={stats.noShows} /></span>
-              </div>
-              <div className="stat-box">
-                <span className="stat-label">Avg. Wait</span>
-                <span className="stat-value"><AnimatedCounter value={stats.avgWait} /> min</span>
-              </div>
+              {loadingStats ? (
+                <div className="loading-state">Loading stats...</div>
+              ) : errorStats ? (
+                <div className="error-message">{errorStats}</div>
+              ) : (
+                <>
+                  <div className="stat-box">
+                    <span className="stat-label">Total Today</span>
+                    <span className="stat-value"><AnimatedCounter value={stats.totalToday} /></span>
+                  </div>
+                  <div className="stat-box">
+                    <span className="stat-label">No-Shows</span>
+                    <span className="stat-value"><AnimatedCounter value={stats.noShows} /></span>
+                  </div>
+                  <div className="stat-box">
+                    <span className="stat-label">Avg. Duration</span>
+                    <span className="stat-value"><AnimatedCounter value={stats.avgWait} /> min</span>
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
@@ -226,8 +424,20 @@ const ProviderHomePage = () => {
               <h3>Manage Availability</h3>
             </div>
             <div className="availability-content">
-              <div className="today-status">Today: <span className="status-free">Free</span></div>
-              <Link to="/dashboard" className="update-schedule-btn">Update My Schedule</Link>
+              <div className="today-status">Today: <span className={`status-${(() => {
+                const today = new Date().toISOString().slice(0, 10);
+                const todayBookings = availabilityData.find(d => d.date === today)?.bookings || 0;
+                if (todayBookings > 5) return 'busy';
+                if (todayBookings > 0) return 'booked';
+                return 'free';
+              })()}`}>{(() => {
+                const today = new Date().toISOString().slice(0, 10);
+                const todayBookings = availabilityData.find(d => d.date === today)?.bookings || 0;
+                if (todayBookings > 5) return 'Busy';
+                if (todayBookings > 0) return 'Booked';
+                return 'Free';
+              })()}</span></div>
+              <button onClick={() => handleNavigateToTop('/dashboard')} className="update-schedule-btn">Update My Schedule</button>
               <MiniCalendar />
             </div>
           </div>
@@ -247,6 +457,9 @@ const ProviderHomePage = () => {
             </div>
             <div className="queue-progress-bar">
               <div className="progress" style={{ width: queueOpen ? '70%' : '0%' }}></div>
+            </div>
+            <div className="queue-under-development">
+              <p>Queue Management - Under Development</p>
             </div>
           </div>
 
@@ -273,10 +486,10 @@ const ProviderHomePage = () => {
               <h3>Quick Access</h3>
             </div>
             <div className="quick-links-grid">
-              <Link to="/profile" className="quick-link-btn"><FaUserEdit /> Edit Profile</Link>
-              <Link to="/dashboard" className="quick-link-btn"><FaListAlt /> Services Offered</Link>
-              <Link to="/reviews" className="quick-link-btn"><FaComments /> Client Feedback</Link>
-              <Link to="/help" className="quick-link-btn"><FaQuestionCircle /> Help Center</Link>
+              <button onClick={() => handleNavigateToTop('/profile')} className="quick-link-btn"><FaUserEdit /> Edit Profile</button>
+              <button onClick={() => handleNavigateToTop('/provider-services')} className="quick-link-btn"><FaListAlt /> Service Catalogue</button>
+              <button onClick={() => handleNavigateToTop('/my-services')} className="quick-link-btn"><FaComments /> My Services</button>
+              <button onClick={() => handleNavigateToTop('/help')} className="quick-link-btn"><FaQuestionCircle /> Help Center</button>
             </div>
           </div>
         </div>

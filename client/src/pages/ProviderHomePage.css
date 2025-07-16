@@ -27,6 +27,34 @@
   align-items: center;
   gap: 0.7rem;
   margin-bottom: 0.7rem;
+  justify-content: space-between;
+}
+
+.view-all-link {
+  background: none;
+  border: none;
+  color: #5a3dff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: color 0.2s;
+  text-decoration: none;
+  padding: 0.3rem 0.6rem;
+  border-radius: 4px;
+}
+
+.view-all-link:hover {
+  color: #a56bff;
+  background: rgba(90, 61, 255, 0.1);
+}
+
+body.dark .view-all-link {
+  color: #9f8fff;
+}
+
+body.dark .view-all-link:hover {
+  color: #c19eff;
+  background: rgba(159, 143, 255, 0.1);
 }
 .card-icon {
   font-size: 1.5rem;
@@ -86,6 +114,7 @@
 .stat-label {
   font-size: 0.95rem;
   color: #64748b;
+  font-weight: 500;
 }
 .stat-value {
   font-size: 1.5rem;
@@ -94,12 +123,39 @@
   margin-top: 0.2rem;
 }
 
+/* Ensure proper contrast in light mode */
+body:not(.dark) .stat-label {
+  color: #475569;
+}
+
+body:not(.dark) .stat-value {
+  color: #5a3dff;
+}
+
+body.dark .stat-label {
+  color: #a1a9c0;
+}
+
+body.dark .stat-value {
+  color: #9f8fff;
+}
+
 .availability-card .today-status {
   font-size: 1.1rem;
   margin-bottom: 0.7rem;
 }
 .status-free {
+  color: #6b7280;
+  font-weight: 600;
+}
+
+.status-booked {
   color: #10b981;
+  font-weight: 600;
+}
+
+.status-busy {
+  color: #ef4444;
   font-weight: 600;
 }
 .update-schedule-btn {
@@ -172,6 +228,22 @@
   height: 100%;
   border-radius: 6px;
   transition: width 0.5s;
+}
+
+.queue-under-development {
+  margin-top: 1rem;
+  padding: 0.8rem;
+  background: #f8f9fa;
+  border-radius: 6px;
+  text-align: center;
+  border: 1px dashed #dee2e6;
+}
+
+.queue-under-development p {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #6c757d;
+  font-style: italic;
 }
 
 .notifications-card .notif-pulse.pulse {
@@ -338,6 +410,15 @@ body.dark .queue-progress-bar {
 body.dark .queue-progress-bar .progress {
   background: linear-gradient(90deg, #a56bff 0%, #10b981 100%);
 }
+
+body.dark .queue-under-development {
+  background: #334155;
+  border-color: #475569;
+}
+
+body.dark .queue-under-development p {
+  color: #a1a9c0;
+}
 body.dark .notif-message {
   color: #e2e8f0;
 }
@@ -423,9 +504,20 @@ body.dark .why-icon {
   transition: background 0.2s, color 0.2s;
 }
 .calendar-day.busy {
-  background: #fca5a5;
-  color: #fff;
+  background: #ef4444;
+  color: white;
 }
+
+.calendar-day.green {
+  background: #10b981;
+  color: white;
+}
+
+.calendar-day.free {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
 .calendar-legend {
   display: flex;
   align-items: center;
@@ -446,6 +538,9 @@ body.dark .why-icon {
   background: #fca5a5;
 }
 .calendar-legend .dot.free {
+  background: #10b981;
+}
+.calendar-legend .dot.green {
   background: #10b981;
 }
 
@@ -597,6 +692,14 @@ body.dark .calendar-day {
 body.dark .calendar-day.busy {
   background: #fca5a5;
   color: #fff;
+}
+body.dark .calendar-day.green {
+  background: #10b981;
+  color: #fff;
+}
+body.dark .calendar-day.free {
+  background: #334155;
+  color: #a3a3a3;
 }
 body.dark .calendar-header,
 body.dark .why-choose-title,

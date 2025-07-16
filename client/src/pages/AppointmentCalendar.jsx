@@ -4,7 +4,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import './AppointmentCalendar.css';
-import { FaFilter, FaCalendarDay, FaTimes, FaEdit, FaTrash, FaMapMarkerAlt, FaBuilding, FaClock, FaCalendarAlt, FaStickyNote, FaChevronDown, FaSync, FaAngleUp, FaAngleDown, FaCalendarWeek } from 'react-icons/fa';
+import { FaFilter, FaCalendarDay, FaTimes, FaEdit, FaTrash, FaMapMarkerAlt, FaBuilding, FaClock, FaCalendarAlt, FaStickyNote, FaChevronDown, FaSync, FaAngleUp, FaAngleDown, FaCalendarWeek, FaUser, FaEnvelope, FaPhone, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -23,6 +23,8 @@ const AppointmentCalendar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [notification, setNotification] = useState({ show: false, message: '' });
+  const [userProfile, setUserProfile] = useState(null);
+  const [isProvider, setIsProvider] = useState(false);
 
   // Service categories with their corresponding colors
   const categoryColors = {
@@ -36,6 +38,26 @@ const AppointmentCalendar = () => {
     'Retail': '#42f54e',      // green
     'Events': '#f5e642',      // yellow
     'default': '#6c757d'      // gray
+  };
+
+  // Fetch user profile to determine role
+  const fetchUserProfile = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      if (!token) return;
+      
+      const response = await axios.get('http://localhost:5001/auth/profile', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      
+      if (response.data?.success) {
+        const profile = response.data.user;
+        setUserProfile(profile);
+        setIsProvider(profile.role === 'provider');
+      }
+    } catch (err) {
+      console.error('Error fetching user profile:', err);
+    }
   };
 
   // Fetch appointments data
@@ -53,8 +75,9 @@ const AppointmentCalendar = () => {
         return;
       }
       
-      // Fetch appointments from API
-      const response = await axios.get('http://localhost:5001/appointments', {
+      // Fetch appointments from API based on user role
+      const endpoint = isProvider ? 'http://localhost:5001/appointments/provider' : 'http://localhost:5001/appointments';
+      const response = await axios.get(endpoint, {
         headers: {
           Authorization: `Bearer ${token}`
         }
@@ -78,10 +101,17 @@ const AppointmentCalendar = () => {
     }
   };
 
-  // Use effect to fetch appointments on component mount
+  // Use effect to fetch user profile and appointments on component mount
   useEffect(() => {
-    fetchAppointments();
+    fetchUserProfile();
   }, []);
+
+  // Use effect to fetch appointments after user profile is loaded
+  useEffect(() => {
+    if (userProfile) {
+      fetchAppointments();
+    }
+  }, [userProfile, isProvider]);
 
   // Use effect to check for appointment updates in localStorage
   useEffect(() => {
@@ -264,6 +294,49 @@ const AppointmentCalendar = () => {
     }
   };
 
+  // Update appointment status (for providers)
+  const updateAppointmentStatus = async (id, status) => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      const response = await axios.patch(
+        `http://localhost:5001/appointments/${id}/provider-status`,
+        { status },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        }
+      );
+      
+      if (response.data && response.data.success) {
+        // Update local state
+        const updatedAppointments = appointments.map(appt => 
+          appt._id === id ? { ...appt, status } : appt
+        );
+        setAppointments(updatedAppointments);
+        
+        // Show notification
+        setNotification({
+          show: true,
+          message: `Appointment ${status} successfully`
+        });
+        
+        // Hide notification after 3 seconds
+        setTimeout(() => {
+          setNotification({ show: false, message: '' });
+        }, 3000);
+        
+        closeModal();
+      } else {
+        throw new Error(response.data?.message || 'Failed to update appointment status');
+      }
+    } catch (err) {
+      console.error('Error updating appointment status:', err);
+      alert('Error updating appointment status. Please try again.');
+    }
+  };
+
   // Reschedule appointment function
   const rescheduleAppointment = (id) => {
     closeModal();
@@ -341,7 +414,7 @@ const AppointmentCalendar = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          Appointment Calendar
+          {isProvider ? 'Provider Calendar' : 'Appointment Calendar'}
         </motion.h1>
         <motion.div 
           className="calendar-actions"
@@ -449,9 +522,16 @@ const AppointmentCalendar = () => {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.5 }}
         >
-          <h3>No Appointments Yet</h3>
-          <p>You don't have any scheduled appointments. Ready to book your first?</p>
-          <a href="/appointments" className="book-appointment-btn">Book Your First Appointment</a>
+          <h3>{isProvider ? 'No Bookings Yet' : 'No Appointments Yet'}</h3>
+          <p>
+            {isProvider 
+              ? "You don't have any scheduled bookings yet. Your calendar will show appointments as clients book your services."
+              : "You don't have any scheduled appointments. Ready to book your first?"
+            }
+          </p>
+          {!isProvider && (
+            <a href="/appointments" className="book-appointment-btn">Book Your First Appointment</a>
+          )}
         </motion.div>
       )}
 
@@ -472,8 +552,8 @@ const AppointmentCalendar = () => {
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               onClick={(e) => e.stopPropagation()}
             >
-              <button className="close-modal-btn" onClick={closeModal}>
-                <FaTimes />
+              <button className="close-modal-btn" onClick={closeModal} title="Close">
+                ✕
               </button>
               <div className="modal-header">
                 <h2>{selectedAppointment.serviceName}</h2>
@@ -497,20 +577,55 @@ const AppointmentCalendar = () => {
                       {selectedAppointment.time}
                     </div>
                   </div>
-                  <div className="detail-item">
-                    <strong>Provider</strong>
-                    <div className="detail-content">
-                      <FaBuilding className="detail-icon" />
-                      {selectedAppointment.provider}
-                    </div>
-                  </div>
-                  <div className="detail-item">
-                    <strong>Location</strong>
-                    <div className="detail-content">
-                      <FaMapMarkerAlt className="detail-icon" />
-                      {selectedAppointment.location}
-                    </div>
-                  </div>
+                  {!isProvider ? (
+                    <>
+                      <div className="detail-item">
+                        <strong>Provider</strong>
+                        <div className="detail-content">
+                          <FaBuilding className="detail-icon" />
+                          {selectedAppointment.provider}
+                        </div>
+                      </div>
+                      <div className="detail-item">
+                        <strong>Location</strong>
+                        <div className="detail-content">
+                          <FaMapMarkerAlt className="detail-icon" />
+                          {selectedAppointment.location}
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="detail-item">
+                        <strong>Client</strong>
+                        <div className="detail-content">
+                          <FaUser className="detail-icon" />
+                          {selectedAppointment.customerName}
+                        </div>
+                      </div>
+                      <div className="detail-item">
+                        <strong>Client Email</strong>
+                        <div className="detail-content">
+                          <FaEnvelope className="detail-icon" />
+                          {selectedAppointment.customerEmail}
+                        </div>
+                      </div>
+                      <div className="detail-item">
+                        <strong>Client Phone</strong>
+                        <div className="detail-content">
+                          <FaPhone className="detail-icon" />
+                          {selectedAppointment.customerPhone}
+                        </div>
+                      </div>
+                      <div className="detail-item">
+                        <strong>Client Address</strong>
+                        <div className="detail-content">
+                          <FaMapMarkerAlt className="detail-icon" />
+                          {selectedAppointment.customerAddress}
+                        </div>
+                      </div>
+                    </>
+                  )}
                   {selectedAppointment.notes && (
                     <div className="detail-item">
                       <strong>Notes</strong>
@@ -523,30 +638,63 @@ const AppointmentCalendar = () => {
                 </div>
               </div>
               <div className="modal-actions">
-                {selectedAppointment.status === 'scheduled' && (
+                {!isProvider ? (
+                  // Client actions
                   <>
-                    <button 
-                      className="reschedule-btn"
-                      onClick={() => rescheduleAppointment(selectedAppointment._id)}
-                      disabled={isPastAppointment(selectedAppointment.date, selectedAppointment.time)}
-                      title={isPastAppointment(selectedAppointment.date, selectedAppointment.time) ? 'Cannot reschedule past appointments' : ''}
-                    >
-                      <FaEdit /> Reschedule
-                    </button>
-                    <button 
-                      className="cancel-btn"
-                      onClick={() => cancelAppointment(selectedAppointment._id)}
-                      disabled={isPastAppointment(selectedAppointment.date, selectedAppointment.time)}
-                      title={isPastAppointment(selectedAppointment.date, selectedAppointment.time) ? 'Cannot cancel past appointments' : ''}
-                    >
-                      <FaTrash /> Cancel
-                    </button>
+                    {selectedAppointment.status === 'scheduled' && (
+                      <>
+                        <button 
+                          className="reschedule-btn"
+                          onClick={() => rescheduleAppointment(selectedAppointment._id)}
+                          disabled={isPastAppointment(selectedAppointment.date, selectedAppointment.time)}
+                          title={isPastAppointment(selectedAppointment.date, selectedAppointment.time) ? 'Cannot reschedule past appointments' : ''}
+                        >
+                          <FaEdit /> Reschedule
+                        </button>
+                        <button 
+                          className="cancel-btn"
+                          onClick={() => cancelAppointment(selectedAppointment._id)}
+                          disabled={isPastAppointment(selectedAppointment.date, selectedAppointment.time)}
+                          title={isPastAppointment(selectedAppointment.date, selectedAppointment.time) ? 'Cannot cancel past appointments' : ''}
+                        >
+                          <FaTrash /> Cancel
+                        </button>
+                      </>
+                    )}
+                    {selectedAppointment.status === 'completed' && !selectedAppointment.hasReviewed && (
+                      <a href={`/appointments#review-${selectedAppointment._id}`} className="leave-review-btn">
+                        Leave a Review
+                      </a>
+                    )}
                   </>
-                )}
-                {selectedAppointment.status === 'completed' && !selectedAppointment.hasReviewed && (
-                  <a href={`/appointments#review-${selectedAppointment._id}`} className="leave-review-btn">
-                    Leave a Review
-                  </a>
+                ) : (
+                  // Provider actions
+                  <>
+                    {selectedAppointment.status === 'pending' && (
+                      <>
+                        <button 
+                          className="confirm-btn"
+                          onClick={() => updateAppointmentStatus(selectedAppointment._id, 'confirmed')}
+                        >
+                          <FaCheckCircle /> Confirm
+                        </button>
+                        <button 
+                          className="reject-btn"
+                          onClick={() => updateAppointmentStatus(selectedAppointment._id, 'rejected')}
+                        >
+                          <FaTimesCircle /> Reject
+                        </button>
+                      </>
+                    )}
+                    {selectedAppointment.status === 'confirmed' && (
+                      <button 
+                        className="complete-btn"
+                        onClick={() => updateAppointmentStatus(selectedAppointment._id, 'completed')}
+                      >
+                        <FaCheckCircle /> Mark Complete
+                      </button>
+                    )}
+                  </>
                 )}
               </div>
             </motion.div>

@@ -8,7 +8,7 @@ const Service = require('../models/Service');
 exports.getServices = async (req, res) => {
   try {
     console.log('Fetching services with query:', req.query);
-    const { category, name } = req.query;
+    const { category, name, providerOnly } = req.query;
     let query = {};
     
     if (category) {
@@ -19,6 +19,19 @@ exports.getServices = async (req, res) => {
     if (name) {
       query.name = { $regex: new RegExp(name, 'i') }; // Case-insensitive search
       console.log(`Searching for name containing: ${name}`);
+    }
+
+    // Provider-only filter
+    if (providerOnly === 'true' && req.user && req.user.role === 'provider') {
+      // Find the provider's _id
+      const Provider = require('../models/Provider');
+      const provider = await Provider.findOne({ userId: req.user.id });
+      if (provider) {
+        query.providerId = provider._id;
+      } else {
+        // No provider profile found, return empty
+        return res.status(200).json({ success: true, count: 0, services: [] });
+      }
     }
     
     const services = await Service.find(query).sort('name');
@@ -190,6 +203,15 @@ exports.createSampleServices = async (req, res) => {
  */
 exports.addService = async (req, res) => {
   try {
+    // Only allow providers to add services
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    const Provider = require('../models/Provider');
+    const provider = await Provider.findOne({ userId: req.user.id });
+    if (!provider) {
+      return res.status(403).json({ success: false, message: 'Only providers can add services.' });
+    }
     // Validate required fields
     const requiredFields = ['name', 'category', 'description', 'price', 'duration'];
     for (const field of requiredFields) {
@@ -200,7 +222,6 @@ exports.addService = async (req, res) => {
         });
       }
     }
-
     // Validate numeric fields
     if (isNaN(req.body.price) || req.body.price < 0) {
       return res.status(400).json({
@@ -208,18 +229,18 @@ exports.addService = async (req, res) => {
         message: 'Price must be a positive number'
       });
     }
-
     if (isNaN(req.body.duration) || req.body.duration < 5) {
       return res.status(400).json({
         success: false,
         message: 'Duration must be at least 5 minutes'
       });
     }
-
-    // Create and save the new service
-    const newService = new Service(req.body);
+    // Create and save the new service, always set providerId
+    const newService = new Service({
+      ...req.body,
+      providerId: provider._id
+    });
     await newService.save();
-    
     res.status(201).json({ 
       success: true, 
       message: "Service added successfully", 
@@ -227,7 +248,6 @@ exports.addService = async (req, res) => {
     });
   } catch (err) {
     console.error('Error adding service:', err);
-    
     // Handle validation errors from Mongoose
     if (err.name === 'ValidationError') {
       const messages = Object.values(err.errors).map(val => val.message);
@@ -236,12 +256,78 @@ exports.addService = async (req, res) => {
         message: messages.join(', ') 
       });
     }
-    
     res.status(500).json({ 
       success: false, 
       message: 'Server error', 
       error: err.message 
     });
+  }
+};
+
+/**
+ * Update a service (provider only)
+ * @route PATCH /services/:id
+ * @access Private
+ */
+exports.updateService = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    const Provider = require('../models/Provider');
+    const provider = await Provider.findOne({ userId: req.user.id });
+    if (!provider) {
+      return res.status(403).json({ success: false, message: 'Only providers can update services.' });
+    }
+    const service = await Service.findById(req.params.id);
+    if (!service) {
+      return res.status(404).json({ success: false, message: 'Service not found' });
+    }
+    if (service.providerId.toString() !== provider._id.toString()) {
+      return res.status(403).json({ success: false, message: 'You do not own this service.' });
+    }
+    // Only allow certain fields to be updated
+    const updatableFields = ['name', 'category', 'description', 'price', 'duration', 'isActive', 'location', 'buffer', 'timeSlots'];
+    updatableFields.forEach(field => {
+      if (req.body[field] !== undefined) {
+        service[field] = req.body[field];
+      }
+    });
+    await service.save();
+    res.status(200).json({ success: true, message: 'Service updated successfully', data: service });
+  } catch (err) {
+    console.error('Error updating service:', err);
+    res.status(500).json({ success: false, message: 'Server error', error: err.message });
+  }
+};
+
+/**
+ * Delete a service (provider only)
+ * @route DELETE /services/:id
+ * @access Private
+ */
+exports.deleteService = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    const Provider = require('../models/Provider');
+    const provider = await Provider.findOne({ userId: req.user.id });
+    if (!provider) {
+      return res.status(403).json({ success: false, message: 'Only providers can delete services.' });
+    }
+    const service = await Service.findById(req.params.id);
+    if (!service) {
+      return res.status(404).json({ success: false, message: 'Service not found' });
+    }
+    if (service.providerId.toString() !== provider._id.toString()) {
+      return res.status(403).json({ success: false, message: 'You do not own this service.' });
+    }
+    await Service.findByIdAndDelete(req.params.id);
+    res.status(200).json({ success: true, message: 'Service deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting service:', err);
+    res.status(500).json({ success: false, message: 'Server error', error: err.message });
   }
 };
 
@@ -278,3 +364,30 @@ exports.getServicesByCategory = async (req, res) => {
   }
 };
  
+// New: Get services for the logged-in provider only
+exports.getProviderServices = async (req, res) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+    // Only allow providers
+    const Provider = require('../models/Provider');
+    const provider = await Provider.findOne({ userId: req.user.id });
+    if (!provider) {
+      return res.status(200).json({ success: true, count: 0, services: [] });
+    }
+    const services = await Service.find({ providerId: provider._id }).sort('name');
+    res.status(200).json({
+      success: true,
+      count: services.length,
+      services
+    });
+  } catch (error) {
+    console.error('Error fetching provider services:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch provider services',
+      error: error.message
+    });
+  }
+}; 

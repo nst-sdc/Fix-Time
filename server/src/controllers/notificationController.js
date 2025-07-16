@@ -269,4 +269,4 @@ exports.createBookingStatusNotification = async (appointmentData, status) => {
     console.error('Error creating booking status notification:', error);
     throw error;
   }
-}; 
+};

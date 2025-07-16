@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { Link } from 'react-router-dom';
 import RatingDisplay from './RatingDisplay';
 import './ServiceCard.css';
 
-const ServiceCard = ({ service }) => {
+const ServiceCard = ({ service, hideBook }) => {
   const {
     _id,
     name,
@@ -43,7 +44,7 @@ const ServiceCard = ({ service }) => {
             {price && <p className="service-price">₹{price}</p>}
             {duration && <p className="service-duration">{duration} min</p>}
 
-            <button className="book-now-btn">Book Now</button>
+            {!hideBook && <button className="book-now-btn">Book Now</button>}
             <button
               className="know-more-btn"
               type="button"
@@ -58,7 +59,7 @@ const ServiceCard = ({ service }) => {
         </div>
       </Link>
 
-      {showModal && (
+      {showModal && ReactDOM.createPortal(
         <div
           className="service-modal-overlay"
           onClick={() => setShowModal(false)}
@@ -112,6 +113,7 @@ const ServiceCard = ({ service }) => {
 
             <RatingDisplay rating={ratingValue} totalReviews={reviewCount} />
 
+            {!hideBook && (
             <button
               className="book-now-btn"
               onClick={() => {
@@ -123,8 +125,10 @@ const ServiceCard = ({ service }) => {
             >
               Book Now
             </button>
+            )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

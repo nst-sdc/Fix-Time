@@ -13,36 +13,10 @@ const CategoryPage = ({ categoryName, children, onServiceAdded }) => {
     }
   };
 
+  // Remove the Add Service button and ServiceForm modal from the client explore categories page. Only show category content and children.
   return (
     <div className="category-page-wrapper">
-      {/* Add Service Button */}
-      <div style={{ textAlign: 'right', margin: '20px' }}>
-        <button
-          onClick={() => setShowForm(true)}
-          style={{
-            backgroundColor: '#ff7597',
-            color: '#fff',
-            padding: '10px 20px',
-            border: 'none',
-            borderRadius: '8px',
-            cursor: 'pointer',
-            fontWeight: 'bold'
-          }}
-        >
-          + Add Service
-        </button>
-      </div>
-
-      {/* Modal for adding service */}
-      {showForm && (
-        <ServiceForm
-          category={categoryName}
-          onClose={() => setShowForm(false)}
-          onSuccess={handleServiceSuccess}
-        />
-      )}
-
-      {/* Your specific category content */}
+      {/* No Add Service Button or ServiceForm for clients */}
       {children}
     </div>
   );
