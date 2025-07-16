@@ -34,3 +34,21 @@ export const fetchServiceRating = async (serviceId) => {
     return { avgRating: 0, totalReviews: 0 };
   }
 }; 
+
+/**
+ * Checks if an appointment is in the past (date and time)
+ * @param {string|Date} date - The appointment date (string or Date)
+ * @param {string} time - The appointment time (e.g., '10:30 AM')
+ * @returns {boolean} - True if the appointment is in the past
+ */
+export function isPastAppointment(date, time) {
+  const now = new Date();
+  const apptDate = new Date(date);
+  if (!time) return apptDate < now; // fallback if time missing
+  const [rawTime, period] = time.split(' ');
+  let [hours, minutes] = rawTime.split(':').map(Number);
+  if (period === 'PM' && hours !== 12) hours += 12;
+  if (period === 'AM' && hours === 12) hours = 0;
+  apptDate.setHours(hours, minutes, 0, 0);
+  return apptDate < now;
+} 

@@ -18,6 +18,15 @@ import {
   FaExclamationTriangle
 } from 'react-icons/fa';
 import './MyAppointments.css';
+import { isPastAppointment } from '../utils/serviceUtils';
+
+// Add a helper to get the display status
+function getDisplayStatus(appointment) {
+  if ((appointment.status === 'scheduled' || appointment.status === 'confirmed') && isPastAppointment(appointment.date, appointment.time)) {
+    return 'completed';
+  }
+  return appointment.status;
+}
 
 const MyAppointments = () => {
   const [appointments, setAppointments] = useState([]);
@@ -605,9 +614,9 @@ const MyAppointments = () => {
                     <h3 className="service-name">{appointment.serviceName}</h3>
                     <span className="service-category">{appointment.serviceCategory}</span>
                   </div>
-                  <div className="status-badge" style={{ backgroundColor: getStatusColor(appointment.status) }}>
-                    {getStatusIcon(appointment.status)}
-                    <span>{getStatusText(appointment.status)}</span>
+                  <div className="status-badge" style={{ backgroundColor: getStatusColor(getDisplayStatus(appointment)) }}>
+                    {getStatusIcon(getDisplayStatus(appointment))}
+                    <span>{getStatusText(getDisplayStatus(appointment))}</span>
                   </div>
                 </div>
 
@@ -641,7 +650,7 @@ const MyAppointments = () => {
                     <FaEye />
                     View Details
                   </button>
-                  {(appointment.status === 'scheduled' || appointment.status === 'confirmed') && (
+                  {(appointment.status === 'scheduled' || appointment.status === 'confirmed') && !isPastAppointment(appointment.date, appointment.time) && (
                     <>
                     <button 
                       className="reschedule-btn"
@@ -702,11 +711,11 @@ const MyAppointments = () => {
                     <span className="detail-label">Status:</span>
                     <span className="detail-value">
                       <div className="status-detail-container">
-                        <span className="status-indicator" style={{ backgroundColor: getStatusColor(selectedAppointment.status) }}>
-                          {getStatusIcon(selectedAppointment.status)}
-                          {getStatusText(selectedAppointment.status)}
+                        <span className="status-indicator" style={{ backgroundColor: getStatusColor(getDisplayStatus(selectedAppointment)) }}>
+                          {getStatusIcon(getDisplayStatus(selectedAppointment))}
+                          {getStatusText(getDisplayStatus(selectedAppointment))}
                         </span>
-                        <p className="status-description">{getStatusDescription(selectedAppointment.status)}</p>
+                        <p className="status-description">{getStatusDescription(getDisplayStatus(selectedAppointment))}</p>
                       </div>
                     </span>
                   </div>
@@ -754,7 +763,7 @@ const MyAppointments = () => {
             </div>
 
             <div className="modal-footer">
-              {(selectedAppointment.status === 'scheduled' || selectedAppointment.status === 'confirmed') && (
+              {(selectedAppointment.status === 'scheduled' || selectedAppointment.status === 'confirmed') && !isPastAppointment(selectedAppointment.date, selectedAppointment.time) && (
                 <>
                 <button 
                   className="reschedule-btn"
