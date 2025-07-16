@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './MyServices.css';
 import { FaBell, FaCalendarAlt, FaUser, FaStar, FaEdit, FaTrash, FaPlus, FaChartPie, FaChartBar, FaEnvelope, FaFlag, FaUsers, FaClock, FaToggleOn, FaToggleOff } from 'react-icons/fa';
+import axios from 'axios';
 
 // --- Mock Data ---
 const mockBookings = [
@@ -67,20 +68,70 @@ const mockTeam = [
 
 // --- Section 1: Booking Dashboard ---
 function BookingDashboard() {
+  const [bookings, setBookings] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [filter, setFilter] = useState('Upcoming');
-  const filters = ['Upcoming', 'Today', 'Past', 'Cancelled'];
-  const filtered = mockBookings.filter(b =>
-    filter === 'Upcoming' ? b.status === 'Confirmed' :
-    filter === 'Today' ? b.date === '2024-07-15' :
-    filter === 'Past' ? b.status === 'No-show' :
-    filter === 'Cancelled' ? b.status === 'Cancelled' : true
-  );
-  // Simple calendar: just show days with bookings
+  const [actionLoading, setActionLoading] = useState({});
+  const filters = ['Upcoming', 'Today', 'Scheduled', 'Past', 'Cancelled'];
+
+  useEffect(() => {
+    fetchBookings();
+    // eslint-disable-next-line
+  }, []);
+
+  const fetchBookings = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const token = localStorage.getItem('token');
+      const res = await axios.get('http://localhost:5001/appointments/provider', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setBookings(res.data.appointments || []);
+    } catch (err) {
+      setError('Failed to load bookings.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleStatusChange = async (id, action) => {
+    setActionLoading(prev => ({ ...prev, [id]: true }));
+    let newStatus = '';
+    if (action === 'confirm') newStatus = 'scheduled';
+    if (action === 'reject') newStatus = 'cancelled';
+    try {
+      const token = localStorage.getItem('token');
+      await axios.patch(`http://localhost:5001/appointments/${id}/provider-status`, { status: newStatus }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setBookings(prev => prev.map(b => b._id === id ? { ...b, status: newStatus } : b));
+    } catch (err) {
+      alert('Failed to update status.');
+    } finally {
+      setActionLoading(prev => ({ ...prev, [id]: false }));
+    }
+  };
+
+  // Filtering logic
+  const todayStr = new Date().toISOString().slice(0, 10);
+  const filtered = bookings.filter(b => {
+    if (filter === 'Upcoming') return b.status === 'pending' || b.status === 'confirmed';
+    if (filter === 'Today') return b.date && b.date.slice(0, 10) === todayStr;
+    if (filter === 'Scheduled') return b.status === 'scheduled';
+    if (filter === 'Past') return b.status === 'completed' || b.status === 'no-show';
+    if (filter === 'Cancelled') return b.status === 'cancelled' || b.status === 'rejected';
+    return true;
+  });
+
+  // Calendar days with bookings
   const days = Array.from({ length: 7 }, (_, i) => {
     const d = new Date();
     d.setDate(d.getDate() + i);
     return d;
   });
+
   return (
     <section className="section booking-dashboard">
       <h2>Booking Dashboard</h2>
@@ -89,7 +140,11 @@ function BookingDashboard() {
           <button key={f} className={filter === f ? 'active' : ''} onClick={() => setFilter(f)}>{f}</button>
         ))}
       </div>
-      {filtered.length === 0 ? (
+      {loading ? (
+        <div className="loading-state">Loading bookings...</div>
+      ) : error ? (
+        <div className="error-state">{error}</div>
+      ) : filtered.length === 0 ? (
         <div className="empty-state">
           <h3>No Bookings</h3>
           <p>You have no bookings in this category.</p>
@@ -97,18 +152,42 @@ function BookingDashboard() {
       ) : (
         <div className="booking-cards">
           {filtered.map(b => (
-            <div className={`booking-card status-${b.status.toLowerCase()}`} key={b.id}>
+            <div className={`booking-card status-${b.status?.toLowerCase()}`} key={b._id}>
               <div className="booking-card-header">
-                <span className="booking-name">{b.name}</span>
-                <span className={`booking-status ${b.status.toLowerCase()}`}>{b.status}</span>
+                <span className="booking-name">{b.customerName || b.customerEmail}</span>
+                <span className={`booking-status ${
+                  b.status === 'scheduled' ? 'scheduled-blue' :
+                  b.status === 'cancelled' ? 'cancelled-red' :
+                  b.status?.toLowerCase()
+                }`}>
+                  {b.status === 'scheduled' ? 'Scheduled' :
+                   b.status === 'cancelled' ? 'Cancelled' :
+                   b.status}
+                </span>
               </div>
               <div className="booking-card-body">
-                <span>{b.service}</span>
-                <span>{b.date} {b.time}</span>
+                <span>{b.serviceName}</span>
+                <span>{b.date?.slice(0, 10)} {b.time}</span>
               </div>
               <div className="booking-card-actions">
-                <button>View</button>
-                <button>Message</button>
+                {b.status === 'pending' && (
+                  <>
+                    <button
+                      onClick={() => handleStatusChange(b._id, 'confirm')}
+                      disabled={!!actionLoading[b._id]}
+                      className="confirm-btn"
+                    >
+                      {actionLoading[b._id] ? 'Confirming...' : 'Confirm'}
+                    </button>
+                    <button
+                      onClick={() => handleStatusChange(b._id, 'reject')}
+                      disabled={!!actionLoading[b._id]}
+                      className="reject-btn"
+                    >
+                      {actionLoading[b._id] ? 'Rejecting...' : 'Reject'}
+                    </button>
+                  </>
+                )}
               </div>
             </div>
           ))}
@@ -118,7 +197,7 @@ function BookingDashboard() {
         <FaCalendarAlt className="calendar-icon" />
         <div className="calendar-days">
           {days.map((d, i) => (
-            <div key={i} className={`calendar-day${mockBookings.some(b => b.date === d.toISOString().slice(0,10)) ? ' booked' : ''}`}>
+            <div key={i} className={`calendar-day${bookings.some(b => b.date && b.date.slice(0,10) === d.toISOString().slice(0,10)) ? ' booked' : ''}`}>
               {d.getDate()}
             </div>
           ))}

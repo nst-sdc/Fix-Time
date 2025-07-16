@@ -212,6 +212,14 @@ body.dark .booking-name {
   color: #6c8ae4;
 }
 
+.booking-status.scheduled-blue {
+  background: rgba(90, 125, 255, 0.15);
+  color: #3a6ee8;
+}
+.booking-status.cancelled-red {
+  background: rgba(255, 61, 61, 0.15);
+  color: #ff3d3d;
+}
 body.dark .booking-status.confirmed {
   background: rgba(43, 182, 115, 0.2);
 }
@@ -226,6 +234,15 @@ body.dark .booking-status.no-show {
 
 body.dark .booking-status.cancelled {
   background: rgba(108, 138, 228, 0.2);
+}
+
+body.dark .booking-status.scheduled-blue {
+  background: rgba(90, 125, 255, 0.25);
+  color: #7faaff;
+}
+body.dark .booking-status.cancelled-red {
+  background: rgba(255, 61, 61, 0.25);
+  color: #ff7a7a;
 }
 
 .booking-card-body {
