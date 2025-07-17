@@ -27,7 +27,8 @@ const Dashboard = ({ userProfile, setUserProfile }) => {
           return;
         }
 
-        const response = await axios.get('http://localhost:5001/appointments', {
+        const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
+        const response = await axios.get(`${API_BASE_URL}/appointments`, {
           headers: { Authorization: `Bearer ${token}` }
         });
 

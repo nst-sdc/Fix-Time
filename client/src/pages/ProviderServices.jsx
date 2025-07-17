@@ -37,7 +37,8 @@ const ProviderServices = ({ userProfile }) => {
         setLoading(true);
         setError('');
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5001/services/provider', {
+        const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
+        const response = await axios.get(`${API_BASE_URL}/services/provider`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (response.data.success) {
@@ -78,7 +79,8 @@ const ProviderServices = ({ userProfile }) => {
     if (!window.confirm(`Are you sure you want to delete the service "${service.name}"?`)) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5001/services/${service._id}`, {
+      const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
+      await axios.delete(`${API_BASE_URL}/services/${service._id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setRefresh(r => r + 1);

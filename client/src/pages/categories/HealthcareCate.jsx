@@ -19,7 +19,7 @@ const iconMapping = {
   "default": <FaUserMd />
 };
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
 
 const HealthcareCate = () => {
   const [services, setServices] = useState([]);

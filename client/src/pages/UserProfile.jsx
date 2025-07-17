@@ -64,7 +64,8 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
         return;
       }
 
-      const response = await axios.get('http://localhost:5001/auth/profile', {
+      const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
+      const response = await axios.get(`${API_BASE_URL}/auth/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
 
@@ -174,7 +175,8 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
           experience: businessInfo.experience
         };
       }
-      const response = await axios.put('http://localhost:5001/auth/profile', payload, {
+      const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
+      const response = await axios.put(`${API_BASE_URL}/auth/profile`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });
 

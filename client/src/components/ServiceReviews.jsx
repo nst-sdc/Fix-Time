@@ -59,7 +59,8 @@ const ServiceReviews = ({ serviceId }) => {
           return;
         }
         
-        const response = await axios.get(`http://localhost:5001/reviews/service/${serviceId}`);
+        const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
+        const response = await axios.get(`${API_BASE_URL}/reviews/service/${serviceId}`);
         setReviews(response.data.data);
         setLoading(false);
       } catch (err) {

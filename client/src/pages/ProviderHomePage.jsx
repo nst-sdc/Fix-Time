@@ -63,7 +63,8 @@ const ProviderHomePage = () => {
       setErrorUpcoming('');
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5001/appointments/provider', {
+        const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
+        const res = await axios.get(`${API_BASE_URL}/appointments/provider`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (res.data.appointments) {
@@ -101,12 +102,13 @@ const ProviderHomePage = () => {
       setErrorStats('');
       try {
         const token = localStorage.getItem('token');
+        const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
         // Fetch appointments for today
-        const appointmentsRes = await axios.get('http://localhost:5001/appointments/provider', {
+        const appointmentsRes = await axios.get(`${API_BASE_URL}/appointments/provider`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         // Fetch provider's services for average duration
-        const servicesRes = await axios.get('http://localhost:5001/services/provider', {
+        const servicesRes = await axios.get(`${API_BASE_URL}/services/provider`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         
@@ -143,7 +145,8 @@ const ProviderHomePage = () => {
       setLoadingAvailability(true);
       try {
         const token = localStorage.getItem('token');
-        const res = await axios.get('http://localhost:5001/appointments/provider', {
+        const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
+        const res = await axios.get(`${API_BASE_URL}/appointments/provider`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         
