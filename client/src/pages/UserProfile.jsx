@@ -257,6 +257,11 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
   return (
     <div className="profile-container">
       <div className="profile-card">
+        <div className="profile-avatar">
+          {user?.fullName
+            ? user.fullName.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase()
+            : <FiUser />}
+        </div>
         <div className="profile-header">
           <h1 className="profile-title">User Profile</h1>
           <div className="profile-actions">

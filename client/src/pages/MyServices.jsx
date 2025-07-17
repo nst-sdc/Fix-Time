@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './MyServices.css';
-import { FaBell, FaCalendarAlt, FaUser, FaStar, FaEdit, FaTrash, FaPlus, FaChartPie, FaChartBar, FaEnvelope, FaFlag, FaUsers, FaClock, FaToggleOn, FaToggleOff } from 'react-icons/fa';
+import { FaBell, FaCalendarAlt, FaUser, FaStar, FaEdit, FaTrash, FaPlus, FaChartPie, FaChartBar, FaEnvelope, FaFlag, FaUsers, FaClock, FaToggleOn, FaToggleOff, FaUserCircle, FaMapMarkerAlt, FaTags, FaPhone, FaImage, FaCheckCircle, FaSpinner, FaTimes } from 'react-icons/fa';
 import axios from 'axios';
 import ServiceForm from '../components/ServiceForm';
 import ReactDOM from 'react-dom';
@@ -36,17 +36,12 @@ const mockAnalytics = {
     { label: 'Car Wash', value: 35, color: '#BFD7ED' },
   ],
   bar: [
-    { label: 'Week 1', value: 15 },
-    { label: 'Week 2', value: 18 },
-    { label: 'Week 3', value: 20 },
-    { label: 'Week 4', value: 19 },
+    { label: 'Week 1', value: 15, details: { Haircut: 7, Yoga: 4, 'Car Wash': 4 } },
+    { label: 'Week 2', value: 18, details: { Haircut: 6, Yoga: 7, 'Car Wash': 5 } },
+    { label: 'Week 3', value: 20, details: { Haircut: 8, Yoga: 6, 'Car Wash': 6 } },
+    { label: 'Week 4', value: 19, details: { Haircut: 7, Yoga: 5, 'Car Wash': 7 } },
   ],
 };
-const mockCustomers = [
-  { id: 1, name: 'Alice Smith', contact: 'alice@email.com', history: 5 },
-  { id: 2, name: 'Bob Lee', contact: 'bob@email.com', history: 3 },
-  { id: 3, name: 'Charlie Kim', contact: 'charlie@email.com', history: 2 },
-];
 const mockReviews = [
   { id: 1, service: 'Haircut', name: 'Alice Smith', rating: 5, text: 'Great service!', date: '2024-07-10' },
   { id: 2, service: 'Yoga', name: 'Bob Lee', rating: 4, text: 'Very relaxing.', date: '2024-07-09' },
@@ -60,14 +55,6 @@ const mockProfile = {
   tags: ['Salon', 'Wellness', 'Haircut'],
   contact: '+1 234 567 890',
 };
-const mockCoupons = [
-  { id: 1, name: 'SUMMER10', amount: 10, type: '%', expiry: '2024-08-01', used: 5 },
-  { id: 2, name: 'WELCOME5', amount: 5, type: '$', expiry: '2024-12-31', used: 12 },
-];
-const mockTeam = [
-  { id: 1, name: 'Priya', role: 'Stylist', services: ['Haircut'], performance: 4.8 },
-  { id: 2, name: 'Rahul', role: 'Yoga Trainer', services: ['Yoga'], performance: 4.6 },
-];
 
 // --- Section 1: Booking Dashboard ---
 function BookingDashboard() {
@@ -372,45 +359,6 @@ function ServiceManagement() {
   );
 }
 
-// --- Section 3: Availability & Schedule Settings ---
-function AvailabilitySettings() {
-  const [availability, setAvailability] = useState({
-    Mon: { enabled: true, slots: ['09:00-12:00', '14:00-18:00'] },
-    Tue: { enabled: true, slots: ['09:00-12:00', '14:00-18:00'] },
-    Wed: { enabled: true, slots: ['09:00-12:00', '14:00-18:00'] },
-    Thu: { enabled: true, slots: ['09:00-12:00', '14:00-18:00'] },
-    Fri: { enabled: true, slots: ['09:00-12:00', '14:00-18:00'] },
-    Sat: { enabled: false, slots: [] },
-    Sun: { enabled: false, slots: [] },
-  });
-  const [holidays, setHolidays] = useState(['2024-07-20']);
-  const [breaks, setBreaks] = useState(['12:00-13:00']);
-  const days = Object.keys(availability);
-  const toggleDay = d => setAvailability({ ...availability, [d]: { ...availability[d], enabled: !availability[d].enabled } });
-  return (
-    <section className="section availability-settings">
-      <h2>Availability & Schedule</h2>
-      <div className="availability-days">
-        {days.map(d => (
-          <div key={d} className={`day-row${availability[d].enabled ? '' : ' off'}`}>
-            <span>{d}</span>
-            <button onClick={() => toggleDay(d)}>{availability[d].enabled ? <FaToggleOn /> : <FaToggleOff />}</button>
-            <span className="slots">{availability[d].slots.join(', ')}</span>
-          </div>
-        ))}
-      </div>
-      <div className="availability-extras">
-        <div>
-          <strong>Holidays:</strong> {holidays.join(', ')}
-        </div>
-        <div>
-          <strong>Breaks:</strong> {breaks.join(', ')}
-        </div>
-      </div>
-    </section>
-  );
-}
-
 // --- Section 4: Notifications Panel ---
 function NotificationsPanel() {
   const [open, setOpen] = useState(false);
@@ -449,9 +397,60 @@ function NotificationsPanel() {
 
 // --- Section 5: Analytics & Insights ---
 function AnalyticsInsights() {
+  // Prepare data for service-wise and week-wise charts
+  const services = mockAnalytics.pie.map(s => s.label);
+  const weeks = mockAnalytics.bar.map(b => b.label);
+  // Service-wise: for each service, array of bookings per week
+  const serviceData = services.map(service =>
+    mockAnalytics.bar.map(week => week.details[service] || 0)
+  );
+  // Week-wise: for each week, array of bookings per service
+  const weekData = mockAnalytics.bar.map(week =>
+    services.map(service => week.details[service] || 0)
+  );
+  const serviceColors = mockAnalytics.pie.map(s => s.color);
+
+  // Donut chart SVG
+  function DonutChart({ data }) {
+    const total = data.reduce((sum, d) => sum + d.value, 0);
+    let cumulative = 0;
+    const radius = 38, cx = 45, cy = 45, stroke = 16;
+    return (
+      <svg width="90" height="90" viewBox="0 0 90 90">
+        {data.map((d, i) => {
+          const val = d.value / total;
+          const start = cumulative;
+          cumulative += val;
+          const x1 = cx + radius * Math.cos(2 * Math.PI * start - Math.PI / 2);
+          const y1 = cy + radius * Math.sin(2 * Math.PI * start - Math.PI / 2);
+          const x2 = cx + radius * Math.cos(2 * Math.PI * cumulative - Math.PI / 2);
+          const y2 = cy + radius * Math.sin(2 * Math.PI * cumulative - Math.PI / 2);
+          const largeArc = val > 0.5 ? 1 : 0;
+          const pathData = `M${cx},${cy} L${x1},${y1} A${radius},${radius} 0 ${largeArc} 1 ${x2},${y2} Z`;
+          return <path key={i} d={pathData} fill={d.color} opacity="0.9" />;
+        })}
+      </svg>
+    );
+  }
+
+  // Bar chart SVG
+  function BarChart({ data, labels, colors }) {
+    const max = Math.max(...data);
+    return (
+      <svg width="120" height="70" viewBox="0 0 120 70">
+        {data.map((v, i) => (
+          <rect key={i} x={i * 35 + 10} y={70 - (v / max) * 60} width="18" height={(v / max) * 60} fill={colors[i]} rx="4" />
+        ))}
+      </svg>
+    );
+  }
+
   return (
-    <section className="section analytics-insights">
-      <h2>Analytics & Insights</h2>
+    <section className="section analytics-insights analytics-blur">
+      <div className="analytics-header-row">
+        <h2>Analytics & Insights</h2>
+        <span className="coming-soon-note-highlight">(Coming soon)</span>
+      </div>
       <div className="analytics-cards">
         <div className="analytics-item">
           <span>Total Bookings (Month)</span>
@@ -469,63 +468,38 @@ function AnalyticsInsights() {
           <span>Repeat Customers</span>
           <strong>{mockAnalytics.repeatCustomers}</strong>
         </div>
+        <div className="analytics-item">
+          <span>Avg. Booking Value</span>
+          <strong>${(mockAnalytics.revenue / mockAnalytics.monthlyBookings).toFixed(2)}</strong>
+        </div>
+        <div className="analytics-item">
+          <span>New Customers</span>
+          <strong>12</strong>
+        </div>
+        <div className="analytics-item">
+          <span>Top Service</span>
+          <strong>Haircut</strong>
+        </div>
       </div>
       <div className="charts-row">
-        <div className="pie-chart">
-          <svg width="120" height="120" viewBox="0 0 32 32">
-            {(() => {
-              let acc = 0;
-              return mockAnalytics.pie.map((slice, i) => {
-                const val = slice.value / 100 * 100;
-                const dash = `${val} ${100 - val}`;
-                const el = <circle key={i} r="16" cx="16" cy="16" fill="transparent" stroke={slice.color} strokeWidth="8" strokeDasharray={dash} strokeDashoffset={-acc} />;
-                acc -= val;
-                return el;
-              });
-            })()}
-          </svg>
+        <div className="donut-chart">
+          <div className="chart-title">Service Distribution</div>
+          <DonutChart data={mockAnalytics.pie} />
           <div className="pie-legend">
-            {mockAnalytics.pie.map((slice, i) => (
-              <span key={i} style={{ color: slice.color }}>{slice.label}</span>
+            {mockAnalytics.pie.map((s, i) => (
+              <span key={i} style={{ color: s.color }}>{s.label}</span>
             ))}
           </div>
         </div>
-        <div className="bar-chart">
-          <svg width="120" height="80">
-            {mockAnalytics.bar.map((bar, i) => (
-              <rect key={i} x={i*25+10} y={80-bar.value*3} width="18" height={bar.value*3} fill="#6C8AE4" rx="4" />
-            ))}
-          </svg>
+        <div className="line-chart">
+          <div className="chart-title">Bookings by Week</div>
+          <BarChart data={mockAnalytics.bar.map(b => b.value)} labels={mockAnalytics.bar.map(b => b.label)} colors={serviceColors} />
           <div className="bar-legend">
-            {mockAnalytics.bar.map((bar, i) => (
-              <span key={i}>{bar.label}</span>
+            {mockAnalytics.bar.map((b, i) => (
+              <span key={i}>{b.label}</span>
             ))}
           </div>
         </div>
-      </div>
-    </section>
-  );
-}
-
-// --- Section 6: Customer Management ---
-function CustomerManagement() {
-  return (
-    <section className="section customer-management">
-      <h2>Customer Management</h2>
-      <div className="customer-list">
-        {mockCustomers.map(c => (
-          <div className="customer-item" key={c.id}>
-            <div className="customer-info">
-              <span className="customer-name">{c.name}</span>
-              <span className="customer-contact">{c.contact}</span>
-              <span className="customer-history">Past bookings: {c.history}</span>
-            </div>
-            <div className="customer-actions">
-              <button><FaEnvelope /></button>
-              <button><FaEdit /></button>
-            </div>
-          </div>
-        ))}
       </div>
     </section>
   );
@@ -533,161 +507,103 @@ function CustomerManagement() {
 
 // --- Section 7: Ratings & Feedback ---
 function RatingsFeedback() {
+  const [reviews, setReviews] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchAllReviews = async () => {
+      setLoading(true);
+      setError('');
+      try {
+        const token = localStorage.getItem('token');
+        // 1. Fetch all provider services
+        const servicesRes = await axios.get('http://localhost:5001/services/provider', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (!servicesRes.data.success || !servicesRes.data.services) {
+          setError('Failed to fetch your services.');
+          setLoading(false);
+          return;
+        }
+        const services = servicesRes.data.services;
+        // 2. Fetch reviews for each service
+        const allReviews = [];
+        for (const service of services) {
+          try {
+            const reviewsRes = await axios.get(`http://localhost:5001/reviews/service/${service._id}`);
+            if (reviewsRes.data.success && Array.isArray(reviewsRes.data.data)) {
+              reviewsRes.data.data.forEach(r => allReviews.push({ ...r, serviceName: service.name }));
+            }
+          } catch (err) {
+            // Ignore errors for individual services
+          }
+        }
+        setReviews(allReviews);
+      } catch (err) {
+        setError('Failed to load ratings and feedback.');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchAllReviews();
+  }, []);
+
   return (
     <section className="section ratings-feedback">
       <h2>Ratings & Feedback</h2>
-      <div className="reviews-list">
-        {mockReviews.map(r => (
-          <div className="review-item" key={r.id}>
-            <div className="review-header">
-              <span className="review-name">{r.name}</span>
-              <span className="review-service">({r.service})</span>
-              <span className="review-date">{r.date}</span>
+      {loading ? (
+        <div className="loading-state">Loading ratings and feedback...</div>
+      ) : error ? (
+        <div className="error-message">{error}</div>
+      ) : reviews.length === 0 ? (
+        <div className="empty-state">No ratings or feedback yet.</div>
+      ) : (
+        <div className="reviews-list">
+          {reviews.map((r, idx) => (
+            <div className="review-item" key={r._id || idx}>
+              <div className="review-header">
+                <span className="review-name">{r.userId?.email?.split('@')[0] || 'Anonymous'}</span>
+                <span className="review-service">({r.serviceName})</span>
+                <span className="review-date">{new Date(r.createdAt).toLocaleDateString()}</span>
+              </div>
+              <div className="review-rating">
+                {[...Array(5)].map((_, i) => <FaStar key={i} className={i < r.rating ? 'star filled' : 'star'} />)}
+              </div>
+              <div className="review-text">{r.comment}</div>
+              <div className="review-actions">
+                <button className="review-btn"><FaEdit /> Respond</button>
+                <button className="review-btn"><FaFlag /> Report</button>
+              </div>
             </div>
-            <div className="review-rating">
-              {[...Array(5)].map((_, i) => <FaStar key={i} className={i < r.rating ? 'star filled' : 'star'} />)}
-            </div>
-            <div className="review-text">{r.text}</div>
-            <div className="review-actions">
-              <button><FaEdit /> Respond</button>
-              <button><FaFlag /> Report</button>
-            </div>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </section>
   );
 }
 
-// --- Section 8: Profile Customization ---
-function ProfileCustomization() {
-  const [profile, setProfile] = useState(mockProfile);
-  const handleChange = e => setProfile({ ...profile, [e.target.name]: e.target.value });
+// --- Section 8: Manage Team Members ---
+function ManageTeamMembers() {
+  // Placeholder for team management UI
   return (
-    <section className="section profile-customization">
-      <h2>Profile Customization</h2>
-      <form className="profile-form">
-        <div className="profile-row">
-          <label>Business Name</label>
-          <input name="name" value={profile.name} onChange={handleChange} />
-        </div>
-        <div className="profile-row">
-          <label>Logo</label>
-          <input type="file" accept="image/*" />
-        </div>
-        <div className="profile-row">
-          <label>Description</label>
-          <textarea name="description" value={profile.description} onChange={handleChange} />
-        </div>
-        <div className="profile-row">
-          <label>Location</label>
-          <input name="address" value={profile.address} onChange={handleChange} />
-        </div>
-        <div className="profile-row">
-          <label>Tags</label>
-          <input name="tags" value={profile.tags.join(', ')} onChange={e => setProfile({ ...profile, tags: e.target.value.split(',').map(t => t.trim()) })} />
-        </div>
-        <div className="profile-row">
-          <label>Contact Info</label>
-          <input name="contact" value={profile.contact} onChange={handleChange} />
-        </div>
-      </form>
+    <section className="section manage-team-members">
+      <h2>Manage Team Members</h2>
+      <div style={{color:'#64748b',fontSize:'1.08rem',marginTop:'1.2rem'}}>Team management features coming soon.</div>
     </section>
   );
 }
-
-// --- Section 9: Promotions & Coupons ---
-function PromotionsCoupons() {
-  const [coupons, setCoupons] = useState(mockCoupons);
-  const [form, setForm] = useState({ name: '', amount: '', type: '%', expiry: '' });
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
-  const handleAdd = e => {
-    e.preventDefault();
-    setCoupons([...coupons, { ...form, id: Date.now(), used: 0 }]);
-    setForm({ name: '', amount: '', type: '%', expiry: '' });
-  };
-  return (
-    <section className="section promotions-coupons">
-      <h2>Promotions & Coupons</h2>
-      <div className="coupons-list">
-        {coupons.map(c => (
-          <div className="coupon-item" key={c.id}>
-            <span className="coupon-name">{c.name}</span>
-            <span className="coupon-amount">{c.amount}{c.type}</span>
-            <span className="coupon-expiry">Exp: {c.expiry}</span>
-            <span className="coupon-used">Used: {c.used}</span>
-            <button onClick={() => {}}><FaEdit /></button>
-            <button onClick={() => setCoupons(coupons.filter(x => x.id !== c.id))}><FaTrash /></button>
-          </div>
-        ))}
-      </div>
-      <form className="coupon-form" onSubmit={handleAdd}>
-        <input name="name" placeholder="Coupon Name" value={form.name} onChange={handleChange} required />
-        <input name="amount" placeholder="Amount" value={form.amount} onChange={handleChange} required />
-        <select name="type" value={form.type} onChange={handleChange}>
-          <option value="%">%</option>
-          <option value="$">$</option>
-        </select>
-        <input name="expiry" placeholder="Expiry (YYYY-MM-DD)" value={form.expiry} onChange={handleChange} required />
-        <button type="submit"><FaPlus /> Add Coupon</button>
-      </form>
-    </section>
-  );
-}
-
-// --- Section 10: Team Access ---
-function TeamAccess() {
-  const [team, setTeam] = useState(mockTeam);
-  const [form, setForm] = useState({ name: '', role: '', services: '', performance: '' });
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
-  const handleAdd = e => {
-    e.preventDefault();
-    setTeam([...team, { ...form, id: Date.now(), services: form.services.split(',').map(s => s.trim()) }]);
-    setForm({ name: '', role: '', services: '', performance: '' });
-  };
-  return (
-    <section className="section team-access">
-      <h2>Team Access</h2>
-      <div className="team-list">
-        {team.map(m => (
-          <div className="team-item" key={m.id}>
-            <div className="team-info">
-              <span className="team-name">{m.name}</span>
-              <span className="team-role">{m.role}</span>
-              <span className="team-services">{m.services.join(', ')}</span>
-              <span className="team-performance">Performance: {m.performance}</span>
-            </div>
-            <button onClick={() => {}}><FaEdit /></button>
-            <button onClick={() => setTeam(team.filter(x => x.id !== m.id))}><FaTrash /></button>
-          </div>
-        ))}
-      </div>
-      <form className="team-form" onSubmit={handleAdd}>
-        <input name="name" placeholder="Name" value={form.name} onChange={handleChange} required />
-        <input name="role" placeholder="Role" value={form.role} onChange={handleChange} required />
-        <input name="services" placeholder="Services (comma separated)" value={form.services} onChange={handleChange} required />
-        <input name="performance" placeholder="Performance" value={form.performance} onChange={handleChange} required />
-        <button type="submit"><FaPlus /> Add Member</button>
-      </form>
-    </section>
-  );
-}
-
 // --- Main Page Layout ---
 export default function MyServices() {
   return (
     <div className="myservices-main">
-      <NotificationsPanel />
       <div className="dashboard-grid">
+        <NotificationsPanel />
         <BookingDashboard />
         <ServiceManagement />
-        <AvailabilitySettings />
         <AnalyticsInsights />
-        <CustomerManagement />
         <RatingsFeedback />
-        <ProfileCustomization />
-        <PromotionsCoupons />
-        <TeamAccess />
+        <ManageTeamMembers />
       </div>
     </div>
   );

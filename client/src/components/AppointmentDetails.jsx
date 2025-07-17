@@ -45,6 +45,11 @@ const AppointmentDetails = ({ appointment }) => {
       <div className="appointment-card">
         <div className="appointment-header">
           <h3>{appointment.serviceName}</h3>
+          {appointment.customerName || appointment.customerEmail ? (
+            <div className="appointment-customer">
+              {appointment.customerName || appointment.customerEmail}
+            </div>
+          ) : null}
           <span className={`status-badge status-${status}`}>
             {status.charAt(0).toUpperCase() + status.slice(1)}
           </span>
