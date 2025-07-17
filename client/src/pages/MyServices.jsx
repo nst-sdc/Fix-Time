@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './MyServices.css';
 import { FaBell, FaCalendarAlt, FaUser, FaStar, FaEdit, FaTrash, FaPlus, FaChartPie, FaChartBar, FaEnvelope, FaFlag, FaUsers, FaClock, FaToggleOn, FaToggleOff, FaUserCircle, FaMapMarkerAlt, FaTags, FaPhone, FaImage, FaCheckCircle, FaSpinner, FaTimes } from 'react-icons/fa';
-import Cropper from 'react-easy-crop';
 import axios from 'axios';
 import ServiceForm from '../components/ServiceForm';
 import ReactDOM from 'react-dom';
