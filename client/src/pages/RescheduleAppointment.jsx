@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { FaCalendarAlt, FaClock, FaArrowLeft, FaCheck } from 'react-icons/fa';
 import './RescheduleAppointment.css';
+import { API_BASE_URL } from '../App';
 
 const RescheduleAppointment = () => {
   const location = useLocation();
@@ -14,8 +15,6 @@ const RescheduleAppointment = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(false);
-
-  const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
 
   // Generate date options (current date + 14 days)
   const generateDateOptions = () => {

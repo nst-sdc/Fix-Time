@@ -33,7 +33,10 @@ import AddService from './pages/AddService';
 import ProviderServices from './pages/ProviderServices';
 
 // Export API base URL for use in other components
-export const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
+export const API_BASE_URL =
+  window.location.hostname === 'localhost'
+    ? 'http://localhost:5001'
+    : process.env.REACT_APP_API_URL;
 
 // Create theme context
 export const ThemeContext = createContext();

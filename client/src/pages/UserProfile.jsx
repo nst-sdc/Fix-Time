@@ -4,6 +4,7 @@ import axios from 'axios';
 import { FiEdit2, FiSave, FiX, FiUser, FiPhone, FiMapPin, FiCalendar, FiMail } from 'react-icons/fi';
 import './UserProfile.css';
 import { FaSpinner } from 'react-icons/fa';
+import { API_BASE_URL } from '../App';
 
 const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
   const [user, setUser] = useState(null);
@@ -64,7 +65,6 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
         return;
       }
 
-      const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
       const response = await axios.get(`${API_BASE_URL}/auth/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -175,7 +175,6 @@ const UserProfile = ({ isLoggedIn, setIsLoggedIn, setUserProfile }) => {
           experience: businessInfo.experience
         };
       }
-      const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
       const response = await axios.put(`${API_BASE_URL}/auth/profile`, payload, {
         headers: { Authorization: `Bearer ${token}` }
       });

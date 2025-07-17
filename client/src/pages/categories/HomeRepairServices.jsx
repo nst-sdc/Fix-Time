@@ -4,6 +4,7 @@ import './CategoryPage.css';
 import { FaTools, FaWrench, FaFaucet, FaBolt, FaSnowflake, FaBroom, FaPaintRoller, FaHammer } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
 import CategoryPage from './CategoryPage';
+import { API_BASE_URL } from '../../App';
 
 // Default icon mapping for this category
 const iconMapping = {
@@ -18,8 +19,6 @@ const iconMapping = {
   // Default icon for any other service
   "default": <FaTools />
 };
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
 
 const HomeRepairServices = () => {
   const [services, setServices] = useState([]);

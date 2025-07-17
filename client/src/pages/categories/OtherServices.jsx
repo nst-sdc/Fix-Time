@@ -3,8 +3,7 @@ import axios from 'axios';
 import './CategoryPage.css';
 import ServiceCard from '../../components/ServiceCard';
 import CategoryPage from './CategoryPage';
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
+import { API_BASE_URL } from '../../App';
 
 // List of pre-existing categories (should match those in SERVICES)
 const PRE_EXISTING_CATEGORIES = [

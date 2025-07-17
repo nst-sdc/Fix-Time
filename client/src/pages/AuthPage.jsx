@@ -4,6 +4,7 @@ import './auth.css';
 import axios from 'axios';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
 import { FaUser, FaBuilding, FaCalendarAlt, FaPhone, FaMapMarkerAlt } from 'react-icons/fa';
+import { API_BASE_URL } from '../App';
 
 const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
   const [isLogin, setIsLogin] = useState(initialIsLogin);
@@ -29,8 +30,6 @@ const AuthPage = ({ isLogin: initialIsLogin = true, setIsLoggedIn }) => {
   const [businessHours, setBusinessHours] = useState('');
   const [businessLocation, setBusinessLocation] = useState('');
   const navigate = useNavigate();
-
-  const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
 
   // Calculate min and max dates for age validation (10 years minimum age)
   const calculateDateLimits = () => {

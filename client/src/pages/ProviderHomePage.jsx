@@ -9,6 +9,7 @@ import AOS from 'aos';
 import 'aos/dist/aos.css';
 import axios from 'axios';
 import { navigateToTop } from '../utils/useScrollToTop';
+import { API_BASE_URL } from '../App';
 
 // Dummy data for now
 const dummyAppointments = [
@@ -63,7 +64,6 @@ const ProviderHomePage = () => {
       setErrorUpcoming('');
       try {
         const token = localStorage.getItem('token');
-        const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
         const res = await axios.get(`${API_BASE_URL}/appointments/provider`, {
           headers: { Authorization: `Bearer ${token}` }
         });
@@ -102,9 +102,7 @@ const ProviderHomePage = () => {
       setErrorStats('');
       try {
         const token = localStorage.getItem('token');
-        const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
-        // Fetch appointments for today
-        const appointmentsRes = await axios.get(`${API_BASE_URL}/appointments/provider`, {
+        const res = await axios.get(`${API_BASE_URL}/appointments/provider`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         // Fetch provider's services for average duration
@@ -112,9 +110,9 @@ const ProviderHomePage = () => {
           headers: { Authorization: `Bearer ${token}` }
         });
         
-        if (appointmentsRes.data.appointments && servicesRes.data.services) {
+        if (res.data.appointments && servicesRes.data.services) {
           const today = new Date().toISOString().slice(0, 10);
-          const todayAppointments = appointmentsRes.data.appointments.filter(a => 
+          const todayAppointments = res.data.appointments.filter(a => 
             a.date && a.date.slice(0, 10) === today
           );
           const noShows = todayAppointments.filter(a => a.status === 'no-show').length;
@@ -145,7 +143,6 @@ const ProviderHomePage = () => {
       setLoadingAvailability(true);
       try {
         const token = localStorage.getItem('token');
-        const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
         const res = await axios.get(`${API_BASE_URL}/appointments/provider`, {
           headers: { Authorization: `Bearer ${token}` }
         });

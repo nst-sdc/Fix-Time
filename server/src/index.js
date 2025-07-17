@@ -8,7 +8,7 @@ const app = express();
 
 // Configure CORS with more specific options
 app.use(cors({
-  origin: 'https://fix-time-7.vercel.app',
+  origin: ['http://localhost:3000', 'https://fix-time-7.vercel.app'],
   credentials: true
 }));
 app.use(express.json());
