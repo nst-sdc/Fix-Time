@@ -78,17 +78,7 @@ const ServiceCategory = () => {
       <div className="services-container">
         <h1 className="services-heading">{categoryData.category}</h1>
         <Link to="/services" className="btn btn-secondary" style={{marginBottom: '2rem', display: 'inline-block'}}>Back to All Categories</Link>
-
-        <button className="btn btn-primary" onClick={() => setShowForm(!showForm)}>+ Add a Service</button>
-
-        {showForm && (
-          <ServiceForm
-            category={categorySlug}
-            onClose={() => setShowForm(false)}
-            onSuccess={fetchDynamicServices}
-          />
-        )}
-
+        {/* No Add Service button for clients */}
         <h3 style={{marginTop: "2rem"}}>Popular Services:</h3>
         <div className="services-list">
           {categoryData.services.map((service, idx) => (
@@ -98,7 +88,6 @@ const ServiceCategory = () => {
             </div>
           ))}
         </div>
-
         <h3 style={{marginTop: "2rem"}}>User Added Services:</h3>
         {dynamicServices.length === 0 ? (
           <p>No services added yet for this category.</p>

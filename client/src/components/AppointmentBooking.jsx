@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import axios from 'axios';
+import { API_BASE_URL } from '../App';
 import "./AppointmentBooking.css";
 import ReviewForm from './ReviewForm';
 
-const timeSlots = [
+const defaultTimeSlots = [
   "8:00 AM", "9:00 AM", "10:00 AM",
   "10:30 AM", "11:30 AM", "1:00 PM",
   "2:00 PM", "2:30 PM", "3:30 PM",
@@ -32,6 +33,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [bookedAppointmentId, setBookedAppointmentId] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [serviceSlots, setServiceSlots] = useState(null); // null = not loaded, [] = no slots
 
   useEffect(() => {
     const generateDates = () => {
@@ -72,6 +74,41 @@ const AppointmentBooking = ({ serviceId = null }) => {
         .catch(() => {});
     }
   }, []);
+
+  useEffect(() => {
+    // Fetch service details if we have an ID
+    const id = preSelectedServiceId || serviceId;
+    if (id) {
+      axios.get(`${API_BASE_URL}/services/${id}`)
+        .then(res => {
+          const slots = res.data?.service?.timeSlots;
+          if (Array.isArray(slots) && slots.length > 0) {
+            setServiceSlots(slots);
+          } else {
+            setServiceSlots([]); // explicitly no slots
+          }
+        })
+        .catch(() => setServiceSlots([]));
+    } else {
+      setServiceSlots([]);
+    }
+  }, [preSelectedServiceId, serviceId]);
+
+  // Use serviceSlots if loaded and non-empty, else defaultTimeSlots
+  const timeSlots = (serviceSlots && serviceSlots.length > 0) ? serviceSlots : defaultTimeSlots;
+
+  // Helper to format time to 12-hour with AM/PM
+  function formatTime12h(timeStr) {
+    // If already in 12-hour format with AM/PM, return as is
+    if (/am|pm|AM|PM/.test(timeStr)) return timeStr;
+    // If in HH:MM format, convert
+    const [h, m] = timeStr.split(":").map(Number);
+    if (isNaN(h) || isNaN(m)) return timeStr;
+    let hour = h % 12;
+    if (hour === 0) hour = 12;
+    const ampm = h < 12 ? "AM" : "PM";
+    return `${hour}:${m.toString().padStart(2, "0")} ${ampm}`;
+  }
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -247,7 +284,7 @@ const AppointmentBooking = ({ serviceId = null }) => {
                 cursor: disabled ? "not-allowed" : "pointer"
               }}
             >
-              {slot}
+              {formatTime12h(slot)}
             </button>
           );
         })}

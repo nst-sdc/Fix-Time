@@ -4,7 +4,20 @@ import axios from 'axios';
 import { API_BASE_URL } from '../App';
 import './ServiceForm.css';
 
-const ServiceForm = ({ category, onClose, onSuccess }) => {
+const CATEGORIES = [
+  'Healthcare & Wellness',
+  'Beauty & Personal Care',
+  'Home & Repair Services',
+  'Education & Coaching',
+  'Government / Legal Services',
+  'Automobile Services',
+  'Retail & Local Businesses',
+  'Private Events',
+  'Hotel & Restaurant',
+  'Others'
+];
+
+const ServiceForm = ({ category, onClose, onSuccess, service }) => {
   const [form, setForm] = useState({
     serviceName: "",
     description: "",
@@ -16,8 +29,27 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
     price: "",
     duration: "",
     timeSlots: [],
-    category,
+    category: category || "",
   });
+
+  // Pre-fill form if editing
+  useEffect(() => {
+    if (service) {
+      setForm({
+        serviceName: service.name || "",
+        description: service.description || "",
+        companyName: service.provider || "",
+        address: service.location ? service.location.split(",")[0] : "",
+        city: service.location ? service.location.split(",")[1]?.trim() || "" : "",
+        contact: service.contact || "",
+        imageUrl: service.imageUrl || "",
+        price: service.price?.toString() || "",
+        duration: service.duration?.toString() || "",
+        timeSlots: service.timeSlots || [],
+        category: service.category || category || "",
+      });
+    }
+  }, [service, category]);
 
   const [startTime, setStartTime] = useState("");
   const [endTime, setEndTime] = useState("");
@@ -52,6 +84,8 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
     if (!form.duration || isNaN(form.duration) || Number(form.duration) < 5) {
       newErrors.duration = "Duration must be at least 5 minutes";
     }
+
+    if (!form.category) newErrors.category = "Category is required";
 
     if (form.imageUrl) {
       try {
@@ -139,15 +173,35 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
 
     try {
       setIsSubmitting(true);
-      const response = await axios.post(`${API_BASE_URL}/services`, transformedData);
+      const token = localStorage.getItem('token');
+      let response;
+      if (service && service._id) {
+        // Edit mode: PATCH
+        response = await axios.patch(
+          `${API_BASE_URL}/services/${service._id}`,
+          transformedData,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+      } else {
+        // Add mode: POST
+        response = await axios.post(
+          `${API_BASE_URL}/services`,
+          transformedData,
+          {
+            headers: { Authorization: `Bearer ${token}` }
+          }
+        );
+      }
       if (response.data.success) {
         onSuccess(response.data.data);
         onClose();
       } else {
-        setSubmitError(response.data.message || "Failed to add service");
+        setSubmitError(response.data.message || (service ? "Failed to update service" : "Failed to add service"));
       }
     } catch (err) {
-      console.error("Error adding service:", err.response?.data || err.message);
+      console.error(service ? "Error updating service:" : "Error adding service:", err.response?.data || err.message);
       setSubmitError(err.response?.data?.message || "Something went wrong.");
     } finally {
       setIsSubmitting(false);
@@ -157,10 +211,20 @@ const ServiceForm = ({ category, onClose, onSuccess }) => {
   return (
     <div className="modal-overlay">
       <div className="service-form-wrapper">
-        <h3>Add New Service</h3>
+        <button className="close-modal-btn" onClick={onClose} aria-label="Close">&times;</button>
+        <h3>{service ? 'Edit Service' : 'Add New Service'}</h3>
         {submitError && <div className="error-message">{submitError}</div>}
-
         <form className="service-form" onSubmit={handleSubmit}>
+          {/* Category Dropdown */}
+          <div className="form-group">
+            <select name="category" value={form.category} onChange={handleChange} className={errors.category ? "error" : ""} required>
+              <option value="">Select Category</option>
+              {CATEGORIES.map(cat => (
+                <option key={cat} value={cat}>{cat}</option>
+              ))}
+            </select>
+            {errors.category && <span className="error-text">{errors.category}</span>}
+          </div>
           {/* Core Inputs */}
           <div className="form-group">
             <input name="serviceName" placeholder="Service Name" onChange={handleChange} value={form.serviceName} className={errors.serviceName ? "error" : ""} />

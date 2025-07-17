@@ -55,7 +55,7 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => 
             </Link>
           </li>
           
-          {isLoggedIn && (
+          {isLoggedIn && userProfile?.role !== 'provider' && (
             <li className="nav-item">
               <Link to="/services" className="nav-link" onClick={() => setMenuOpen(false)}>
                 Schedule
@@ -74,11 +74,18 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => 
 
           {/* Show My Services only for providers */}
           {isLoggedIn && userProfile?.role === 'provider' && (
-            <li className="nav-item">
-              <Link to="/my-services" className="nav-link" onClick={() => setMenuOpen(false)}>
-                My Services
-              </Link>
-            </li>
+            <>
+              <li className="nav-item">
+                <Link to="/my-services" className="nav-link" onClick={() => setMenuOpen(false)}>
+                  My Services
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link to="/provider-services" className="nav-link" onClick={() => setMenuOpen(false)}>
+                  Service Catalog
+                </Link>
+              </li>
+            </>
           )}
 
           {isLoggedIn && (
@@ -140,25 +147,33 @@ const Navbar = ({ isLoggedIn, userProfile, onLogout, theme, onThemeToggle }) => 
                     <span>Dashboard</span>
                   </Link>
                   
-                   {/* Show My Appointments only for clients */}
-                   {userProfile?.role !== 'provider' && (
-                     <Link to="/my-appointments" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
-                       <FaUser className="dropdown-icon" />
-                       <span>My Appointments</span>
-                     </Link>
-                   )}
-                   {/* Show My Services only for providers */}
-                   {userProfile?.role === 'provider' && (
-                     <Link to="/my-services" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
-                       <FaUser className="dropdown-icon" />
-                       <span>My Services</span>
-                     </Link>
-                   )}
-                   
-                    <Link to="/profile" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
-                      <FaUserEdit className="dropdown-icon" />
-                      <span>Profile</span>
+                  {/* Show My Appointments only for clients */}
+                  {userProfile?.role !== 'provider' && (
+                    <Link to="/my-appointments" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
+                      <FaUser className="dropdown-icon" />
+                      <span>My Appointments</span>
                     </Link>
+                  )}
+                  
+                  {/* Show My Services only for providers */}
+                  {userProfile?.role === 'provider' && (
+                    <>
+                      <Link to="/my-services" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
+                        <FaUser className="dropdown-icon" />
+                        <span>My Services</span>
+                      </Link>
+                      <Link to="/provider-services" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
+                        <FaUser className="dropdown-icon" />
+                        <span>Service Catalog</span>
+                      </Link>
+                    </>
+                  )}
+                  
+                  <Link to="/profile" className="dropdown-item" onClick={() => { setMenuOpen(false); setDropdownOpen(false); }}>
+                    <FaUserEdit className="dropdown-icon" />
+                    <span>Profile</span>
+                  </Link>
+                  
                   <div className="dropdown-item logout-item" onClick={handleLogout}>
                     <FaSignOutAlt className="dropdown-icon" />
                     <span>Logout</span>

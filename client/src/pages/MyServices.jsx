@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './MyServices.css';
 import { FaBell, FaCalendarAlt, FaUser, FaStar, FaEdit, FaTrash, FaPlus, FaChartPie, FaChartBar, FaEnvelope, FaFlag, FaUsers, FaClock, FaToggleOn, FaToggleOff } from 'react-icons/fa';
 import axios from 'axios';
+import ServiceForm from '../components/ServiceForm';
+import ReactDOM from 'react-dom';
 
 // --- Mock Data ---
 const mockBookings = [
@@ -114,10 +116,35 @@ function BookingDashboard() {
     }
   };
 
+  // Helper to check if appointment is in the future
+  function isFutureAppointment(dateStr, timeStr) {
+    if (!dateStr || !timeStr) return false;
+    // Support both '10:00' and '10:00 AM' formats
+    let hours = 0, minutes = 0;
+    let t = timeStr.trim();
+    let ampm = '';
+    if (/am|pm|AM|PM/.test(t)) {
+      // 12-hour format
+      const [time, meridian] = t.split(/\s+/);
+      [hours, minutes] = time.split(":").map(Number);
+      ampm = meridian.toUpperCase();
+      if (ampm === 'PM' && hours !== 12) hours += 12;
+      if (ampm === 'AM' && hours === 12) hours = 0;
+    } else {
+      // 24-hour format
+      [hours, minutes] = t.split(":").map(Number);
+    }
+    const apptDate = new Date(dateStr);
+    apptDate.setHours(hours);
+    apptDate.setMinutes(minutes);
+    apptDate.setSeconds(0);
+    return apptDate > new Date();
+  }
+
   // Filtering logic
   const todayStr = new Date().toISOString().slice(0, 10);
   const filtered = bookings.filter(b => {
-    if (filter === 'Upcoming') return b.status === 'pending' || b.status === 'confirmed';
+    if (filter === 'Upcoming') return isFutureAppointment(b.date, b.time);
     if (filter === 'Today') return b.date && b.date.slice(0, 10) === todayStr;
     if (filter === 'Scheduled') return b.status === 'scheduled';
     if (filter === 'Past') return b.status === 'completed' || b.status === 'no-show';
@@ -209,47 +236,136 @@ function BookingDashboard() {
 
 // --- Section 2: Service Management Panel ---
 function ServiceManagement() {
-  const [services, setServices] = useState(mockServices);
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
   const [showForm, setShowForm] = useState(false);
-  const [form, setForm] = useState({ name: '', duration: '', cost: '', category: '', buffer: '' });
-  const handleChange = e => setForm({ ...form, [e.target.name]: e.target.value });
-  const handleAdd = e => {
-    e.preventDefault();
-    setServices([...services, { ...form, id: Date.now(), status: true }]);
-    setForm({ name: '', duration: '', cost: '', category: '', buffer: '' });
-    setShowForm(false);
+  const [editService, setEditService] = useState(null);
+  const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('all');
+  const [refresh, setRefresh] = useState(0);
+
+  useEffect(() => {
+    const fetchServices = async () => {
+      try {
+        setLoading(true);
+        setError('');
+        const token = localStorage.getItem('token');
+        const response = await axios.get('http://localhost:5001/services/provider', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (response.data.success) {
+          setServices(response.data.services);
+        } else {
+          setError('Failed to fetch your services');
+        }
+      } catch (err) {
+        setError('Failed to load your services');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchServices();
+  }, [refresh]);
+
+  // Unique categories for filter
+  const categories = ['all', ...Array.from(new Set(services.map(s => s.category)))];
+
+  // Filtered services
+  const filtered = services.filter(s =>
+    (category === 'all' || s.category === category) &&
+    s.name.toLowerCase().includes(search.toLowerCase())
+  );
+
+  // Handlers
+  const handleAdd = () => {
+    setEditService(null);
+    setShowForm(true);
   };
-  const handleToggle = id => setServices(services.map(s => s.id === id ? { ...s, status: !s.status } : s));
-  const handleDelete = id => setServices(services.filter(s => s.id !== id));
+  const handleEdit = (service) => {
+    setEditService(service);
+    setShowForm(true);
+  };
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this service?')) return;
+    try {
+      const token = localStorage.getItem('token');
+      await axios.delete(`http://localhost:5001/services/${id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setRefresh(r => r + 1);
+    } catch {
+      alert('Failed to delete service.');
+    }
+  };
+  const handleToggle = async (service) => {
+    try {
+      const token = localStorage.getItem('token');
+      await axios.patch(`http://localhost:5001/services/${service._id}`, {
+        isActive: !service.isActive
+      }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setRefresh(r => r + 1);
+    } catch {
+      alert('Failed to update service status.');
+    }
+  };
+  const handleFormClose = () => {
+    setShowForm(false);
+    setEditService(null);
+    setRefresh(r => r + 1);
+  };
+
   return (
     <section className="section service-management">
       <h2>Service Management</h2>
-      <div className="service-list">
-        {services.map(s => (
-          <div className={`service-item${s.status ? '' : ' inactive'}`} key={s.id}>
-            <div className="service-info">
-              <span className="service-name">{s.name}</span>
-              <span className="service-meta">{s.duration} min | ${s.cost} | {s.category}</span>
-              <span className="service-buffer">Buffer: {s.buffer} min</span>
-            </div>
-            <div className="service-actions">
-              <button onClick={() => handleToggle(s.id)}>{s.status ? <FaToggleOn /> : <FaToggleOff />}</button>
-              <button onClick={() => {}}><FaEdit /></button>
-              <button onClick={() => handleDelete(s.id)}><FaTrash /></button>
-            </div>
-          </div>
-        ))}
+      <div className="service-filters">
+        <input
+          type="text"
+          placeholder="Search services..."
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          className="service-search"
+        />
+        <select value={category} onChange={e => setCategory(e.target.value)} className="service-category-filter">
+          {categories.map(cat => (
+            <option key={cat} value={cat}>{cat === 'all' ? 'All Categories' : cat}</option>
+          ))}
+        </select>
       </div>
-      <button className="add-btn" onClick={() => setShowForm(!showForm)}><FaPlus /> Add New Service</button>
-      {showForm && (
-        <form className="service-form" onSubmit={handleAdd}>
-          <input name="name" placeholder="Service Name" value={form.name} onChange={handleChange} required />
-          <input name="duration" placeholder="Duration (min)" value={form.duration} onChange={handleChange} required />
-          <input name="cost" placeholder="Cost ($)" value={form.cost} onChange={handleChange} required />
-          <input name="category" placeholder="Category" value={form.category} onChange={handleChange} required />
-          <input name="buffer" placeholder="Buffer Time (min)" value={form.buffer} onChange={handleChange} required />
-          <button type="submit">Add Service</button>
-        </form>
+      {loading ? (
+        <div className="loading-state">Loading your services...</div>
+      ) : error ? (
+        <div className="error-message">{error}</div>
+      ) : filtered.length === 0 ? (
+        <div className="no-services-message">You haven’t added any services yet.</div>
+      ) : (
+        <div className="service-list">
+          {filtered.map(service => (
+            <div className={`service-item${service.isActive ? '' : ' inactive'}`} key={service._id}>
+              <div className="service-info">
+                <span className="service-name">{service.name}</span>
+                <span className="service-meta">{service.duration} min | ₹{service.price} | {service.category}</span>
+                <span className="service-buffer">{service.timeSlots?.length ? `Slots: ${service.timeSlots.length}` : ''}</span>
+              </div>
+              <div className="service-actions">
+                <button onClick={() => handleToggle(service)}>{service.isActive ? <FaToggleOn /> : <FaToggleOff />}</button>
+                <button onClick={() => handleEdit(service)}><FaEdit /></button>
+                <button onClick={() => handleDelete(service._id)}><FaTrash /></button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+      <button className="add-btn" onClick={handleAdd}><FaPlus /> Add New Service</button>
+      {showForm && ReactDOM.createPortal(
+        <ServiceForm
+          service={editService}
+          onClose={handleFormClose}
+          onSuccess={handleFormClose}
+        />,
+        document.body
       )}
     </section>
   );
