@@ -4,6 +4,7 @@ import './CategoryPage.css';
 import { FaBalanceScale, FaPassport, FaFileContract, FaGavel, FaIdCard, FaFileSignature, FaUniversity } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
 import CategoryPage from './CategoryPage';
+import { API_BASE_URL } from '../../App';
 
 // Default icon mapping for this category
 const iconMapping = {
@@ -18,7 +19,6 @@ const iconMapping = {
   "default": <FaBalanceScale />
 };
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
 
 const GovernmentLegalServices = () => {
   const [services, setServices] = useState([]);

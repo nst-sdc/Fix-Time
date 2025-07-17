@@ -9,6 +9,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import axios from 'axios';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { isPastAppointment } from '../utils/serviceUtils';
+import { API_BASE_URL } from '../App';
 
 const AppointmentCalendar = () => {
   const [appointments, setAppointments] = useState([]);
@@ -39,8 +40,6 @@ const AppointmentCalendar = () => {
     'Events': '#f5e642',      // yellow
     'default': '#6c757d'      // gray
   };
-
-  const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
 
   // Fetch user profile to determine role
   const fetchUserProfile = async () => {

@@ -19,6 +19,7 @@ import {
 } from 'react-icons/fa';
 import './MyAppointments.css';
 import { isPastAppointment } from '../utils/serviceUtils';
+import { API_BASE_URL } from '../App';
 
 // Add a helper to get the display status
 function getDisplayStatus(appointment) {
@@ -59,7 +60,6 @@ const MyAppointments = () => {
         return;
       }
 
-      const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
       const response = await axios.get(`${API_BASE_URL}/appointments`, {
         headers: { Authorization: `Bearer ${token}` }
       });
@@ -302,7 +302,6 @@ const MyAppointments = () => {
         token: token ? 'present' : 'missing'
       });
 
-      const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
       const response = await axios.put(
         `${API_BASE_URL}/appointments/${selectedAppointment._id}/reschedule`,
         {
@@ -415,7 +414,6 @@ const MyAppointments = () => {
         const token = localStorage.getItem('token');
         
         // Call API to update appointment status
-        const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
         const response = await axios.patch(
           `${API_BASE_URL}/appointments/${id}/status`,
           { status: 'cancelled' },

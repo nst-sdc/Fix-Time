@@ -4,6 +4,7 @@ import './CategoryPage.css';
 import { FaShoppingBag, FaStore, FaGem, FaTshirt, FaGlasses, FaBook, FaMobileAlt, FaGamepad } from 'react-icons/fa';
 import ServiceCard from '../../components/ServiceCard';
 import CategoryPage from './CategoryPage';
+import { API_BASE_URL } from '../../App';
 
 // Default icon mapping for this category
 const iconMapping = {
@@ -18,8 +19,6 @@ const iconMapping = {
   // Default icon for any other service
   "default": <FaStore />
 };
-
-const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
 
 const RetailLocalBusinesses = () => {
   const [services, setServices] = useState([]);
