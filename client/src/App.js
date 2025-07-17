@@ -33,7 +33,7 @@ import AddService from './pages/AddService';
 import ProviderServices from './pages/ProviderServices';
 
 // Export API base URL for use in other components
-export const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+export const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
 
 // Create theme context
 export const ThemeContext = createContext();
@@ -72,7 +72,7 @@ function App() {
       setIsLoggedIn(true);
       const fetchUserProfile = async () => {
         try {
-          const res = await axios.get('http://localhost:5001/auth/profile', {
+          const res = await axios.get(`${API_BASE_URL}/auth/profile`, {
             headers: {
               Authorization: `Bearer ${token}`
             }

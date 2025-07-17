@@ -40,13 +40,15 @@ const AppointmentCalendar = () => {
     'default': '#6c757d'      // gray
   };
 
+  const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
+
   // Fetch user profile to determine role
   const fetchUserProfile = async () => {
     try {
       const token = localStorage.getItem('token');
       if (!token) return;
       
-      const response = await axios.get('http://localhost:5001/auth/profile', {
+      const response = await axios.get(`${API_BASE_URL}/auth/profile`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       
@@ -76,7 +78,7 @@ const AppointmentCalendar = () => {
       }
       
       // Fetch appointments from API based on user role
-      const endpoint = isProvider ? 'http://localhost:5001/appointments/provider' : 'http://localhost:5001/appointments';
+      const endpoint = isProvider ? `${API_BASE_URL}/appointments/provider` : `${API_BASE_URL}/appointments`;
       const response = await axios.get(endpoint, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -253,7 +255,7 @@ const AppointmentCalendar = () => {
         
         // Call API to update appointment status
         const response = await axios.patch(
-          `http://localhost:5001/appointments/${id}/status`,
+          `${API_BASE_URL}/appointments/${id}/status`,
           { status: 'cancelled' },
           {
             headers: {
@@ -300,7 +302,7 @@ const AppointmentCalendar = () => {
       const token = localStorage.getItem('token');
       
       const response = await axios.patch(
-        `http://localhost:5001/appointments/${id}/provider-status`,
+        `${API_BASE_URL}/appointments/${id}/provider-status`,
         { status },
         {
           headers: {

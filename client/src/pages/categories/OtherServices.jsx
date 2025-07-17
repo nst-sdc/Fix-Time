@@ -4,7 +4,7 @@ import './CategoryPage.css';
 import ServiceCard from '../../components/ServiceCard';
 import CategoryPage from './CategoryPage';
 
-const API_BASE_URL = process.env.REACT_APP_API_URL || "http://localhost:5001";
+const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
 
 // List of pre-existing categories (should match those in SERVICES)
 const PRE_EXISTING_CATEGORIES = [

@@ -87,7 +87,8 @@ function BookingDashboard() {
     setError(null);
     try {
       const token = localStorage.getItem('token');
-      const res = await axios.get('http://localhost:5001/appointments/provider', {
+      const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
+      const res = await axios.get(`${API_BASE_URL}/appointments/provider`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setBookings(res.data.appointments || []);
@@ -105,7 +106,8 @@ function BookingDashboard() {
     if (action === 'reject') newStatus = 'cancelled';
     try {
       const token = localStorage.getItem('token');
-      await axios.patch(`http://localhost:5001/appointments/${id}/provider-status`, { status: newStatus }, {
+      const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
+      await axios.patch(`${API_BASE_URL}/appointments/${id}/provider-status`, { status: newStatus }, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setBookings(prev => prev.map(b => b._id === id ? { ...b, status: newStatus } : b));
@@ -251,7 +253,8 @@ function ServiceManagement() {
         setLoading(true);
         setError('');
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5001/services/provider', {
+        const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
+        const response = await axios.get(`${API_BASE_URL}/services/provider`, {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (response.data.success) {
@@ -290,7 +293,8 @@ function ServiceManagement() {
     if (!window.confirm('Are you sure you want to delete this service?')) return;
     try {
       const token = localStorage.getItem('token');
-      await axios.delete(`http://localhost:5001/services/${id}`, {
+      const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
+      await axios.delete(`${API_BASE_URL}/services/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       setRefresh(r => r + 1);
@@ -301,7 +305,8 @@ function ServiceManagement() {
   const handleToggle = async (service) => {
     try {
       const token = localStorage.getItem('token');
-      await axios.patch(`http://localhost:5001/services/${service._id}`, {
+      const API_BASE_URL = process.env.REACT_APP_API_URL || "https://fixtime-i368.onrender.com";
+      await axios.patch(`${API_BASE_URL}/services/${service._id}`, {
         isActive: !service.isActive
       }, {
         headers: { Authorization: `Bearer ${token}` }
