@@ -45,6 +45,8 @@ const ProviderHomePage = () => {
   const [errorUpcoming, setErrorUpcoming] = useState('');
   const [availabilityData, setAvailabilityData] = useState([]);
   const [loadingAvailability, setLoadingAvailability] = useState(true);
+  const [pendingRequests, setPendingRequests] = useState([]);
+  const [actionLoading, setActionLoading] = useState({});
 
   // Function to navigate with scroll to top
   const handleNavigateToTop = (path) => {
@@ -172,6 +174,44 @@ const ProviderHomePage = () => {
     };
     fetchAvailability();
   }, []);
+
+  useEffect(() => {
+    const fetchPendingRequests = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const res = await axios.get('http://localhost:5001/appointments/provider', {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.data.appointments) {
+          const pending = res.data.appointments.filter(a => a.status === 'pending');
+          setPendingRequests(pending);
+        } else {
+          setPendingRequests([]);
+        }
+      } catch (err) {
+        setPendingRequests([]);
+      }
+    };
+    fetchPendingRequests();
+  }, []);
+
+  const handleRequestAction = async (id, action) => {
+    setActionLoading(prev => ({ ...prev, [id]: true }));
+    let newStatus = '';
+    if (action === 'accept') newStatus = 'scheduled';
+    if (action === 'decline') newStatus = 'cancelled';
+    try {
+      const token = localStorage.getItem('token');
+      await axios.patch(`http://localhost:5001/appointments/${id}/provider-status`, { status: newStatus }, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      setPendingRequests(prev => prev.filter(r => r._id !== id));
+    } catch (err) {
+      alert('Failed to update request.');
+    } finally {
+      setActionLoading(prev => ({ ...prev, [id]: false }));
+    }
+  };
 
   // Animated counter
   const AnimatedCounter = ({ value }) => {
@@ -457,6 +497,26 @@ const ProviderHomePage = () => {
             </div>
             <div className="queue-progress-bar">
               <div className="progress" style={{ width: queueOpen ? '70%' : '0%' }}></div>
+            </div>
+            <div className="queue-requests-section">
+              <h4 style={{marginTop:'1rem',marginBottom:'0.5rem'}}>Pending Requests</h4>
+              {pendingRequests.length === 0 ? (
+                <div className="empty-state">No pending requests.</div>
+              ) : (
+                pendingRequests.map(req => (
+                  <div className="queue-request-item" key={req._id}>
+                    <div className="queue-request-info">
+                      <span className="queue-request-name">{req.customerName || req.customerEmail}</span>
+                      <span className="queue-request-service">{req.serviceName}</span>
+                      <span className="queue-request-time">{formatTime12h(req.time)}</span>
+                    </div>
+                    <div className="queue-request-actions">
+                      <button className="accept-btn" disabled={!!actionLoading[req._id]} onClick={() => handleRequestAction(req._id, 'accept')}>{actionLoading[req._id] ? 'Accepting...' : 'Accept'}</button>
+                      <button className="decline-btn" disabled={!!actionLoading[req._id]} onClick={() => handleRequestAction(req._id, 'decline')}>{actionLoading[req._id] ? 'Declining...' : 'Decline'}</button>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
             <div className="queue-under-development">
               <p>Queue Management - Under Development</p>
