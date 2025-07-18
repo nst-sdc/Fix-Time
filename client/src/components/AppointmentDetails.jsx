@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { FaCalendarAlt, FaClock, FaCheckCircle, FaStar } from 'react-icons/fa';
 import ReviewForm from './ReviewForm';
 import './AppointmentDetails.css';
+import { useNavigate } from 'react-router-dom';
 
 const AppointmentDetails = ({ appointment }) => {
-  const [showReviewForm, setShowReviewForm] = useState(false);
   const [hasReviewed, setHasReviewed] = useState(appointment?.hasReviewed || false);
+  const navigate = useNavigate();
 
   const formatDate = (dateString) => {
     const options = { year: 'numeric', month: 'long', day: 'numeric' };
@@ -34,7 +35,6 @@ const AppointmentDetails = ({ appointment }) => {
   const handleReviewSubmit = (review) => {
     console.log('Review submitted successfully:', review);
     setHasReviewed(true);
-    setShowReviewForm(false);
     setTimeout(() => {
       alert('Thank you for your review!');
     }, 500);
@@ -66,10 +66,10 @@ const AppointmentDetails = ({ appointment }) => {
           </div>
         </div>
 
-        {status === 'completed' && !hasReviewed && !showReviewForm && (
+        {status === 'completed' && !hasReviewed && (
           <button 
             className="leave-review-btn" 
-            onClick={() => setShowReviewForm(true)}
+            onClick={() => navigate('/leave-review', { state: { appointmentId: appointment._id } })}
           >
             <FaStar className="review-icon" />
             Leave a Review
@@ -84,15 +84,7 @@ const AppointmentDetails = ({ appointment }) => {
         )}
       </div>
 
-      {showReviewForm && (
-        <div className="review-section">
-          <ReviewForm 
-            appointmentId={appointment._id} 
-            onReviewSubmitted={handleReviewSubmit} 
-            onClose={() => setShowReviewForm(false)}
-          />
-        </div>
-      )}
+      {/* Remove all showReviewForm logic and modal rendering */}
     </div>
   );
 };

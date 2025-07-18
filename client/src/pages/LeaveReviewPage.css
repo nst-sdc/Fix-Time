@@ -1,0 +1,35 @@
+.leave-review-page-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f7f7fa;
+  padding: 24px 8px;
+}
+
+.leave-review-form-wrapper {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 16px rgba(0,0,0,0.08);
+  padding: 32px 24px;
+  max-width: 420px;
+  width: 100%;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-y: auto;
+}
+
+.leave-review-form-wrapper h2 {
+  margin-bottom: 24px;
+  font-size: 1.6rem;
+  text-align: center;
+}
+
+@media (max-width: 600px) {
+  .leave-review-form-wrapper {
+    padding: 18px 6px;
+    max-width: 98vw;
+  }
+} 

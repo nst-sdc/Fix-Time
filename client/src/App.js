@@ -31,6 +31,7 @@ import MyServices from './pages/MyServices';
 import OtherServices from './pages/categories/OtherServices';
 import AddService from './pages/AddService';
 import ProviderServices from './pages/ProviderServices';
+import LeaveReviewPage from './pages/LeaveReviewPage';
 
 // Export API base URL for use in other components
 export const API_BASE_URL =
@@ -205,6 +206,7 @@ function AppContent({
               ? <ProviderServices userProfile={userProfile} />
               : <Navigate to="/login" />
           } />
+          <Route path="/leave-review" element={<LeaveReviewPage />} />
         </Routes>
       </main>
       <Footer />
