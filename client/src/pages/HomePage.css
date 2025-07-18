@@ -963,7 +963,7 @@ body.light .hero-badge {
 /* Light mode-specific buttons */
 body.light .btn-secondary {
   background-color: rgba(255, 255, 255, 0.15);
-  color: #ffffff;
+  color: #4f46e5;
   border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
