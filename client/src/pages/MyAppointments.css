@@ -141,6 +141,14 @@ body.dark .stat-number {
   color: var(--accent-dark, #9f8fff);
 }
 
+body.light .stat-number {
+  color: #4f46e5;
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  -webkit-text-fill-color: initial;
+}
+
 .stat-label {
   font-size: 0.9rem;
   color: var(--text-secondary-light, #64748b);
