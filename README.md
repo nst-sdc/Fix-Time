@@ -1,240 +1,233 @@
-# ⏱️ FixTime – Queue-Free Booking Platform
+# ⏱️ FixTime - Queue-Free Booking Platform
 
-**FixTime** is an open-source appointment booking platform built using the **MERN stack (MongoDB, Express, React, Node.js)**.
+A full-stack web application where customers can seamlessly book appointments and service providers can efficiently manage their schedules.
 
-It helps eliminate long queues by allowing users to book time slots in advance — whether it's a hospital, clinic, salon, or any local service provider.
-
----
-
-## 🧠 Problem
-
-Everywhere you look, there are queues.  
-About **99 million Indians** spend over **3 hours a day** standing in lines — leading to a productivity loss of nearly **297 lakh hours daily**.
-
-Even in hospitals, people wait outside early in the morning just to get a token. And at local salons, customers often leave if they see 2–3 people waiting — leading to time waste on both sides.
+Built as a **real-world open-source project** under the mentorship of faculty and the Software Development Club at Newton School of Technology, **FixTime** helps reduce queue wait times by offering a smart scheduling experience. The application features role-based dashboards, slot-based booking, and reviews — designed to save time for both users and service providers.
 
 ---
 
-## 💡 Our Solution: FixTime
+## ❓ Problem
 
-FixTime is a **smart, real-time appointment scheduler** that:
-- Lets users book slots online based on availability
-- Helps service providers manage time efficiently
-- Avoids crowding during peak hours
-- Fills idle gaps during lean hours
-
-Users save time.  
-Providers get organized.  
-Everyone wins.
+In many public and private service sectors like clinics, salons, or government offices, customers face long queues and inefficient walk-in systems. This leads to frustration, poor customer satisfaction, and wasted time for both clients and service providers.
 
 ---
 
-## 🔧 Tech Stack
+## 💡 Solution
 
-| Layer      | Technology            |
-|------------|------------------------|
-| Frontend   | React, React Router DOM, Axios |
-| Backend    | Node.js, Express.js    |
-| Database   | MongoDB, Mongoose      |
-| Auth       | JWT (JSON Web Tokens), bcryptjs |
-| Hosting    | *(Coming soon: Vercel + Render)* |
+**FixTime** eliminates the chaos of waiting lines by offering a seamless, real-time appointment booking system. It empowers users to book slots based on provider availability while enabling service providers to manage bookings efficiently through a dedicated dashboard. This enhances convenience, optimizes schedules, and improves user experience for all parties involved.
+
+---
+
+## 🔗 Live Website
+
+* **Frontend:** [https://fix-time-7.vercel.app](https://fix-time-7.vercel.app)
+* **Backend:** [https://fixtime-i368.onrender.com](https://fixtime-i368.onrender.com)
+
+---
+
+## ✨ Features
+
+### 📅 For Users:
+
+* Browse services by category (hospital, salon, etc.)
+* Book appointment slots in real-time
+* View upcoming and past appointments
+* Leave reviews and ratings
+* Calendar integration for upcoming bookings
+* Email confirmation on successful bookings
+
+### 🧑‍🎓 For Service Providers:
+
+* Create and manage offered services
+* Set available time slots
+* View/manage incoming appointments
+* Respond to reviews
+* View analytics of appointments and feedback
+* Manage availability on a dynamic calendar view
+
+### ✅ General:
+
+* Role-based dashboards (Customer & Provider)
+* Auth with JWT and bcrypt
+* Dark/light theme toggle
+* Responsive design
+* Error handling and form validation
+* Environment variable support for API configuration
+
+---
+
+## 🛠️ Tech Stack
+
+| Layer      | Technology                                  |
+| ---------- | ------------------------------------------- |
+| Frontend   | React, React Router DOM, Axios, CSS Modules |
+| Backend    | Node.js, Express.js                         |
+| Database   | MongoDB, Mongoose                           |
+| Auth       | JWT, bcrypt.js                              |
+| Deployment | Vercel (Frontend), Render (Backend)         |
 
 ---
 
 ## 🚀 Getting Started (Local Setup)
 
-### 🖥️ Prerequisites
-- Node.js v14+
-- MongoDB (local or Atlas)
-- Git
+### 1. Clone the Repository
 
----
-
-### 📦 Installation
-
-#### 1. Clone the repo
 ```bash
-git clone https://github.com/nst-sdc/Fix-Time
+git clone https://github.com/nst-sdc/Fix-Time.git
 cd Fix-Time
 ```
 
-Set up the backend
+### 2. Backend Setup
+
 ```bash
 cd server
 npm install
 touch .env
 ```
 
-Add the following to .env
-```
+**Add this in `.env`:**
+
+```env
 PORT=5001
-MONGODB_URI=mongodb+srv://rudranshgupta:Rudra%40123@fix-time.uarfbdn.mongodb.net/?retryWrites=true&w=majority&appName=Fix-Time
-JWT_SECRET=Hv6dQ6+s0f1+f62oJ27clu1nL0iMkYRwL0oi/6jXGfE=
+MONGODB_URI=<your_mongo_uri>
+JWT_SECRET=<your_jwt_secret>
 ```
 
 Start the backend:
+
 ```bash
 npm run dev
 ```
-Server runs at: http://localhost:5001
 
-Set up the frontend
+Visit: [http://localhost:5001](http://localhost:5001)
+
+---
+
+### 3. Frontend Setup
+
 ```bash
 cd ../client
 npm install
 npm install react-icons
-npm start
-```
-Frontend runs at: http://localhost:3000
-
-
-
-#### Ensure MongoDB is Running
-Make sure MongoDB is installed and running on your local machine. On most systems, you can check with:
-```bash
-# Check if MongoDB is running
-mongod --version
 ```
 
-If not installed, follow these steps to install MongoDB:
+Create a `.env` file:
 
-##### macOS Installation
-```bash
-# Using Homebrew
-brew tap mongodb/brew
-brew install mongodb-community
-brew services start mongodb-community
+```env
+REACT_APP_API_URL=http://localhost:5001
 ```
 
-For other operating systems, follow the [official MongoDB installation guide](https://www.mongodb.com/docs/manual/installation/).
+Start the app:
 
-#### Start the Applications
 ```bash
-# Start the server (from server directory)
-cd server
-npm run dev
-
-# Start the client (from client directory)
-cd ../client
 npm start
 ```
 
-#### 5. Seed the Database with Demo Services
-If you encounter the error **"No service ID available for booking"** when trying to book an appointment, you need to seed the database with services:
-
-```bash
-# Seed sample services (with server running)
-curl -X POST http://localhost:5001/services/sample
-```
-
-This will create several sample services in different categories that you can use for testing appointment bookings.
+Visit: [http://localhost:3000](http://localhost:3000)
 
 ---
 
-🧪 API Endpoints
-| Method | Route            | Description         |
-| ------ | ---------------- | ------------------- |
-| POST   | `/auth/register` | Register new user   |
-| POST   | `/auth/login`    | Login existing user |
-| GET    | `/`              | Test server route   |
+### 4. Seed Sample Data
 
-📌 Project Structure
+To test bookings:
+
 ```bash
-Fix-Time/
-├── client/            # React frontend
-│   ├── public/        # Public assets
-│   ├── src/
-│   │   ├── components/  # Reusable UI components
-│   │   │   ├── AppointmentBooking.jsx
-│   │   │   ├── AppointmentDetails.jsx
-│   │   │   ├── Navbar.jsx
-│   │   │   ├── Footer.jsx
-│   │   │   └── ...
-│   │   ├── pages/     # Page components
-│   │   │   ├── Home.jsx
-│   │   │   ├── AppointmentPage.jsx
-│   │   │   ├── Dashboard.jsx
-│   │   │   ├── categories/  # Category-specific pages
-│   │   │   └── ...
-│   │   ├── utils/     # Utility functions
-│   │   ├── App.js     # Main application component
-│   │   └── index.js   # Entry point
-│   └── package.json   # Frontend dependencies
-├── server/                             # Backend - Express & MongoDB
-│   ├── src/
-│   │   ├── controllers/
-│   │   │   ├── appointmentController.js
-│   │   │   ├── authController.js
-│   │   │   ├── reviewController.js
-│   │   │   ├── serviceController.js
-│   │   │   ├── providerController.js     # NEW - For provider-specific logic
-│   │   │   └── receiverController.js     # NEW - For receiver-specific logic
-│   │   ├── middleware/
-│   │   │   ├── auth.js
-│   │   │   └── roleAuth.js               # NEW - Protect role-based routes
-│   │   ├── models/
-│   │   │   ├── Appointment.js
-│   │   │   ├── Review.js
-│   │   │   ├── Service.js
-│   │   │   ├── User.js                   # Current user model
-│   │   │   ├── Provider.js               # NEW - Will replace User
-│   │   │   └── Receiver.js               # NEW - Will replace User
-│   │   ├── routes/
-│   │   │   ├── appointments.js
-│   │   │   ├── auth.js
-│   │   │   ├── reviews.js
-│   │   │   ├── services.js
-│   │   │   ├── providers.js              # NEW - Provider endpoints
-│   │   │   └── receivers.js              # NEW - Receiver endpoints
-│   │   ├── utils/
-│   │   │   └── roleUtils.js              # NEW - Helpers for roles
-│   │   ├── seedServices.js              # Seeder for dummy service data
-│   │   └── index.js                     # Main server entry
-│   ├── .env           # Environment variables (gitignored) Mongo URI, JWT secret, etc
-│   ├── package.json
-│   ├── package.json   # Backend dependencies
-│   ├── .gitignore
-│   └── README.md
-├── Contribution.md           
-└── README.md          # Project documentation
+curl -X POST http://localhost:5001/services/sample
 ```
 
+---
+
+## 🕵️ Folder Structure
+
+```bash
+Fix-Time/
+├── client/                 # React frontend
+│   ├── src/
+│   │   ├── components/     # UI components
+│   │   ├── pages/          # Route pages (Home, Dashboard, Auth, etc.)
+│   │   ├── utils/          # Helper functions
+│   │   └── App.js
+│   └── public/
+├── server/                 # Node.js + Express API
+│   ├── src/
+│   │   ├── controllers/    # Logic handlers
+│   │   ├── routes/         # All API endpoints
+│   │   ├── models/         # Mongoose schemas
+│   │   ├── middleware/     # Auth middlewares
+│   │   └── index.js        # Entry file
+│   └── seedServices.js     # Seeder script
+└── README.md
+```
+
+---
+
+## 🌐 API Routes Overview
+
+| Method | Route                    | Description                    |
+| ------ | ------------------------ | ------------------------------ |
+| POST   | `/auth/register`         | Register new user              |
+| POST   | `/auth/login`            | Login existing user            |
+| GET    | `/appointments/user`     | Get upcoming/past appointments |
+| POST   | `/appointments/book`     | Book a slot                    |
+| GET    | `/services/category/:id` | Get services by category       |
+| POST   | `/reviews/submit`        | Submit a review                |
+| GET    | `/profile`               | Fetch user profile info        |
+| PATCH  | `/appointments/update`   | Cancel/reschedule appointments |
+
+---
+
 ## 🤝 Contributing
-Want to contribute to FixTime? Awesome!
-We're just getting started, and we welcome contributions of all kinds:
 
-•Code improvements
+We welcome contributions of all types:
 
-•UI design
+* Feature additions
+* UI improvements
+* Bug fixes
+* Documentation enhancements
 
-•Bug fixes
+**Steps to contribute:**
 
-•Feature suggestions
+1. Fork the repo
+2. Create a branch: `git checkout -b feature-name`
+3. Make changes and commit: `git commit -m "add feature"`
+4. Push changes: `git push origin feature-name`
+5. Open a Pull Request
 
-•Documentation
+---
 
+## 🔍 Roadmap
 
-## 💡 To contribute:
+* Provider analytics dashboard
+* Email/SMS confirmations
+* Google Calendar integration
+* Searchable service listing
+* Admin panel (for moderation)
+* Notification system for appointment reminders
+* Review moderation system for providers
+* PWA support for mobile responsiveness
 
-1.Fork the repo
+---
 
-2.Create a new branch (```git checkout -b feature-name```)
+## 🎓 Built By
 
-3.Commit your changes
+This project was developed by a student team at **Newton School of Technology**, as part of a real-world software initiative led by **NST-SDC** (Software Development Club).
 
-4.Push and make a PR
+*Rudransh Gupta* (rudransh.gupta@adypu.edu.in)
 
-## 🔭 Roadmap (Planned Features)
+*Naman Gupta* (naman.gupta@adypu.edu.in)
 
- •Add time slot selection UI
+*Ipshita Patel* (ipshita.patel@adypu.edu.in)
 
- •Provider dashboard for availability
+*Priyabrata Singh* (priyabrata.singh@adypu.edu.in)
 
- •Booking confirmation via email/SMS
+*Shreyas Sarkar* (shreyas.sarkar@adypu.edu.in)
 
- •Analytics for providers
+*Sarthak Ghoderao* (sarthak.ghoderao@adypu.edu.in)
 
-## 📃 License
-This project is licensed under the MIT License.
+## 📄 License
 
-### ⚡ If this repo helped you, consider giving it a ⭐ and sharing it with others!
+This project is licensed under the [MIT License](./LICENSE).
+
+---
+
+### ⭐ If you like this project, give it a star and share it with others!
